@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+    app:
+        build: .
+        entrypoint: .docker/entrypoint.sh
+        container_name: chat-backend
+        ports:
+            - 3011:3011
+        volumes:
+            - .:/home/node/app
+
+    db:
+        build: .docker/postgres
+        container_name: db-chat
+        restart: always
+        tty: true
+        volumes:
+            - .docker/dbdata:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_PASSWORD=root
+            - POSTGRES_DB=chat
