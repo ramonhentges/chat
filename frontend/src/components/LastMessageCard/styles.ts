@@ -11,6 +11,10 @@ const useStyles = makeStyles((theme: Theme) =>
       marginBottom: theme.spacing(0.3),
       backgroundColor: theme.palette.secondary.main,
     },
+    showTime: {
+      marginTop: -theme.spacing(3),
+      paddingRight: theme.spacing(1)
+    }
   })
 );
 

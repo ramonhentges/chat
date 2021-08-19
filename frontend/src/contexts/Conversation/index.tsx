@@ -45,7 +45,14 @@ export const ConversationProvider: React.FC = ({ children }) => {
     async function getLastMessages() {
       const latestMessages = await getLatestMessages();
       if (latestMessages?.status === 200) {
-        setLastMessages(latestMessages.data);
+        const transformedMessages: UserMessage[] = [];
+        latestMessages.data.forEach((message: UserMessage) => {
+          transformedMessages.push({
+            ...message,
+            createdAt: new Date(message.createdAt),
+          });
+        });
+        setLastMessages(transformedMessages);
       }
     }
     getLastMessages();
@@ -149,12 +156,24 @@ export const ConversationProvider: React.FC = ({ children }) => {
   useEffect(() => {
     socket.off("sendedMsgFromUser");
     socket.on("sendedMsgFromUser", (message: UserMessage) => {
-      receiveUserMessage(message, MessageType.Sended);
+      receiveUserMessage(
+        {
+          ...message,
+          createdAt: new Date(message.createdAt),
+        },
+        MessageType.Sended
+      );
     });
 
     socket.off("msgFromUser");
     socket.on("msgFromUser", (message: UserMessage) => {
-      receiveUserMessage(message, MessageType.Received);
+      receiveUserMessage(
+        {
+          ...message,
+          createdAt: new Date(message.createdAt),
+        },
+        MessageType.Received
+      );
     });
   }, [receiveUserMessage]);
 
