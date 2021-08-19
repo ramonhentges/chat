@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useCallback } from "react";
 import { Group } from "../../interfaces/group";
 import { User } from "../../interfaces/user";
 import { UserMessage } from "../../interfaces/user-message";
@@ -12,6 +12,11 @@ import {
   sendUserMessage,
   sendGroupMessage,
 } from "../../services/socket.service";
+
+enum MessageType {
+  Sended,
+  Received,
+}
 
 interface ConversationContextProps {
   destination: Group | User | null;
@@ -46,75 +51,112 @@ export const ConversationProvider: React.FC = ({ children }) => {
     getLastMessages();
   }, []);
 
-  useEffect(() => {
-    socket.off("sendedMsgFromUser");
-    socket.on("sendedMsgFromUser", (message: UserMessage) => {
-      if (
-        lastMessages.some((lastMessage) =>
-          [
-            lastMessage.origin.username,
-            lastMessage.userDestination.username,
-          ].includes(message.origin.username)
-        )
-      ) {
-        setLastMessages((prevState) =>
-          prevState.map((lastMessage) => {
-            if (
-              destination &&
-              "username" in destination &&
-              [
-                lastMessage.origin.username,
-                lastMessage.userDestination.username,
-              ].includes(destination.username)
-            ) {
-              return message;
-            }
-            return lastMessage;
-          })
-        );
-      } else {
-        setLastMessages((prevState) => [message, ...prevState]);
-      }
-      setMessages((oldMsgs) => [...oldMsgs, message]);
-    });
-
-    socket.off("msgFromUser");
-    socket.on("msgFromUser", (message: UserMessage) => {
-      if (
-        destination &&
-        "username" in destination &&
-        destination.username === message.origin.username
-      ) {
-        setMessages((oldMsgs) => [...oldMsgs, message]);
-      }
-      if (
-        lastMessages.some((lastMessage) =>
-          [
-            lastMessage.origin.username,
-            lastMessage.userDestination.username,
-          ].includes(message.origin.username)
-        )
-      ) {
-        setLastMessages((prevState) =>
-          prevState.map((lastMessage) => {
-            if (
-              destination &&
-              "username" in destination &&
+  const receiveUserMessage = useCallback(
+    (message: UserMessage, messageType: MessageType) => {
+      if (message.origin.username === message.userDestination.username) {
+        if (
+          lastMessages.some(
+            (lastMessage) =>
+              lastMessage.origin.username === message.origin.username &&
+              lastMessage.userDestination.username ===
+                message.userDestination.username
+          )
+        ) {
+          setLastMessages((prevState) =>
+            prevState.map((lastMessage) => {
+              if (
+                destination &&
+                "username" in destination &&
+                lastMessage.origin.username === message.origin.username &&
+                lastMessage.userDestination.username ===
+                  message.userDestination.username
+              ) {
+                return message;
+              }
+              return lastMessage;
+            })
+          );
+        } else {
+          setLastMessages((prevState) => [message, ...prevState]);
+        }
+      } else if (
+        messageType === MessageType.Received
+          ? lastMessages.some((lastMessage) =>
               [
                 lastMessage.origin.username,
                 lastMessage.userDestination.username,
               ].includes(message.origin.username)
-            ) {
-              return message;
-            }
-            return lastMessage;
-          })
-        );
+            )
+          : lastMessages.some((lastMessage) =>
+              [
+                lastMessage.origin.username,
+                lastMessage.userDestination.username,
+              ].includes(message.userDestination.username)
+            )
+      ) {
+        if (messageType === MessageType.Received) {
+          setLastMessages((prevState) =>
+            prevState.map((lastMessage) => {
+              if (
+                [
+                  lastMessage.origin.username,
+                  lastMessage.userDestination.username,
+                ].includes(message.origin.username)
+              ) {
+                return message;
+              }
+              return lastMessage;
+            })
+          );
+        } else if (messageType === MessageType.Sended) {
+          setLastMessages((prevState) =>
+            prevState.map((lastMessage) => {
+              if (
+                [
+                  lastMessage.origin.username,
+                  lastMessage.userDestination.username,
+                ].includes(message.userDestination.username)
+              ) {
+                return message;
+              }
+              return lastMessage;
+            })
+          );
+        }
       } else {
         setLastMessages((prevState) => [message, ...prevState]);
       }
+
+      if (
+        destination &&
+        messageType === MessageType.Received &&
+        "username" in destination &&
+        destination.username === message.origin.username
+      ) {
+        setMessages((oldMsgs) => [...oldMsgs, message]);
+      } else if (
+        destination &&
+        messageType === MessageType.Sended &&
+        "username" in destination &&
+        destination.username === message.userDestination.username
+      ) {
+        setMessages((oldMsgs) => [...oldMsgs, message]);
+      }
+    },
+    [destination, lastMessages]
+  );
+
+  useEffect(() => {
+    socket.off("sendedMsgFromUser");
+    socket.on("sendedMsgFromUser", (message: UserMessage) => {
+      receiveUserMessage(message, MessageType.Sended);
     });
-  }, [destination, lastMessages]);
+
+    socket.off("msgFromUser");
+    socket.on("msgFromUser", (message: UserMessage) => {
+      receiveUserMessage(message, MessageType.Received);
+    });
+  }, [receiveUserMessage]);
 
   async function setDestination(destination: Group | User) {
     setDestinationState(destination);
