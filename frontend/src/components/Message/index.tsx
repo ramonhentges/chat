@@ -8,6 +8,12 @@ interface MessageProps {
   message: UserMessage;
 }
 
+const getMessageTime = (date: Date): string => {
+  return `${date.getHours()}:${
+    date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()
+  }`;
+};
+
 export default function Message(props: MessageProps) {
   const classes = useStyles();
   const { message } = props;
@@ -25,9 +31,14 @@ export default function Message(props: MessageProps) {
       <Chip
         variant={myMessage ? "outlined" : "default"}
         label={
-          <Typography variant="body2" style={{ whiteSpace: "normal" }}>
-            {message.message}
-          </Typography>
+          <>
+            <Typography variant="body2" style={{ whiteSpace: "normal" }}>
+              {message.message}
+            </Typography>
+            <Typography align="right" display="block" variant="caption">
+              {getMessageTime(message.createdAt)}
+            </Typography>
+          </>
         }
         className={classes.message}
       />

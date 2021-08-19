@@ -27,6 +27,21 @@ interface ConversationContextProps {
   lastMessages: UserMessage[];
 }
 
+const transformUserMessages = (messages: UserMessage[]): UserMessage[] => {
+  const transformedMessages: UserMessage[] = [];
+  messages.forEach((message: UserMessage) => {
+    transformedMessages.push(transformUserMessage(message));
+  });
+  return transformedMessages;
+};
+
+const transformUserMessage = (message: UserMessage): UserMessage => {
+  return {
+    ...message,
+    createdAt: new Date(message.createdAt),
+  };
+};
+
 const ConversationContext = React.createContext<ConversationContextProps>(
   {} as ConversationContextProps
 );
@@ -45,14 +60,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
     async function getLastMessages() {
       const latestMessages = await getLatestMessages();
       if (latestMessages?.status === 200) {
-        const transformedMessages: UserMessage[] = [];
-        latestMessages.data.forEach((message: UserMessage) => {
-          transformedMessages.push({
-            ...message,
-            createdAt: new Date(message.createdAt),
-          });
-        });
-        setLastMessages(transformedMessages);
+        setLastMessages(transformUserMessages(latestMessages.data));
       }
     }
     getLastMessages();
@@ -156,24 +164,12 @@ export const ConversationProvider: React.FC = ({ children }) => {
   useEffect(() => {
     socket.off("sendedMsgFromUser");
     socket.on("sendedMsgFromUser", (message: UserMessage) => {
-      receiveUserMessage(
-        {
-          ...message,
-          createdAt: new Date(message.createdAt),
-        },
-        MessageType.Sended
-      );
+      receiveUserMessage(transformUserMessage(message), MessageType.Sended);
     });
 
     socket.off("msgFromUser");
     socket.on("msgFromUser", (message: UserMessage) => {
-      receiveUserMessage(
-        {
-          ...message,
-          createdAt: new Date(message.createdAt),
-        },
-        MessageType.Received
-      );
+      receiveUserMessage(transformUserMessage(message), MessageType.Received);
     });
   }, [receiveUserMessage]);
 
@@ -201,7 +197,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
   async function getMessagesFromUser(destination: User) {
     const response = await getUserMessages(destination);
     if (response.status === 200) {
-      setMessages(response.data);
+      setMessages(transformUserMessages(response.data));
     }
     if (response.status === 401) {
       signOut();
