@@ -8,6 +8,7 @@ import ConversationList from "../../../components/ConversationList";
 import MessagesList from "../../../components/MessagesList";
 import SendButton from "../../../components/SendButton";
 import { ConversationProvider } from "../../../contexts/Conversation";
+import NewConversationButton from "../../../components/NewConversationButton";
 
 const InitialPage: React.FC = () => {
   const classes = useStyles();
@@ -29,11 +30,19 @@ const InitialPage: React.FC = () => {
               <Grid item>
                 <UserCard />
                 <ConversationList />
+                <NewConversationButton />
               </Grid>
             </Paper>
 
-            <Paper className={classes.conversationGrid} >
-              <Grid item container alignItems="stretch" direction="column" className={classes.conversationGrid} xs>
+            <Paper className={classes.conversationGrid}>
+              <Grid
+                item
+                container
+                alignItems="stretch"
+                direction="column"
+                className={classes.conversationGrid}
+                xs
+              >
                 <Grid item>
                   <ConversationCard />
                 </Grid>

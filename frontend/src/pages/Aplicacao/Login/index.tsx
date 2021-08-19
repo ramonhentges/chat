@@ -6,7 +6,6 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core";
-import { AxiosResponse } from "axios";
 import React, { useRef, useState } from "react";
 import { Redirect, useHistory, Link as LinkDom } from "react-router-dom";
 import Footer from "../../../components/Footer";

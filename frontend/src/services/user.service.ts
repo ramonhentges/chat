@@ -13,4 +13,6 @@ const createUser = (user: CreateUser) =>
 
 const myUserInfo = () => api.get(`users/my/user`);
 
-export { createUser, myUserInfo };
+const usersList = () => api.get(`users`);
+
+export { createUser, myUserInfo, usersList };

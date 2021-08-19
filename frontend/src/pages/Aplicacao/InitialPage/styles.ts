@@ -26,6 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
       width: 300,
       minWidth: 200,
       marginRight: theme.spacing(2),
+      position: "relative",
     },
     conversationGrid: {
       flexGrow: 2,

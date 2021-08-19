@@ -3,7 +3,6 @@ import { createBrowserHistory } from "history";
 import React from "react";
 import { Login } from "../pages/Aplicacao/Login";
 import InitialPage from "../pages/Aplicacao/InitialPage";
-import GridTest from "../pages/Aplicacao/GridTest";
 import { useAuth } from "../contexts/Auth";
 import { CreateAccount } from "../pages/Aplicacao/CreateAccount";
 
@@ -43,7 +42,6 @@ const Routes: React.FC = () => {
         <Route exact path="/login" component={Login} />
         <PrivateRoute component={InitialPage} path="/" exact />
         <Route exact path="/createAccount" component={CreateAccount} />
-        <Route exact path="/grid" component={GridTest} />
       </Switch>
     </Router>
   );
