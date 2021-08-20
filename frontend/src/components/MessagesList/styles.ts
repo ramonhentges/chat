@@ -8,6 +8,10 @@ const useStyles = makeStyles((theme: Theme) =>
       flexWrap: "nowrap",
       padding: theme.spacing(2),
     },
+    date: {
+      alignSelf: "center",
+      marginBottom: theme.spacing(2),
+    },
   })
 );
 

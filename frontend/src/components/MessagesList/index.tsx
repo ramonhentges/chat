@@ -1,8 +1,16 @@
-import { CircularProgress, Grid } from "@material-ui/core";
+import { Chip, CircularProgress, Grid, Typography } from "@material-ui/core";
 import React, { useEffect, useRef } from "react";
 import { useConversation } from "../../contexts/Conversation";
 import Message from "../Message";
 import useStyles from "./styles";
+
+const sameDay = (firstDate: Date, secondDate: Date): boolean => {
+  return (
+    firstDate.getDate() === secondDate.getDate() &&
+    firstDate.getMonth() === secondDate.getMonth() &&
+    firstDate.getFullYear() === secondDate.getFullYear()
+  );
+};
 
 export default function MessagesList() {
   const classes = useStyles();
@@ -20,7 +28,12 @@ export default function MessagesList() {
     });
   };
   return loading ? (
-    <Grid container justify="center" alignItems="center" className={classes.messagesGrid}>
+    <Grid
+      container
+      justify="center"
+      alignItems="center"
+      className={classes.messagesGrid}
+    >
       <CircularProgress />
     </Grid>
   ) : (
@@ -32,8 +45,21 @@ export default function MessagesList() {
       className={classes.messagesGrid}
       ref={messagesGrid}
     >
-      {messages.map((message) => (
-        <Message key={message.uuid} message={message} />
+      {messages.map((message, idx) => (
+        <>
+          {(idx === 0 || (idx > 0 && !sameDay(message.createdAt, messages[idx - 1].createdAt))) && (
+            <Chip
+              className={classes.date}
+              variant="outlined"
+              label={
+                  <Typography variant="body2" style={{ whiteSpace: "normal" }}>
+                    {message.createdAt.toLocaleDateString()}
+                  </Typography>
+              }
+            />
+          )}
+          <Message key={message.uuid} message={message} />
+        </>
       ))}
     </Grid>
   );
