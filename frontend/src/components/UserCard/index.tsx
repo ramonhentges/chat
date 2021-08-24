@@ -34,7 +34,7 @@ const UserCard: React.FC = () => {
         <CardHeader
           avatar={
             <Avatar aria-label="recipe" className={classes.avatar}>
-              R
+              {user?.fullName[0]}
             </Avatar>
           }
           action={

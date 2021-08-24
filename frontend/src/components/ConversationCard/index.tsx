@@ -23,7 +23,7 @@ export default function ConversationCard() {
       <CardHeader
         avatar={
           <Avatar aria-label="recipe" className={classes.avatar}>
-            R
+            {title && title[0]}
           </Avatar>
         }
         title={title}

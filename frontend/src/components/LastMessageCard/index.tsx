@@ -54,7 +54,7 @@ const LastMessageCard: React.FC<LastMessageCardProps> = ({ lastMessage }) => {
       onClick={() => setDestination(contact)}
     >
       <CardHeader
-        avatar={<Avatar aria-label="recipe">R</Avatar>}
+        avatar={<Avatar aria-label="recipe">{contact.fullName[0]}</Avatar>}
         title={`${contact.fullName} - ${contact.username}`}
         subheader={
           user?.username === lastMessage.origin.username
