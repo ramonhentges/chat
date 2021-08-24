@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Socket } from 'socket.io';
-import { JwsTokenDto } from 'src/dto/jws-token.dto';
-import { MessageDto } from 'src/dto/message.dto';
+import { JwsTokenDto } from '../auth/dto/jws-token.dto';
+import { MessageDto } from './dto/message.dto';
 import { ReturnedUserMessage } from 'src/interfaces/returned-user-message.interface';
 import { Message } from 'src/models/message.model';
 import { User } from 'src/models/user.model';

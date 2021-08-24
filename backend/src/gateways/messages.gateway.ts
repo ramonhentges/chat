@@ -10,11 +10,11 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { wsOptions } from 'src/constants/constants';
-import { MessageDto } from 'src/dto/message.dto';
 import { Message } from 'src/models/message.model';
-import { AuthService } from 'src/services/auth/auth.service';
-import { MessageService } from 'src/services/message/message.service';
-import { UserService } from 'src/services/user/user.service';
+import { AuthService } from 'src/modules/auth/auth.service';
+import { MessageDto } from 'src/modules/message/dto/message.dto';
+import { MessageService } from 'src/modules/message/message.service';
+import { UserService } from 'src/modules/user/user.service';
 
 @WebSocketGateway(wsOptions)
 export class MessagesGateway {

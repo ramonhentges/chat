@@ -11,9 +11,9 @@ import {
   UnprocessableEntityException,
   ValidationPipe
 } from '@nestjs/common';
-import { AddRemoveUserToGroupDto } from 'src/dto/add-user-to-group.dto';
-import { GroupDto } from 'src/dto/group.dto';
-import { GroupService } from 'src/services/group/group.service';
+import { AddRemoveUserToGroupDto } from './dto/add-user-to-group.dto';
+import { GroupDto } from './dto/group.dto';
+import { GroupService } from './group.service';
 
 @Controller('groups')
 export class GroupController {

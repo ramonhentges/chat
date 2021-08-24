@@ -5,9 +5,9 @@ import {
   forwardRef
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AddRemoveUserToGroupDto } from 'src/dto/add-user-to-group.dto';
-import { GroupDto } from 'src/dto/group.dto';
-import { JwsTokenDto } from 'src/dto/jws-token.dto';
+import { AddRemoveUserToGroupDto } from './dto/add-user-to-group.dto';
+import { GroupDto } from './dto/group.dto';
+import { JwsTokenDto } from '../auth/dto/jws-token.dto';
 import { MessagesGateway } from 'src/gateways/messages.gateway';
 import { Group } from 'src/models/group.model';
 import { Repository } from 'typeorm';

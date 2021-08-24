@@ -1,7 +1,7 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { JwsTokenDto } from 'src/dto/jws-token.dto';
-import { UserDto } from 'src/dto/user.dto';
+import { JwsTokenDto } from '../auth/dto/jws-token.dto';
+import { UserDto } from './dto/user.dto';
 import { Group } from 'src/models/group.model';
 import { User } from 'src/models/user.model';
 import AlreadyExists from 'src/validation/already.exists.validator';
