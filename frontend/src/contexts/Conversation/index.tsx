@@ -61,10 +61,6 @@ export const ConversationProvider: React.FC = ({ children }) => {
   const { signOut } = useAuth();
 
   useEffect(() => {
-    setLastMessages(lastMessages.sort(sortLastMessages));
-  }, [lastMessages]);
-
-  useEffect(() => {
     async function getLastMessages() {
       const latestMessages = await getLatestMessages();
       if (latestMessages?.status === 200) {
@@ -97,10 +93,10 @@ export const ConversationProvider: React.FC = ({ children }) => {
                 return message;
               }
               return lastMessage;
-            })
-          );
+            }).sort(sortLastMessages)
+          )
         } else {
-          setLastMessages((prevState) => [message, ...prevState]);
+          setLastMessages((prevState) => [message, ...prevState].sort(sortLastMessages));
         }
       } else if (
         messageType === MessageType.Received
@@ -129,7 +125,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
                 return message;
               }
               return lastMessage;
-            })
+            }).sort(sortLastMessages)
           );
         } else if (messageType === MessageType.Sended) {
           setLastMessages((prevState) =>
@@ -143,11 +139,11 @@ export const ConversationProvider: React.FC = ({ children }) => {
                 return message;
               }
               return lastMessage;
-            })
+            }).sort(sortLastMessages)
           );
         }
       } else {
-        setLastMessages((prevState) => [message, ...prevState]);
+        setLastMessages((prevState) => [message, ...prevState].sort(sortLastMessages));
       }
 
       if (
