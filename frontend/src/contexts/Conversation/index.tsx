@@ -27,6 +27,10 @@ interface ConversationContextProps {
   lastMessages: UserMessage[];
 }
 
+const sortLastMessages = (a: UserMessage, b: UserMessage): number => {
+  return a.createdAt > b.createdAt ? -1 : a.createdAt === b.createdAt ? 0 : 1;
+};
+
 const transformUserMessages = (messages: UserMessage[]): UserMessage[] => {
   const transformedMessages: UserMessage[] = [];
   messages.forEach((message: UserMessage) => {
@@ -57,10 +61,14 @@ export const ConversationProvider: React.FC = ({ children }) => {
   const { signOut } = useAuth();
 
   useEffect(() => {
+    setLastMessages(lastMessages.sort(sortLastMessages));
+  }, [lastMessages]);
+
+  useEffect(() => {
     async function getLastMessages() {
       const latestMessages = await getLatestMessages();
       if (latestMessages?.status === 200) {
-        setLastMessages(transformUserMessages(latestMessages.data));
+        setLastMessages(transformUserMessages(latestMessages.data).sort(sortLastMessages));
       }
     }
     getLastMessages();
