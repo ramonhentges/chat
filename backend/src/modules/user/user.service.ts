@@ -20,15 +20,15 @@ export class UserService {
     });
   }
 
-  getByUUID(uuid: string) {
+  getByID(id: string) {
     return this.userRepo.findOneOrFail({
-      where: { uuid }
+      where: { id }
     });
   }
 
-  getByUUIDWithoutID(uuid: string) {
+  getByIDWithoutID(id: string) {
     return this.userRepo.findOneOrFail({
-      where: { uuid },
+      where: { id },
       select: ['username', 'fullName']
     });
   }
@@ -36,7 +36,7 @@ export class UserService {
   getByUsername(username: string) {
     return this.userRepo.findOneOrFail({
       where: { username },
-      select: ['id', 'uuid', 'fullName', 'username', 'createdAt']
+      select: ['id', 'fullName', 'username', 'createdAt']
     });
   }
 
@@ -47,10 +47,10 @@ export class UserService {
     });
   }
 
-  async getUserGroups(uuid: string): Promise<Group[]> {
+  async getUserGroups(id: string): Promise<Group[]> {
     const user = await this.userRepo.findOne({
       relations: ['groups'],
-      where: { uuid }
+      where: { id }
     });
     return user.groups;
   }
@@ -72,12 +72,7 @@ export class UserService {
 
   async update(token: JwsTokenDto, userDto: UserDto) {
     if (
-      await AlreadyExists(
-        this.userRepo,
-        'username',
-        userDto.username,
-        token.uuid
-      )
+      await AlreadyExists(this.userRepo, 'username', userDto.username, token.id)
     ) {
       throw new UnprocessableEntityException([
         {
@@ -88,14 +83,14 @@ export class UserService {
         }
       ]);
     }
-    this.userRepo.update({ uuid: token.uuid }, userDto);
-    return await this.userRepo.findOne({ where: { uuid: token.uuid } });
+    this.userRepo.update({ id: token.id }, userDto);
+    return await this.userRepo.findOne({ where: { id: token.id } });
   }
 
   async login(username: string, password: string) {
     return this.userRepo.findOne({
       where: { username, password },
-      select: ['username', 'uuid']
+      select: ['username', 'id']
     });
   }
 }

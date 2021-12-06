@@ -8,10 +8,10 @@ export class CreateGroupsTable1612893071295 implements MigrationInterface {
         columns: [
           {
             name: 'id',
-            type: 'int',
-            isPrimary: true,
+            type: 'uuid',
             isGenerated: true,
-            generationStrategy: 'increment'
+            generationStrategy: 'uuid',
+            isPrimary: true
           },
           {
             name: 'name',
@@ -23,7 +23,7 @@ export class CreateGroupsTable1612893071295 implements MigrationInterface {
             isNullable: true
           },
           {
-            name: 'created_at',
+            name: 'createdAt',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }

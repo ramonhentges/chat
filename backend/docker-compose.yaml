@@ -13,8 +13,8 @@ services:
     db:
         build: .docker/postgres
         container_name: db-chat
-        restart: always
-        tty: true
+        ports:
+            - 5432:5432
         volumes:
             - .docker/dbdata:/var/lib/postgresql/data
         environment:

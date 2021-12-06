@@ -13,10 +13,7 @@ import { User } from './user.model';
 @Entity({ name: 'groups' })
 export class Group {
   @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ type: 'uuid' })
-  uuid: string;
+  id: string;
 
   @Column()
   name: string;

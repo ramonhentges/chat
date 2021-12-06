@@ -12,17 +12,17 @@ export class CreateUsersGroupsTable1612959395170 implements MigrationInterface {
         name: 'users_groups',
         columns: [
           {
-            name: 'users_id',
-            type: 'int',
+            name: 'usersId',
+            type: 'uuid',
             isPrimary: true
           },
           {
-            name: 'groups_id',
-            type: 'int',
+            name: 'groupsId',
+            type: 'uuid',
             isPrimary: true
           },
           {
-            name: 'created_at',
+            name: 'createdAt',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -33,7 +33,7 @@ export class CreateUsersGroupsTable1612959395170 implements MigrationInterface {
     await queryRunner.createForeignKey(
       'users_groups',
       new TableForeignKey({
-        columnNames: ['users_id'],
+        columnNames: ['usersId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE'
@@ -43,7 +43,7 @@ export class CreateUsersGroupsTable1612959395170 implements MigrationInterface {
     await queryRunner.createForeignKey(
       'users_groups',
       new TableForeignKey({
-        columnNames: ['groups_id'],
+        columnNames: ['groupsId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'groups',
         onDelete: 'CASCADE'

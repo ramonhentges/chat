@@ -7,6 +7,6 @@ export class AddRemoveUserToGroupDto {
   })
   readonly username: string;
 
-  @IsNotEmpty({ message: 'Deve ser informado o UUID do grupo' })
-  readonly groupUuid: string;
+  @IsNotEmpty({ message: 'Deve ser informado o ID do grupo' })
+  readonly groupId: string;
 }

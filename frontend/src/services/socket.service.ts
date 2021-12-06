@@ -8,11 +8,11 @@ const sendUserMessage = (destinationUsername: string, message: string) => {
     destination: destinationUsername,
   });
 };
-const sendGroupMessage = (groupUuid: string, message: string) => {
+const sendGroupMessage = (groupId: string, message: string) => {
   console.log("sending group message");
   socket.emit("msgToGroup", {
     message,
-    destination: groupUuid,
+    destination: groupId,
   });
 };
 const setAuthorizationToken = (token: string) => {

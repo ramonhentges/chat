@@ -26,7 +26,7 @@ export class MessageService {
   ) {}
 
   async userLastMessages(user: JwsTokenDto) {
-    const userBd = await this.userService.getByUUID(user.uuid);
+    const userBd = await this.userService.getByID(user.id);
 
     const userMessages = await this.messageRepo
       .createQueryBuilder('msg')
@@ -92,7 +92,7 @@ export class MessageService {
         .leftJoin('msg.origin', 'org')
         .leftJoin('msg.userDestination', 'dst')
         .select([
-          'msg.uuid',
+          'msg.id',
           'msg.message',
           'msg.deleted',
           'msg.createdAt',
@@ -107,15 +107,15 @@ export class MessageService {
     }
   }
 
-  async listAllGroupMessages(uuidGroup: string, user: JwsTokenDto) {
-    const destination = await this.groupService.getByUUID(uuidGroup, user);
+  async listAllGroupMessages(idGroup: string, user: JwsTokenDto) {
+    const destination = await this.groupService.getByID(idGroup, user);
 
     return this.messageRepo
       .createQueryBuilder('msg')
       .where({ groupDestination: destination })
       .leftJoin('msg.origin', 'org')
       .select([
-        'msg.uuid',
+        'msg.id',
         'msg.message',
         'msg.deleted',
         'msg.createdAt',
@@ -126,15 +126,15 @@ export class MessageService {
       .getMany();
   }
 
-  async lastGroupMessage(uuidGroup: string, user: JwsTokenDto) {
-    const destination = await this.groupService.getByUUID(uuidGroup, user);
+  async lastGroupMessage(idGroup: string, user: JwsTokenDto) {
+    const destination = await this.groupService.getByID(idGroup, user);
 
     return this.messageRepo
       .createQueryBuilder('msg')
       .where({ groupDestination: destination })
       .leftJoin('msg.origin', 'org')
       .select([
-        'msg.uuid',
+        'msg.id',
         'msg.message',
         'msg.deleted',
         'msg.createdAt',
@@ -149,7 +149,7 @@ export class MessageService {
     loggedUser: JwsTokenDto,
     contactUsername: string
   ) {
-    const logged = await this.userService.getByUUID(loggedUser.uuid);
+    const logged = await this.userService.getByID(loggedUser.id);
     const contact = await this.userService.getByUsername(contactUsername);
     return this.messageRepo
       .createQueryBuilder('msg')
@@ -159,7 +159,7 @@ export class MessageService {
       ])
       .leftJoin('msg.origin', 'org')
       .select([
-        'msg.uuid',
+        'msg.id',
         'msg.message',
         'msg.deleted',
         'msg.createdAt',
@@ -170,9 +170,9 @@ export class MessageService {
   }
 
   async postGroupMessage(user: JwsTokenDto, message: MessageDto) {
-    const originUser = await this.userService.getByUUID(user.uuid);
+    const originUser = await this.userService.getByID(user.id);
 
-    const destinationGroup = await this.groupService.getByUUID(
+    const destinationGroup = await this.groupService.getByID(
       message.destination,
       user
     );
@@ -184,7 +184,7 @@ export class MessageService {
     });
     const savedMessage = await this.messageRepo.save(messageToStore);
     const returnMessage = await this.messageRepo.findOne(savedMessage.id, {
-      select: ['uuid', 'message', 'createdAt', 'deleted']
+      select: ['id', 'message', 'createdAt', 'deleted']
     });
 
     return {
@@ -200,7 +200,7 @@ export class MessageService {
     loggedUser: JwsTokenDto,
     message: MessageDto
   ): Promise<ReturnedUserMessage> {
-    const originUser = await this.userService.getByUUID(loggedUser.uuid);
+    const originUser = await this.userService.getByID(loggedUser.id);
     const destination = await this.userService.getByUsername(
       message.destination
     );
@@ -212,7 +212,7 @@ export class MessageService {
 
     const savedMessage = await this.messageRepo.save(messageToSave);
     const returnMessage = await this.messageRepo.findOne(savedMessage.id, {
-      select: ['uuid', 'message', 'createdAt', 'deleted']
+      select: ['id', 'message', 'createdAt', 'deleted']
     });
 
     return {
@@ -227,20 +227,20 @@ export class MessageService {
         },
         ...returnMessage
       },
-      destinationUuid: destination.uuid
+      destinationId: destination.id
     };
   }
 
-  async deleteGroupMessage(user: JwsTokenDto, messageUuid: string) {
-    const origin = await this.userService.getByUUID(user.uuid);
+  async deleteGroupMessage(user: JwsTokenDto, messageId: string) {
+    const origin = await this.userService.getByID(user.id);
     const message = await this.messageRepo.findOne({
-      where: { uuid: messageUuid, origin },
+      where: { id: messageId, origin },
       relations: ['groupDestination']
     });
 
     if (message) {
       this.messageRepo.update(
-        { uuid: messageUuid },
+        { id: messageId },
         { ...message, deleted: true, message: '' }
       );
       return message.groupDestination;
@@ -250,16 +250,16 @@ export class MessageService {
     });
   }
 
-  async deleteUserMessage(user: JwsTokenDto, messageUuid: string) {
-    const origin = await this.userService.getByUUID(user.uuid);
+  async deleteUserMessage(user: JwsTokenDto, messageId: string) {
+    const origin = await this.userService.getByID(user.id);
     const message = await this.messageRepo.findOne({
-      where: { uuid: messageUuid, origin },
+      where: { id: messageId, origin },
       relations: ['userDestination']
     });
 
     if (message) {
       this.messageRepo.update(
-        { uuid: messageUuid },
+        { id: messageId },
         { ...message, deleted: true, message: '' }
       );
       return message.userDestination;
@@ -269,10 +269,10 @@ export class MessageService {
     });
   }
 
-  async joinGroupsRooms(userUuid: string, socket: Socket): Promise<void> {
-    const userGroups = await this.userService.getUserGroups(userUuid);
+  async joinGroupsRooms(userId: string, socket: Socket): Promise<void> {
+    const userGroups = await this.userService.getUserGroups(userId);
     userGroups.forEach((group) => {
-      socket.join(`group-${group.uuid}`);
+      socket.join(`group-${group.id}`);
     });
   }
 }

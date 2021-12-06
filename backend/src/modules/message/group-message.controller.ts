@@ -5,13 +5,13 @@ import { MessageService } from './message.service';
 export class GroupMessageController {
   constructor(private messageService: MessageService) {}
 
-  @Get(':uuid')
-  async index(@Param('uuid') uuid: string, @Request() req) {
-    return this.messageService.listAllGroupMessages(uuid, req.user);
+  @Get(':id')
+  async index(@Param('id') id: string, @Request() req) {
+    return this.messageService.listAllGroupMessages(id, req.user);
   }
 
-  @Get('/last/:uuid')
-  async last(@Param('uuid') uuid: string, @Request() req) {
-    return this.messageService.lastGroupMessage(uuid, req.user);
+  @Get('/last/:id')
+  async last(@Param('id') id: string, @Request() req) {
+    return this.messageService.lastGroupMessage(id, req.user);
   }
 }

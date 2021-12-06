@@ -58,7 +58,7 @@ export default function MessagesList() {
               }
             />
           )}
-          <Message key={message.uuid} message={message} />
+          <Message key={message.id} message={message} />
         </>
       ))}
     </Grid>

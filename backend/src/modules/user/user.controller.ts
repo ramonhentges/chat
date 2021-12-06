@@ -25,7 +25,7 @@ export class UserController {
   @Get('/my/user')
   myUser(@Request() req) {
     const { user } = req;
-    return this.userService.getByUUIDWithoutID(user.uuid);
+    return this.userService.getByIDWithoutID(user.id);
   }
 
   @Get(':username')

@@ -12,10 +12,7 @@ import { Message } from './message.model';
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ type: 'uuid', select: false })
-  uuid: string;
+  id: string;
 
   @Column()
   fullName: string;

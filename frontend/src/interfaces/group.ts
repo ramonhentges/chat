@@ -1,5 +1,5 @@
 export interface Group {
-  uuid: string;
+  id: string;
   name: string;
   description: string;
 };

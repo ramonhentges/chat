@@ -32,32 +32,32 @@ export class MessagesGateway {
       `${client.handshake.headers.authorization}`.replace('Bearer ', '')
     );
     if (payload) {
-      const user = await this.userService.getByUUID(payload.uuid);
+      const user = await this.userService.getByID(payload.id);
       if (user) {
-        this.messageService.joinGroupsRooms(payload.uuid, client);
-        client.join(`user-${payload.uuid}`);
+        this.messageService.joinGroupsRooms(payload.id, client);
+        client.join(`user-${payload.id}`);
         return;
       }
     }
     client.disconnect();
   }
 
-  addUserToGroupRoom(userUuid: string, groupUuid: string) {
-    this.server.in(`user-${userUuid}`).clients((err, clients) => {
+  addUserToGroupRoom(userId: string, groupId: string) {
+    this.server.in(`user-${userId}`).clients((err, clients) => {
       clients.forEach((clientId) => {
         const clientSocket = this.server.sockets.connected[clientId];
-        clientSocket.emit('joined-group', { uuid: `${groupUuid}` });
-        clientSocket.join(`group-${groupUuid}`);
+        clientSocket.emit('joined-group', { id: `${groupId}` });
+        clientSocket.join(`group-${groupId}`);
       });
     });
   }
 
-  removeUserFromGroupRoom(userUuid: string, groupUuid: string) {
-    this.server.in(`user-${userUuid}`).clients((err, clients) => {
+  removeUserFromGroupRoom(userId: string, groupId: string) {
+    this.server.in(`user-${userId}`).clients((err, clients) => {
       clients.forEach((clientId) => {
         const clientSocket = this.server.sockets.connected[clientId];
-        clientSocket.emit('leaved-group', { uuid: `${groupUuid}` });
-        clientSocket.leave(`group-${groupUuid}`);
+        clientSocket.emit('leaved-group', { id: `${groupId}` });
+        clientSocket.leave(`group-${groupId}`);
       });
     });
   }
@@ -119,7 +119,7 @@ export class MessagesGateway {
         throw new WsException('Erro interno do sistema');
       });
     client.broadcast
-      .to(`user-${sendedMessage.destinationUuid}`)
+      .to(`user-${sendedMessage.destinationId}`)
       .emit('msgFromUser', sendedMessage.message);
     return { event: 'sendedMsgFromUser', data: sendedMessage.message };
   }
@@ -128,13 +128,13 @@ export class MessagesGateway {
   async handleDeleteGroupMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody()
-    messageUuid: string
+    messageId: string
   ): Promise<WsResponse<any>> {
     const userToken = await this.authService.validate(
       `${client.handshake.headers.authorization}`.replace('Bearer ', '')
     );
     const destination = await this.messageService
-      .deleteGroupMessage(userToken, messageUuid)
+      .deleteGroupMessage(userToken, messageId)
       .catch((err) => {
         if (err.status === 403) {
           throw new WsException(err.response.message);
@@ -142,12 +142,12 @@ export class MessagesGateway {
         throw new WsException('Erro interno do sistema');
       });
     const returnMessage = {
-      uuid: messageUuid,
+      id: messageId,
       origin: { username: userToken.username },
-      groupDestination: { uuid: destination.uuid }
+      groupDestination: { id: destination.id }
     };
     client.broadcast
-      .to(`group-${destination.uuid}`)
+      .to(`group-${destination.id}`)
       .emit('deleteMsgFromGroup', returnMessage);
     return { event: 'deleteMsgFromGroup', data: returnMessage };
   }
@@ -156,13 +156,13 @@ export class MessagesGateway {
   async handleDeleteUserMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody()
-    messageUuid: string
+    messageId: string
   ): Promise<WsResponse<any>> {
     const userToken = await this.authService.validate(
       `${client.handshake.headers.authorization}`.replace('Bearer ', '')
     );
     const destination = await this.messageService
-      .deleteUserMessage(userToken, messageUuid)
+      .deleteUserMessage(userToken, messageId)
       .catch((err) => {
         if (err.status === 403) {
           throw new WsException(err.response.message);
@@ -171,12 +171,12 @@ export class MessagesGateway {
       });
 
     const returnMessage = {
-      uuid: messageUuid,
+      id: messageId,
       origin: { username: userToken.username },
       userDestination: { username: destination.username }
     };
     client.broadcast
-      .to(`user-${destination.uuid}`)
+      .to(`user-${destination.id}`)
       .emit('deleteMsgFromUser', returnMessage);
     return {
       event: 'deleteMsgFromUser',

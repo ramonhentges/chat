@@ -11,10 +11,7 @@ import { User } from './user.model';
 @Entity({ name: 'messages' })
 export class Message {
   @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  uuid: string;
+  id: string;
 
   @ManyToOne(() => User, (origin) => origin.originMessages)
   origin: User;

@@ -24,9 +24,9 @@ export class GroupController {
     return this.groupService.myGroups(req.user);
   }
 
-  @Get(':uuid')
-  show(@Param('uuid') uuid: string, @Request() req) {
-    return this.groupService.getByUUID(uuid, req.user);
+  @Get(':id')
+  show(@Param('id') id: string, @Request() req) {
+    return this.groupService.getByID(id, req.user);
   }
 
   @Post()
@@ -63,19 +63,19 @@ export class GroupController {
     return this.groupService.addUser(body, req.user);
   }
 
-  @Delete('remove-user/:groupUuid/:username')
+  @Delete('remove-user/:groupId/:username')
   @HttpCode(204)
   async removeUser(
     @Request() req,
-    @Param('groupUuid') groupUuid: string,
+    @Param('groupId') groupId: string,
     @Param('username') username: string
   ) {
-    await this.groupService.removeUser({ username, groupUuid }, req.user);
+    await this.groupService.removeUser({ username, groupId }, req.user);
   }
 
-  @Put(':uuid')
+  @Put(':id')
   async update(
-    @Param('uuid') uuid: string,
+    @Param('id') id: string,
     @Body(
       new ValidationPipe({
         validationError: {
@@ -88,12 +88,12 @@ export class GroupController {
     body: GroupDto,
     @Request() req
   ) {
-    return this.groupService.update(uuid, body, req.user);
+    return this.groupService.update(id, body, req.user);
   }
 
-  @Delete(':uuid')
+  @Delete(':id')
   @HttpCode(204)
-  async delete(@Param('uuid') uuid: string, @Request() req) {
-    return this.groupService.delete(uuid, req.user);
+  async delete(@Param('id') id: string, @Request() req) {
+    return this.groupService.delete(id, req.user);
   }
 }

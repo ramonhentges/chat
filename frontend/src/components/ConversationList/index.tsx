@@ -9,7 +9,7 @@ export default function ConversationList() {
     <>
       {lastMessages.map((contactMessage: UserMessage) => (
         <LastMessageCard
-          key={contactMessage.uuid}
+          key={contactMessage.id}
           lastMessage={contactMessage}
         />
       ))}

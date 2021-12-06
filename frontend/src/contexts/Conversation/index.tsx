@@ -187,8 +187,8 @@ export const ConversationProvider: React.FC = ({ children }) => {
   function sendMessage(message: string) {
     if (destination && "username" in destination) {
       sendUserMessage(destination.username, message);
-    } else if (destination && "uuid" in destination) {
-      sendGroupMessage(destination.uuid, message);
+    } else if (destination && "id" in destination) {
+      sendGroupMessage(destination.id, message);
     }
   }
 

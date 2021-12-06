@@ -10,7 +10,10 @@
         "activityBarBadge.foreground": "#15202b",
         "statusBar.background": "#e0234e",
         "statusBar.foreground": "#e7e7e7",
-        "statusBarItem.hoverBackground": "#e65072"
+        "statusBarItem.hoverBackground": "#e65072",
+        "sash.hoverBorder": "#e65072",
+        "statusBarItem.remoteBackground": "#e0234e",
+        "statusBarItem.remoteForeground": "#e7e7e7"
     },
     "peacock.remoteColor": "#e0234e"
 }

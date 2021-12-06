@@ -1,7 +1,7 @@
 import { User } from "./user";
 
 export interface UserMessage {
-  uuid: string;
+  id: string;
   message: string;
   deleted: boolean;
   createdAt: Date;

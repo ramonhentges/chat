@@ -13,23 +13,23 @@ export class CreateMessagesTable1612965848634 implements MigrationInterface {
         columns: [
           {
             name: 'id',
-            type: 'int',
-            isPrimary: true,
+            type: 'uuid',
             isGenerated: true,
-            generationStrategy: 'increment'
+            generationStrategy: 'uuid',
+            isPrimary: true
           },
           {
-            name: 'origin_id',
-            type: 'int'
+            name: 'originId',
+            type: 'uuid'
           },
           {
-            name: 'user_destination_id',
-            type: 'int',
+            name: 'userDestinationId',
+            type: 'uuid',
             isNullable: true
           },
           {
-            name: 'group_destination_id',
-            type: 'int',
+            name: 'groupDestinationId',
+            type: 'uuid',
             isNullable: true
           },
           {
@@ -42,7 +42,7 @@ export class CreateMessagesTable1612965848634 implements MigrationInterface {
             default: false
           },
           {
-            name: 'created_at',
+            name: 'createdAt',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP'
           }
@@ -53,7 +53,7 @@ export class CreateMessagesTable1612965848634 implements MigrationInterface {
     await queryRunner.createForeignKey(
       'messages',
       new TableForeignKey({
-        columnNames: ['origin_id'],
+        columnNames: ['originId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE'
@@ -63,7 +63,7 @@ export class CreateMessagesTable1612965848634 implements MigrationInterface {
     await queryRunner.createForeignKey(
       'messages',
       new TableForeignKey({
-        columnNames: ['user_destination_id'],
+        columnNames: ['userDestinationId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'CASCADE'
@@ -73,7 +73,7 @@ export class CreateMessagesTable1612965848634 implements MigrationInterface {
     await queryRunner.createForeignKey(
       'messages',
       new TableForeignKey({
-        columnNames: ['group_destination_id'],
+        columnNames: ['groupDestinationId'],
         referencedColumnNames: ['id'],
         referencedTableName: 'groups',
         onDelete: 'CASCADE'

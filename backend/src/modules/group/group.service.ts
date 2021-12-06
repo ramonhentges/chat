@@ -24,14 +24,14 @@ export class GroupService {
   ) {}
 
   async myGroups(user: JwsTokenDto) {
-    return this.userService.getUserGroups(user.uuid);
+    return this.userService.getUserGroups(user.id);
   }
 
-  async getByUUID(uuid: string, user: JwsTokenDto) {
-    const userInGroup = await this.isUserInGroup(user.uuid, uuid);
+  async getByID(id: string, user: JwsTokenDto) {
+    const userInGroup = await this.isUserInGroup(user.id, id);
 
     if (userInGroup) {
-      return await this.groupRepo.findOne({ uuid });
+      return await this.groupRepo.findOne({ id });
     }
     throw new ForbiddenException({
       message: 'Você não possui permissão para visualizar este grupo'
@@ -40,17 +40,17 @@ export class GroupService {
 
   async create(createUser: JwsTokenDto, groupDto: GroupDto) {
     const group = this.groupRepo.create(groupDto);
-    const user = await this.userService.getByUUID(createUser.uuid);
+    const user = await this.userService.getByID(createUser.id);
     group.users = [user];
     return this.groupRepo.save(group);
   }
 
-  async update(uuid: string, groupDto: GroupDto, user: JwsTokenDto) {
-    const userInGroup = await this.isUserInGroup(user.uuid, uuid);
+  async update(id: string, groupDto: GroupDto, user: JwsTokenDto) {
+    const userInGroup = await this.isUserInGroup(user.id, id);
 
     if (userInGroup) {
-      this.groupRepo.update({ uuid }, groupDto);
-      return await this.groupRepo.findOne({ uuid });
+      this.groupRepo.update({ id }, groupDto);
+      return await this.groupRepo.findOne({ id });
     }
     throw new ForbiddenException({
       message: 'Você não possui permissão para alterar este grupo'
@@ -58,24 +58,21 @@ export class GroupService {
   }
 
   async addUser(addUserDto: AddRemoveUserToGroupDto, user: JwsTokenDto) {
-    const userInGroup = await this.isUserInGroup(
-      user.uuid,
-      addUserDto.groupUuid
-    );
+    const userInGroup = await this.isUserInGroup(user.id, addUserDto.groupId);
 
     if (userInGroup) {
       const userToAdd = await this.userService.getByUsername(
         addUserDto.username
       );
       const group = await this.groupRepo.findOneOrFail({
-        where: { uuid: addUserDto.groupUuid },
+        where: { id: addUserDto.groupId },
         relations: ['users']
       });
       group.users.push(userToAdd);
       await this.groupRepo.save(group);
-      this.messageGateway.addUserToGroupRoom(userToAdd.uuid, group.uuid);
+      this.messageGateway.addUserToGroupRoom(userToAdd.id, group.id);
       return await this.groupRepo.findOne({
-        where: { uuid: addUserDto.groupUuid }
+        where: { id: addUserDto.groupId }
       });
     }
     throw new ForbiddenException({
@@ -84,17 +81,14 @@ export class GroupService {
   }
 
   async removeUser(removeUser: AddRemoveUserToGroupDto, user: JwsTokenDto) {
-    const userInGroup = await this.isUserInGroup(
-      user.uuid,
-      removeUser.groupUuid
-    );
+    const userInGroup = await this.isUserInGroup(user.id, removeUser.groupId);
 
     if (userInGroup) {
       const userToRemove = await this.userService.getByUsername(
         removeUser.username
       );
       const group = await this.groupRepo.findOneOrFail({
-        where: { uuid: removeUser.groupUuid },
+        where: { uuid: removeUser.groupId },
         relations: ['users']
       });
 
@@ -102,12 +96,9 @@ export class GroupService {
         (user) => user.username !== userToRemove.username
       );
       await this.groupRepo.save(group);
-      this.messageGateway.removeUserFromGroupRoom(
-        userToRemove.uuid,
-        group.uuid
-      );
+      this.messageGateway.removeUserFromGroupRoom(userToRemove.id, group.id);
       return await this.groupRepo.findOne({
-        where: { uuid: removeUser.groupUuid }
+        where: { id: removeUser.groupId }
       });
     }
     throw new ForbiddenException({
@@ -115,11 +106,11 @@ export class GroupService {
     });
   }
 
-  async delete(uuid: string, user: JwsTokenDto) {
-    const userInGroup = await this.isUserInGroup(user.uuid, uuid);
+  async delete(id: string, user: JwsTokenDto) {
+    const userInGroup = await this.isUserInGroup(user.id, id);
 
     if (userInGroup) {
-      this.groupRepo.delete({ uuid });
+      this.groupRepo.delete({ id });
       return;
     }
     throw new ForbiddenException({
@@ -127,13 +118,13 @@ export class GroupService {
     });
   }
 
-  async isUserInGroup(userUuid: string, groupUuid: string) {
+  async isUserInGroup(userId: string, groupId: string) {
     return (
       (await this.groupRepo
         .createQueryBuilder('group')
         .leftJoinAndSelect('group.users', 'user')
-        .where('user.uuid = :userUuid', { userUuid })
-        .andWhere('group.uuid = :groupUuid', { groupUuid })
+        .where('user.id = :userId', { userId })
+        .andWhere('group.uuid = :groupId', { groupId })
         .getCount()) > 0
     );
   }
