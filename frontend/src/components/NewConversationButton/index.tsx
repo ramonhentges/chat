@@ -1,8 +1,8 @@
-import { Fab } from "@material-ui/core";
-import AddIcon from "@material-ui/icons/Add";
-import { useRef } from "react";
-import FindUserModal from "../FindUserModal";
-import useStyles from "./styles";
+import { Fab } from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
+import { useRef } from 'react';
+import FindUserModal from '../FindUserModal';
+import useStyles from './styles';
 
 const NewConversationButton: React.FC = () => {
   const classes = useStyles();

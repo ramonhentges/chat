@@ -1,5 +1,5 @@
-import { CreateUser } from "../interfaces/create-user";
-import { api } from "./api";
+import { CreateUser } from '../interfaces/create-user';
+import { api } from './api';
 
 const createUser = (user: CreateUser) =>
   api

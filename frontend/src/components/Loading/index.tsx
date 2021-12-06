@@ -1,8 +1,7 @@
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
-import useStyles from "./styles";
-
+import CircularProgress from '@material-ui/core/CircularProgress';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import useStyles from './styles';
 
 interface Props {
   text: string;

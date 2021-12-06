@@ -1,8 +1,9 @@
-import { Login } from "../interfaces/login";
-import { api } from "./api";
+import { Login } from '../interfaces/login';
+import { api } from './api';
 
 const login = (usuario: Login) => {
-  return api.post("auth/login", usuario)
+  return api
+    .post('auth/login', usuario)
     .then((response) => {
       return response;
     })

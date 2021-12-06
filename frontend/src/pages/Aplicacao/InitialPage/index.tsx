@@ -1,14 +1,14 @@
-import { Grid, Paper } from "@material-ui/core";
-import React from "react";
-import ConversationCard from "../../../components/ConversationCard";
-import Footer from "../../../components/Footer";
-import UserCard from "../../../components/UserCard";
-import useStyles from "./styles";
-import ConversationList from "../../../components/ConversationList";
-import MessagesList from "../../../components/MessagesList";
-import SendButton from "../../../components/SendButton";
-import { ConversationProvider } from "../../../contexts/Conversation";
-import NewConversationButton from "../../../components/NewConversationButton";
+import { Grid, Paper } from '@material-ui/core';
+import React from 'react';
+import ConversationCard from '../../../components/ConversationCard';
+import Footer from '../../../components/Footer';
+import UserCard from '../../../components/UserCard';
+import useStyles from './styles';
+import ConversationList from '../../../components/ConversationList';
+import MessagesList from '../../../components/MessagesList';
+import SendButton from '../../../components/SendButton';
+import { ConversationProvider } from '../../../contexts/Conversation';
+import NewConversationButton from '../../../components/NewConversationButton';
 
 const InitialPage: React.FC = () => {
   const classes = useStyles();

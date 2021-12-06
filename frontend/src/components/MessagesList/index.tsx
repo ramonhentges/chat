@@ -1,8 +1,8 @@
-import { Chip, CircularProgress, Grid, Typography } from "@material-ui/core";
-import React, { useEffect, useRef } from "react";
-import { useConversation } from "../../contexts/Conversation";
-import Message from "../Message";
-import useStyles from "./styles";
+import { Chip, CircularProgress, Grid, Typography } from '@material-ui/core';
+import React, { useEffect, useRef } from 'react';
+import { useConversation } from '../../contexts/Conversation';
+import Message from '../Message';
+import useStyles from './styles';
 
 const sameDay = (firstDate: Date, secondDate: Date): boolean => {
   return (
@@ -24,7 +24,7 @@ export default function MessagesList() {
   const scrollToBottom = () => {
     messagesGrid.current!.scroll({
       top: messagesGrid.current!.scrollHeight,
-      behavior: "smooth",
+      behavior: 'smooth'
     });
   };
   return loading ? (
@@ -47,14 +47,16 @@ export default function MessagesList() {
     >
       {messages.map((message, idx) => (
         <>
-          {(idx === 0 || (idx > 0 && !sameDay(message.createdAt, messages[idx - 1].createdAt))) && (
+          {(idx === 0 ||
+            (idx > 0 &&
+              !sameDay(message.createdAt, messages[idx - 1].createdAt))) && (
             <Chip
               className={classes.date}
               variant="outlined"
               label={
-                  <Typography variant="body2" style={{ whiteSpace: "normal" }}>
-                    {message.createdAt.toLocaleDateString()}
-                  </Typography>
+                <Typography variant="body2" style={{ whiteSpace: 'normal' }}>
+                  {message.createdAt.toLocaleDateString()}
+                </Typography>
               }
             />
           )}

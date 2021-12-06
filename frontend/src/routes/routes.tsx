@@ -1,10 +1,10 @@
-import { Redirect, Route, RouteProps, Router, Switch } from "react-router-dom";
-import { createBrowserHistory } from "history";
-import React from "react";
-import { Login } from "../pages/Aplicacao/Login";
-import InitialPage from "../pages/Aplicacao/InitialPage";
-import { useAuth } from "../contexts/Auth";
-import { CreateAccount } from "../pages/Aplicacao/CreateAccount";
+import { Redirect, Route, RouteProps, Router, Switch } from 'react-router-dom';
+import { createBrowserHistory } from 'history';
+import React from 'react';
+import { Login } from '../pages/Aplicacao/Login';
+import InitialPage from '../pages/Aplicacao/InitialPage';
+import { useAuth } from '../contexts/Auth';
+import { CreateAccount } from '../pages/Aplicacao/CreateAccount';
 
 const history = createBrowserHistory();
 
@@ -26,8 +26,8 @@ const Routes: React.FC = () => {
         ) : (
           <Redirect
             to={{
-              pathname: "/login",
-              state: { from: props.location },
+              pathname: '/login',
+              state: { from: props.location }
             }}
           />
         )

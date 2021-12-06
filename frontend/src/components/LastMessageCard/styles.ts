@@ -1,15 +1,15 @@
-import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     notSelected: {
       width: 300,
-      marginBottom: theme.spacing(0.3),
+      marginBottom: theme.spacing(0.3)
     },
     selected: {
       width: 300,
       marginBottom: theme.spacing(0.3),
-      backgroundColor: theme.palette.secondary.main,
+      backgroundColor: theme.palette.secondary.main
     },
     showTime: {
       marginTop: -theme.spacing(3),

@@ -4,23 +4,23 @@ import {
   Link,
   Paper,
   TextField,
-  Typography,
-} from "@material-ui/core";
-import React, { useRef, useState } from "react";
-import { Redirect, useHistory, Link as LinkDom } from "react-router-dom";
-import Footer from "../../../components/Footer";
-import AlertSnackbar from "../../../components/AlertSnackbar";
-import { Login as LoginInterface } from "../../../interfaces/login";
-import useStyles from "./styles";
-import { useAuth } from "../../../contexts/Auth";
+  Typography
+} from '@material-ui/core';
+import React, { useRef, useState } from 'react';
+import { Redirect, useHistory, Link as LinkDom } from 'react-router-dom';
+import Footer from '../../../components/Footer';
+import AlertSnackbar from '../../../components/AlertSnackbar';
+import { Login as LoginInterface } from '../../../interfaces/login';
+import useStyles from './styles';
+import { useAuth } from '../../../contexts/Auth';
 
 export function Login(props: any) {
   const classes = useStyles();
   const history = useHistory();
   const alert = useRef<any>(null);
   const [user, setUser] = useState<LoginInterface>({
-    username: "",
-    password: "",
+    username: '',
+    password: ''
   });
   const { signed, signIn } = useAuth();
 
@@ -35,7 +35,7 @@ export function Login(props: any) {
       if (props.location.state) {
         history.push(props.location.state.from.pathname);
       } else {
-        history.push("/");
+        history.push('/');
       }
     } else {
       alert.current.handleOpenSnackbar();
@@ -45,7 +45,7 @@ export function Login(props: any) {
   return signed ? (
     <Redirect
       to={{
-        pathname: "/",
+        pathname: '/'
       }}
     />
   ) : (
@@ -104,14 +104,14 @@ export function Login(props: any) {
         </Grid>
         <Grid item className={classes.createAccountGrid} lg={4} md={6} xs={8}>
           <Typography className={classes.createAccountText}>
-            {"Não possui conta? "}
+            {'Não possui conta? '}
             <Link component={LinkDom} color="primary" to="createAccount">
               Criar conta
             </Link>
           </Typography>
         </Grid>
         <AlertSnackbar
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
           ref={alert}
           severity="error"
           message="Login inválido"

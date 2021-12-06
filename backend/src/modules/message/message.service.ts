@@ -254,7 +254,7 @@ export class MessageService {
     const origin = await this.userService.getByID(user.id);
     const message = await this.messageRepo.findOne({
       where: { id: messageId, origin },
-      relations: ['userDestination']
+      relations: ['userDestination', 'origin']
     });
 
     if (message) {
@@ -262,7 +262,7 @@ export class MessageService {
         { id: messageId },
         { ...message, deleted: true, message: '' }
       );
-      return message.userDestination;
+      return { ...message, deleted: true, message: '' };
     }
     throw new ForbiddenException({
       message: 'Você não tem permissão para excluir esta mensagem'

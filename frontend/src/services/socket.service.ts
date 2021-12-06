@@ -1,32 +1,43 @@
-import io from "socket.io-client";
+import io from 'socket.io-client';
 
 const { REACT_APP_BASE_API_URL } = process.env;
 const socket = io(`${REACT_APP_BASE_API_URL}`, { autoConnect: false });
 const sendUserMessage = (destinationUsername: string, message: string) => {
-  socket.emit("msgToUser", {
+  socket.emit('msgToUser', {
     message,
-    destination: destinationUsername,
+    destination: destinationUsername
   });
 };
+
 const sendGroupMessage = (groupId: string, message: string) => {
-  console.log("sending group message");
-  socket.emit("msgToGroup", {
+  socket.emit('msgToGroup', {
     message,
-    destination: groupId,
+    destination: groupId
   });
 };
+
+const deleteUserMessage = (messageId: string) => {
+  socket.emit('deleteUserMessage', messageId);
+};
+
 const setAuthorizationToken = (token: string) => {
-  socket.io.opts["transportOptions"] = {
+  socket.io.opts['transportOptions'] = {
     polling: {
       extraHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
+        Authorization: `Bearer ${token}`
+      }
+    }
   };
 };
 
-socket.on("connect", function () {
-  console.log("Connected");
+socket.on('connect', function () {
+  console.log('Connected');
 });
 
-export { socket, sendUserMessage, setAuthorizationToken, sendGroupMessage };
+export {
+  socket,
+  sendUserMessage,
+  setAuthorizationToken,
+  sendGroupMessage,
+  deleteUserMessage
+};

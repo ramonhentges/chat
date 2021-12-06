@@ -1,20 +1,21 @@
-import React from "react";
-import Card from "@material-ui/core/Card";
-import CardHeader from "@material-ui/core/CardHeader";
-import Avatar from "@material-ui/core/Avatar";
-import useStyles from "./styles";
-import { useConversation } from "../../contexts/Conversation";
+import React from 'react';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import Avatar from '@material-ui/core/Avatar';
+import useStyles from './styles';
+import { useConversation } from '../../contexts/Conversation';
+import SelectedMessageInfo from '../SelectedMessageInfo';
 
 export default function ConversationCard() {
   const classes = useStyles();
   const { destination } = useConversation();
   const title =
-    destination !== null && "username" in destination
+    destination !== null && 'username' in destination
       ? destination.fullName
       : destination?.name;
 
   const subheader =
-    destination !== null && "username" in destination
+    destination !== null && 'username' in destination
       ? destination.username
       : destination?.description;
 
@@ -28,7 +29,8 @@ export default function ConversationCard() {
         }
         title={title}
         subheader={subheader}
-        titleTypographyProps={{ color: "secondary" }}
+        titleTypographyProps={{ color: 'secondary' }}
+        action={<SelectedMessageInfo />}
       />
     </Card>
   ) : (

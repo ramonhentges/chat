@@ -1,14 +1,18 @@
-import React from "react";
-import Card from "@material-ui/core/Card";
-import CardHeader from "@material-ui/core/CardHeader";
-import Avatar from "@material-ui/core/Avatar";
-import IconButton from "@material-ui/core/IconButton";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import useStyles from "./styles";
-import { useAuth } from "../../contexts/Auth";
-import { ListItemIcon, Menu, MenuItem, Typography } from "@material-ui/core";
-import { ExitToApp as ExitIcon, Brightness4 as NightIcon, Brightness7 as DayIcon } from "@material-ui/icons";
-import { useMyTheme } from "../../contexts/MyTheme";
+import React from 'react';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import Avatar from '@material-ui/core/Avatar';
+import IconButton from '@material-ui/core/IconButton';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import useStyles from './styles';
+import { useAuth } from '../../contexts/Auth';
+import { ListItemIcon, Menu, MenuItem, Typography } from '@material-ui/core';
+import {
+  ExitToApp as ExitIcon,
+  Brightness4 as NightIcon,
+  Brightness7 as DayIcon
+} from '@material-ui/icons';
+import { useMyTheme } from '../../contexts/MyTheme';
 
 const UserCard: React.FC = () => {
   const classes = useStyles();
@@ -44,7 +48,7 @@ const UserCard: React.FC = () => {
           }
           title={user?.fullName}
           subheader={user?.username}
-          titleTypographyProps={{ color: "primary" }}
+          titleTypographyProps={{ color: 'primary' }}
         />
       </Card>
       <Menu
@@ -56,7 +60,11 @@ const UserCard: React.FC = () => {
       >
         <MenuItem onClick={handleChangeTheme}>
           <ListItemIcon>
-            {theme ? <DayIcon fontSize="small" /> : <NightIcon fontSize="small" />}
+            {theme ? (
+              <DayIcon fontSize="small" />
+            ) : (
+              <NightIcon fontSize="small" />
+            )}
           </ListItemIcon>
           <Typography variant="inherit">Trocar tema</Typography>
         </MenuItem>

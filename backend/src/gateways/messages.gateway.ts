@@ -161,7 +161,7 @@ export class MessagesGateway {
     const userToken = await this.authService.validate(
       `${client.handshake.headers.authorization}`.replace('Bearer ', '')
     );
-    const destination = await this.messageService
+    const deletedMessage = await this.messageService
       .deleteUserMessage(userToken, messageId)
       .catch((err) => {
         if (err.status === 403) {
@@ -170,13 +170,9 @@ export class MessagesGateway {
         throw new WsException('Erro interno do sistema');
       });
 
-    const returnMessage = {
-      id: messageId,
-      origin: { username: userToken.username },
-      userDestination: { username: destination.username }
-    };
+    const returnMessage = deletedMessage;
     client.broadcast
-      .to(`user-${destination.id}`)
+      .to(`user-${deletedMessage.userDestination.id}`)
       .emit('deleteMsgFromUser', returnMessage);
     return {
       event: 'deleteMsgFromUser',

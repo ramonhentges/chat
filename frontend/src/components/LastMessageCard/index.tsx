@@ -1,12 +1,12 @@
-import React from "react";
-import Card from "@material-ui/core/Card";
-import CardHeader from "@material-ui/core/CardHeader";
-import Avatar from "@material-ui/core/Avatar";
-import useStyles from "./styles";
-import { useAuth } from "../../contexts/Auth";
-import { useConversation } from "../../contexts/Conversation";
-import { UserMessage } from "../../interfaces/user-message";
-import { Typography } from "@material-ui/core";
+import React from 'react';
+import Card from '@material-ui/core/Card';
+import CardHeader from '@material-ui/core/CardHeader';
+import Avatar from '@material-ui/core/Avatar';
+import useStyles from './styles';
+import { useAuth } from '../../contexts/Auth';
+import { useConversation } from '../../contexts/Conversation';
+import { UserMessage } from '../../models/user-message';
+import { Typography } from '@material-ui/core';
 
 interface LastMessageCardProps {
   lastMessage: UserMessage;
@@ -38,7 +38,7 @@ const LastMessageCard: React.FC<LastMessageCardProps> = ({ lastMessage }) => {
   function isSelected() {
     if (
       destination &&
-      "username" in destination &&
+      'username' in destination &&
       destination.username === contact.username
     ) {
       return true;
@@ -58,8 +58,8 @@ const LastMessageCard: React.FC<LastMessageCardProps> = ({ lastMessage }) => {
         title={`${contact.fullName} - ${contact.username}`}
         subheader={
           user?.username === lastMessage.origin.username
-            ? `Você: ${lastMessage.message}`
-            : `${lastMessage.message}`
+            ? `Você: ${lastMessage.getMessage()}`
+            : `${lastMessage.getMessage()}`
         }
       />
       <Typography

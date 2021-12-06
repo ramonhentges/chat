@@ -1,13 +1,13 @@
-import { Button, Grid, Paper, TextField, Typography } from "@material-ui/core";
-import { AxiosResponse } from "axios";
-import React, { useRef, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
-import Footer from "../../../components/Footer";
-import AlertSnackbar from "../../../components/AlertSnackbar";
-import useStyles from "./styles";
-import { CreateUser, CreateUserError } from "../../../interfaces/create-user";
-import { createUser } from "../../../services/user.service";
-import { transformErrorResponse } from "../../../util/transformErrorResponse";
+import { Button, Grid, Paper, TextField, Typography } from '@material-ui/core';
+import { AxiosResponse } from 'axios';
+import React, { useRef, useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import Footer from '../../../components/Footer';
+import AlertSnackbar from '../../../components/AlertSnackbar';
+import useStyles from './styles';
+import { CreateUser, CreateUserError } from '../../../interfaces/create-user';
+import { createUser } from '../../../services/user.service';
+import { transformErrorResponse } from '../../../util/transformErrorResponse';
 
 export function CreateAccount(props: any) {
   const classes = useStyles();
@@ -15,10 +15,10 @@ export function CreateAccount(props: any) {
   const alert = useRef<any>(null);
   const success = useRef<any>(null);
   const [user, setUser] = useState<CreateUser>({
-    username: "",
-    password: "",
-    fullName: "",
-    confirmPassword: "",
+    username: '',
+    password: '',
+    fullName: '',
+    confirmPassword: ''
   });
   const [error, setError] = useState<CreateUserError>({});
 
@@ -32,27 +32,27 @@ export function CreateAccount(props: any) {
     if (user.password === user.confirmPassword) {
       const response: AxiosResponse = await createUser(user);
       if (response.status === 201) {
-        success.current.handleOpenMessage("Conta cadastrada com sucesso!");
+        success.current.handleOpenMessage('Conta cadastrada com sucesso!');
         setTimeout(() => {
           if (props.location.state) {
             history.push(props.location.state.from.pathname);
           } else {
-            history.push("/login");
+            history.push('/login');
           }
         }, 2000);
       } else {
         setError(transformErrorResponse(response.data.message));
         alert.current.handleOpenMessage(
-          "Erro ao criar conta. Verifique os campos!"
+          'Erro ao criar conta. Verifique os campos!'
         );
       }
     } else {
       setError((error) => ({
         ...error,
-        password: "As senhas não correspondem",
+        password: 'As senhas não correspondem'
       }));
       alert.current.handleOpenMessage(
-        "As senhas não correspondem. Verifique os campos!"
+        'As senhas não correspondem. Verifique os campos!'
       );
     }
   }
@@ -149,12 +149,12 @@ export function CreateAccount(props: any) {
         </Grid>
 
         <AlertSnackbar
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
           ref={alert}
           severity="error"
         />
         <AlertSnackbar
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
           ref={success}
           severity="success"
         />

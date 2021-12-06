@@ -1,9 +1,10 @@
-import ReactDOM from "react-dom";
-import "fontsource-roboto";
-import React from "react";
-import Routes from "./routes/routes";
-import { MyThemeProvider } from "./contexts/MyTheme";
-import { AuthProvider } from "./contexts/Auth";
+import ReactDOM from 'react-dom';
+import 'fontsource-roboto';
+import 'reflect-metadata';
+import React from 'react';
+import Routes from './routes/routes';
+import { MyThemeProvider } from './contexts/MyTheme';
+import { AuthProvider } from './contexts/Auth';
 
 ReactDOM.render(
   <MyThemeProvider>
@@ -11,5 +12,5 @@ ReactDOM.render(
       <Routes />
     </AuthProvider>
   </MyThemeProvider>,
-  document.getElementById("root")
+  document.getElementById('root')
 );

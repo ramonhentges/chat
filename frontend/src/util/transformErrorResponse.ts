@@ -1,12 +1,12 @@
-import { ErrorResponse } from "../interfaces/error";
+import { ErrorResponse } from '../interfaces/error';
 
 function transformErrorResponse(errors: ErrorResponse[]): any {
   const errorTransformed: any = {};
   errors.forEach((error) => {
-    let errorMessage = "";
+    let errorMessage = '';
     for (const [key, value] of Object.entries(error.constraints)) {
       errorMessage = `${value}\n${errorMessage}`;
-    };
+    }
     errorTransformed[error.property] = errorMessage;
   });
   return errorTransformed;

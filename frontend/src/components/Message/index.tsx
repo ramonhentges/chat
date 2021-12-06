@@ -1,8 +1,9 @@
-import { Chip, Grid, Typography } from "@material-ui/core";
-import React from "react";
-import { useAuth } from "../../contexts/Auth";
-import { UserMessage } from "../../interfaces/user-message";
-import useStyles from "./styles";
+import { Chip, Grid, Typography } from '@material-ui/core';
+import React from 'react';
+import { useAuth } from '../../contexts/Auth';
+import { useConversation } from '../../contexts/Conversation';
+import { UserMessage } from '../../models/user-message';
+import useStyles from './styles';
 
 interface MessageProps {
   message: UserMessage;
@@ -18,6 +19,7 @@ export default function Message(props: MessageProps) {
   const classes = useStyles();
   const { message } = props;
   const { user } = useAuth();
+  const { setSelectedMessage, selectedMessage } = useConversation();
   const myMessage = user?.username === message.origin.username ? true : false;
 
   return (
@@ -25,15 +27,23 @@ export default function Message(props: MessageProps) {
       item
       className={classes.messageGrid}
       style={
-        myMessage ? { alignSelf: "flex-end" } : { alignSelf: "flex-start" }
+        myMessage ? { alignSelf: 'flex-end' } : { alignSelf: 'flex-start' }
       }
     >
       <Chip
-        variant={myMessage ? "outlined" : "default"}
+        variant={myMessage ? 'outlined' : 'default'}
+        color={selectedMessage === message ? 'secondary' : undefined}
+        onClick={
+          myMessage
+            ? () => {
+                setSelectedMessage(message);
+              }
+            : undefined
+        }
         label={
           <>
-            <Typography variant="body2" style={{ whiteSpace: "normal" }}>
-              {message.message}
+            <Typography variant="body2" style={{ whiteSpace: 'normal' }}>
+              {message.getMessage()}
             </Typography>
             <Typography align="right" display="block" variant="caption">
               {getMessageTime(message.createdAt)}

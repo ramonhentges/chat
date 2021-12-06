@@ -3,22 +3,22 @@ import {
   FormControl,
   InputLabel,
   OutlinedInput,
-  IconButton,
-} from "@material-ui/core";
-import SendIcon from "@material-ui/icons/Send";
-import React, { useState } from "react";
-import { useConversation } from "../../contexts/Conversation";
-import useStyles from "./styles";
+  IconButton
+} from '@material-ui/core';
+import SendIcon from '@material-ui/icons/Send';
+import React, { useState } from 'react';
+import { useConversation } from '../../contexts/Conversation';
+import useStyles from './styles';
 
 export default function SendButton() {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const classes = useStyles();
   const { destination, loading, sendMessage } = useConversation();
 
   function sendMessageClick(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     sendMessage(message);
-    setMessage("");
+    setMessage('');
   }
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     let value = event.target.value;

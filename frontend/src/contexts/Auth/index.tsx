@@ -1,11 +1,11 @@
-import { AxiosResponse } from "axios";
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import { Login } from "../../interfaces/login";
-import { User } from "../../interfaces/user";
-import { api } from "../../services/api";
-import { login } from "../../services/auth.service";
-import { myUserInfo } from "../../services/user.service";
-import { socket, setAuthorizationToken } from "../../services/socket.service";
+import { AxiosResponse } from 'axios';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { Login } from '../../interfaces/login';
+import { User } from '../../models/user';
+import { api } from '../../services/api';
+import { login } from '../../services/auth.service';
+import { myUserInfo } from '../../services/user.service';
+import { socket, setAuthorizationToken } from '../../services/socket.service';
 
 interface AuthContextProps {
   signed: boolean;
@@ -31,13 +31,13 @@ export const AuthProvider: React.FC = ({ children }) => {
     const response: AxiosResponse = await login(loginUser);
     if (response.status === 200) {
       api.defaults.headers[
-        "Authorization"
+        'Authorization'
       ] = `Bearer ${response.data.accessToken}`;
-      localStorage.setItem("accessToken", JSON.stringify(response.data));
+      localStorage.setItem('accessToken', JSON.stringify(response.data));
       await getUserInfo();
       setAuthorizationToken(response.data.accessToken);
-      socket.on("disconnect", function () {
-        console.log("Disconnected")
+      socket.on('disconnect', function () {
+        console.log('Disconnected');
         setTimeout(reconnect, 5000);
       });
       socket.connect();
@@ -47,11 +47,11 @@ export const AuthProvider: React.FC = ({ children }) => {
   }
 
   function signOut() {
-    localStorage.removeItem("accessToken");
-    api.defaults.headers["Authorization"] = null;
-    setAuthorizationToken("");
+    localStorage.removeItem('accessToken');
+    api.defaults.headers['Authorization'] = null;
+    setAuthorizationToken('');
     setUser(null);
-    socket.off("disconnect");
+    socket.off('disconnect');
     socket.disconnect();
   }
 
@@ -69,10 +69,10 @@ export const AuthProvider: React.FC = ({ children }) => {
     async function getInfo() {
       await getUserInfo();
     }
-    const storedToken = localStorage.getItem("accessToken");
+    const storedToken = localStorage.getItem('accessToken');
     if (storedToken) {
       const token = JSON.parse(storedToken).accessToken;
-      api.defaults.headers["Authorization"] = `Bearer ${token}`;
+      api.defaults.headers['Authorization'] = `Bearer ${token}`;
       setAuthorizationToken(token);
       getInfo();
     }

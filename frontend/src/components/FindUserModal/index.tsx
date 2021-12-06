@@ -12,28 +12,28 @@ import {
   TablePagination,
   TableRow,
   TextField,
-  Typography,
-} from "@material-ui/core";
-import { Send } from "@material-ui/icons";
+  Typography
+} from '@material-ui/core';
+import { Send } from '@material-ui/icons';
 import {
   ForwardedRef,
   forwardRef,
   useEffect,
   useImperativeHandle,
-  useState,
-} from "react";
-import { useConversation } from "../../contexts/Conversation";
-import { User } from "../../interfaces/user";
-import { usersList } from "../../services/user.service";
-import Loading from "../Loading";
-import useStyles from "./styles";
+  useState
+} from 'react';
+import { useConversation } from '../../contexts/Conversation';
+import { User } from '../../models/user';
+import { usersList } from '../../services/user.service';
+import Loading from '../Loading';
+import useStyles from './styles';
 
 const FindUserModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
   const classes = useStyles();
   const { setDestination } = useConversation();
   const [open, setOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState('');
   const [loading, setLoading] = useState<boolean>(true);
   const [usersSearch, setUsersSearch] = useState<User[]>([]);
   const [page, setPage] = useState(0);
@@ -92,13 +92,13 @@ const FindUserModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
     open && fetchData();
     return () => {
       setLoading(true);
-      setUsername("");
+      setUsername('');
     };
   }, [open]);
 
   useImperativeHandle(ref, () => {
     return {
-      handleOpenFindUserModal: handleOpen,
+      handleOpenFindUserModal: handleOpen
     };
   });
 
@@ -114,7 +114,7 @@ const FindUserModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
         justify="center"
         alignContent="center"
         alignItems="center"
-        style={{ height: "100vh" }}
+        style={{ height: '100vh' }}
       >
         <Grid item xs={8}>
           <Paper className={classes.paper}>
@@ -188,8 +188,8 @@ const FindUserModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
                             page={page}
                             labelRowsPerPage="Pessoas por página:"
                             SelectProps={{
-                              inputProps: { "aria-label": "rows per page" },
-                              native: true,
+                              inputProps: { 'aria-label': 'rows per page' },
+                              native: true
                             }}
                             onChangePage={handleChangePage}
                             onChangeRowsPerPage={handleChangeRowsPerPage}
