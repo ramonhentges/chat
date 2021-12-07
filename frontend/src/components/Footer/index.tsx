@@ -1,7 +1,6 @@
 import React from 'react';
-import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
-import useStyles from './styles';
+import { Typography, Grid } from '@mui/material';
+import Link from '@mui/material/Link';
 
 function Copyright() {
   return (
@@ -16,10 +15,11 @@ function Copyright() {
 }
 
 export default function Footer() {
-  const classes = useStyles();
   return (
-    <footer className={classes.footer}>
-      <Copyright />
-    </footer>
+    <Grid sx={{ m: 2 }}>
+      <footer>
+        <Copyright />
+      </footer>
+    </Grid>
   );
 }

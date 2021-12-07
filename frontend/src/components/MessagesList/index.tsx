@@ -6,14 +6,14 @@ import {
   Menu,
   MenuItem,
   Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { useConversation } from '../../contexts/Conversation';
 import { deleteUserMessage } from '../../services/socket.service';
 import Message from '../Message';
-import useStyles from './styles';
-import Fade from '@material-ui/core/Fade';
-import { Delete } from '@material-ui/icons';
+import Fade from '@mui/material/Fade';
+import { Delete } from '@mui/icons-material';
+import { useConfirm } from '../../contexts/ConfirmDialog';
 
 const sameDay = (firstDate: Date, secondDate: Date): boolean => {
   return (
@@ -24,8 +24,8 @@ const sameDay = (firstDate: Date, secondDate: Date): boolean => {
 };
 
 export default function MessagesList() {
-  const classes = useStyles();
   const messagesGrid = useRef<HTMLDivElement>(null);
+  const { confirm } = useConfirm();
   const { messages, loading, selectedMessage, setSelectedMessage } =
     useConversation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -41,8 +41,14 @@ export default function MessagesList() {
   };
 
   const deleteMessage = () => {
-    selectedMessage && deleteUserMessage(selectedMessage.id);
-    setAnchorEl(null);
+    confirm({
+      title: 'Aviso de exclusão',
+      message: 'Desaja mesmo excluir a mensagem?'
+    }).then(() => {
+      selectedMessage && deleteUserMessage(selectedMessage.id);
+      setSelectedMessage(undefined);
+      setAnchorEl(null);
+    });
   };
 
   useEffect(() => {
@@ -58,9 +64,9 @@ export default function MessagesList() {
   return loading ? (
     <Grid
       container
-      justify="center"
+      justifyContent="center"
       alignItems="center"
-      className={classes.messagesGrid}
+      sx={{ flexGrow: 2, overflowY: 'auto', flexWrap: 'nowrap', padding: 2 }}
     >
       <CircularProgress />
     </Grid>
@@ -70,7 +76,7 @@ export default function MessagesList() {
       item
       alignItems="flex-start"
       direction="column"
-      className={classes.messagesGrid}
+      sx={{ flexGrow: 2, overflowY: 'auto', flexWrap: 'nowrap', padding: 2 }}
       ref={messagesGrid}
     >
       {messages.map((message, idx) => (
@@ -79,7 +85,7 @@ export default function MessagesList() {
             (idx > 0 &&
               !sameDay(message.createdAt, messages[idx - 1].createdAt))) && (
             <Chip
-              className={classes.date}
+              sx={{ alignSelf: 'center', mb: 2 }}
               variant="outlined"
               label={
                 <Typography variant="body2" style={{ whiteSpace: 'normal' }}>
@@ -98,7 +104,6 @@ export default function MessagesList() {
         open={open}
         onClose={handleClose}
         TransitionComponent={Fade}
-        getContentAnchorEl={null}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >

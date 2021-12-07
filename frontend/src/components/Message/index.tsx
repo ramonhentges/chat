@@ -1,9 +1,8 @@
-import { Chip, Grid, Typography } from '@material-ui/core';
+import { Chip, Grid, Typography } from '@mui/material';
 import React from 'react';
 import { useAuth } from '../../contexts/Auth';
 import { useConversation } from '../../contexts/Conversation';
 import { UserMessage } from '../../models/user-message';
-import useStyles from './styles';
 
 interface MessageProps {
   message: UserMessage;
@@ -17,7 +16,6 @@ const getMessageTime = (date: Date): string => {
 };
 
 export default function Message({ message, openMenu }: MessageProps) {
-  const classes = useStyles();
   const { user } = useAuth();
   const { setSelectedMessage, selectedMessage } = useConversation();
   const myMessage = user?.username === message.origin.username ? true : false;
@@ -25,13 +23,13 @@ export default function Message({ message, openMenu }: MessageProps) {
   return (
     <Grid
       item
-      className={classes.messageGrid}
+      sx={{ maxWidth: '65%', mb: 1 }}
       style={
         myMessage ? { alignSelf: 'flex-end' } : { alignSelf: 'flex-start' }
       }
     >
       <Chip
-        variant={myMessage ? 'outlined' : 'default'}
+        variant={myMessage ? 'outlined' : 'filled'}
         color={selectedMessage === message ? 'secondary' : undefined}
         onClick={
           myMessage && !message.deleted
@@ -51,7 +49,7 @@ export default function Message({ message, openMenu }: MessageProps) {
             </Typography>
           </>
         }
-        className={classes.message}
+        sx={{ padding: 1, height: '100%' }}
       />
     </Grid>
   );

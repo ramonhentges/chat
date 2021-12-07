@@ -1,42 +1,48 @@
-import { createMuiTheme, CssBaseline, ThemeProvider } from '@material-ui/core';
+import {
+  createTheme,
+  CssBaseline,
+  ThemeProvider as ThemeProviderCore
+} from '@mui/material';
 import React, { useContext, useEffect, useState } from 'react';
 import { dark, light } from '../../constants/theme';
 
 type ContextProps = {
   changeTheme: () => void;
-  theme: boolean;
+  mode: 'light' | 'dark';
 };
 
 const MyThemeContext = React.createContext<ContextProps>({} as ContextProps);
 
 export const MyThemeProvider: React.FC = ({ children }) => {
-  const [theme, setTheme] = useState(
-    localStorage.getItem('darkMode') === 'true'
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
+  const theme = React.useMemo(
+    () => createTheme(mode === 'light' ? light : dark),
+    [mode]
   );
-  const appliedTheme = createMuiTheme(theme ? dark : light);
   useEffect(() => {
-    if (localStorage.getItem('darkMode') === null) {
+    if (localStorage.getItem('colorMode') === null) {
       if (
         window.matchMedia &&
         window.matchMedia('(prefers-color-scheme: dark)').matches
       ) {
-        localStorage.setItem('darkMode', 'true');
+        localStorage.setItem('colorMode', 'dark');
       } else {
-        localStorage.setItem('darkMode', 'false');
+        localStorage.setItem('colorMode', 'light');
       }
     }
-    setTheme(localStorage.getItem('darkMode') === 'true');
+    setMode(localStorage.getItem('colorMode') === 'light' ? 'light' : 'dark');
   }, []);
   const changeTheme = () => {
-    localStorage.setItem('darkMode', `${!theme}`);
-    setTheme(!theme);
+    const newMode = mode === 'light' ? 'dark' : 'light';
+    localStorage.setItem('colorMode', `newMode`);
+    setMode(newMode);
   };
   return (
-    <MyThemeContext.Provider value={{ theme, changeTheme }}>
-      <ThemeProvider theme={appliedTheme}>
+    <MyThemeContext.Provider value={{ mode, changeTheme }}>
+      <ThemeProviderCore theme={theme}>
         <CssBaseline />
         {children}
-      </ThemeProvider>
+      </ThemeProviderCore>
     </MyThemeContext.Provider>
   );
 };

@@ -1,33 +1,25 @@
 import React from 'react';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import Avatar from '@material-ui/core/Avatar';
-import useStyles from './styles';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import Avatar from '@mui/material/Avatar';
 import { useConversation } from '../../contexts/Conversation';
 
 export default function ConversationCard() {
-  const classes = useStyles();
   const { destination } = useConversation();
-  const title =
-    destination !== null && 'username' in destination
-      ? destination.fullName
-      : destination?.name;
-
-  const subheader =
-    destination !== null && 'username' in destination
-      ? destination.username
-      : destination?.description;
 
   return !!destination ? (
-    <Card className={classes.root} square={true}>
+    <Card sx={{ mb: 3 }} square={true}>
       <CardHeader
         avatar={
-          <Avatar aria-label="recipe" className={classes.avatar}>
-            {title && title[0]}
+          <Avatar
+            aria-label="recipe"
+            sx={{ backgroundColor: 'secondary.main' }}
+          >
+            {destination.getTitle()[0]}
           </Avatar>
         }
-        title={title}
-        subheader={subheader}
+        title={destination.getTitle()}
+        subheader={destination.getSubtitle()}
         titleTypographyProps={{ color: 'secondary' }}
       />
     </Card>

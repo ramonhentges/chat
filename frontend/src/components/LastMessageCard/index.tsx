@@ -1,12 +1,11 @@
 import React from 'react';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import Avatar from '@material-ui/core/Avatar';
-import useStyles from './styles';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import Avatar from '@mui/material/Avatar';
 import { useAuth } from '../../contexts/Auth';
 import { useConversation } from '../../contexts/Conversation';
 import { UserMessage } from '../../models/user-message';
-import { Typography } from '@material-ui/core';
+import { Typography } from '@mui/material';
 
 interface LastMessageCardProps {
   lastMessage: UserMessage;
@@ -27,7 +26,6 @@ const getTime = (date: Date): string => {
 };
 
 const LastMessageCard: React.FC<LastMessageCardProps> = ({ lastMessage }) => {
-  const classes = useStyles();
   const { user } = useAuth();
   const { destination, setDestination } = useConversation();
   const contact =
@@ -48,14 +46,23 @@ const LastMessageCard: React.FC<LastMessageCardProps> = ({ lastMessage }) => {
 
   return (
     <Card
-      className={isSelected() ? classes.selected : classes.notSelected}
+      sx={
+        isSelected()
+          ? {
+              width: 300,
+              mb: 0.3,
+              backgroundColor: 'secondary.main',
+              cursor: 'pointer'
+            }
+          : { width: 300, mb: 0.3, cursor: 'pointer' }
+      }
       square={true}
       variant="outlined"
       onClick={() => setDestination(contact)}
     >
       <CardHeader
         avatar={<Avatar aria-label="recipe">{contact.fullName[0]}</Avatar>}
-        title={`${contact.fullName} - ${contact.username}`}
+        title={contact.getConversationTitle()}
         subheader={
           user?.username === lastMessage.origin.username
             ? `Você: ${lastMessage.getMessage()}`
@@ -63,7 +70,7 @@ const LastMessageCard: React.FC<LastMessageCardProps> = ({ lastMessage }) => {
         }
       />
       <Typography
-        className={classes.showTime}
+        sx={{ marginTop: -3, paddingRight: 1 }}
         align="right"
         display="block"
         variant="caption"

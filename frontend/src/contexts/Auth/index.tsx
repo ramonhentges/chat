@@ -6,6 +6,7 @@ import { api } from '../../services/api';
 import { login } from '../../services/auth.service';
 import { myUserInfo } from '../../services/user.service';
 import { socket, setAuthorizationToken } from '../../services/socket.service';
+import { plainToInstance } from 'class-transformer';
 
 interface AuthContextProps {
   signed: boolean;
@@ -56,11 +57,11 @@ export const AuthProvider: React.FC = ({ children }) => {
   }
 
   const getUserInfo = useCallback(async () => {
-    const response = await myUserInfo();
-    if (response.status === 200) {
+    const { status, data } = await myUserInfo();
+    if (status === 200) {
       socket.connect();
-      setUser(response.data);
-    } else if (response.status === 401) {
+      setUser(plainToInstance(User, data));
+    } else if (status === 401) {
       signOut();
     }
   }, []);

@@ -13,8 +13,8 @@ import {
   TableRow,
   TextField,
   Typography
-} from '@material-ui/core';
-import { Send } from '@material-ui/icons';
+} from '@mui/material';
+import { Send } from '@mui/icons-material';
 import {
   ForwardedRef,
   forwardRef,
@@ -26,10 +26,9 @@ import { useConversation } from '../../contexts/Conversation';
 import { User } from '../../models/user';
 import { usersList } from '../../services/user.service';
 import Loading from '../Loading';
-import useStyles from './styles';
+import { plainToInstance } from 'class-transformer';
 
 const FindUserModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
-  const classes = useStyles();
   const { setDestination } = useConversation();
   const [open, setOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
@@ -84,8 +83,8 @@ const FindUserModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
     const fetchData = async () => {
       const { data, status } = await usersList();
       if (status && status === 200 && open) {
-        setUsers(data);
-        setUsersSearch(data);
+        setUsers(plainToInstance(User, data as []));
+        setUsersSearch(plainToInstance(User, data as []));
         setLoading(false);
       }
     };
@@ -111,21 +110,21 @@ const FindUserModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
     >
       <Grid
         container
-        justify="center"
+        justifyContent="center"
         alignContent="center"
         alignItems="center"
         style={{ height: '100vh' }}
       >
         <Grid item xs={8}>
-          <Paper className={classes.paper}>
-            <Grid item className={classes.marginBottom}>
+          <Paper sx={{ p: 2 }}>
+            <Grid item sx={{ mb: 2 }}>
               <Typography variant="h5">Buscar Contato</Typography>
             </Grid>
             {loading ? (
               <Loading text="Carregando" />
             ) : (
               <>
-                <Grid item className={classes.marginBottom}>
+                <Grid item sx={{ mb: 2 }}>
                   <TextField
                     fullWidth
                     id="username"
@@ -191,8 +190,8 @@ const FindUserModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
                               inputProps: { 'aria-label': 'rows per page' },
                               native: true
                             }}
-                            onChangePage={handleChangePage}
-                            onChangeRowsPerPage={handleChangeRowsPerPage}
+                            onPageChange={handleChangePage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
                           />
                         </TableRow>
                       </TableFooter>

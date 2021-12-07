@@ -1,23 +1,21 @@
 import React from 'react';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import Avatar from '@material-ui/core/Avatar';
-import IconButton from '@material-ui/core/IconButton';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import useStyles from './styles';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import Avatar from '@mui/material/Avatar';
+import IconButton from '@mui/material/IconButton';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useAuth } from '../../contexts/Auth';
-import { ListItemIcon, Menu, MenuItem, Typography } from '@material-ui/core';
+import { ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import {
   ExitToApp as ExitIcon,
   Brightness4 as NightIcon,
   Brightness7 as DayIcon
-} from '@material-ui/icons';
+} from '@mui/icons-material';
 import { useMyTheme } from '../../contexts/MyTheme';
 
 const UserCard: React.FC = () => {
-  const classes = useStyles();
   const { user, signOut } = useAuth();
-  const { theme, changeTheme } = useMyTheme();
+  const { mode, changeTheme } = useMyTheme();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -34,11 +32,14 @@ const UserCard: React.FC = () => {
 
   return (
     <>
-      <Card className={classes.root} elevation={3} square={true}>
+      <Card sx={{ width: 300, mb: 0.3 }} elevation={3} square={true}>
         <CardHeader
           avatar={
-            <Avatar aria-label="recipe" className={classes.avatar}>
-              {user?.fullName[0]}
+            <Avatar
+              aria-label="recipe"
+              sx={{ backgroundColor: 'palette.primary.main' }}
+            >
+              {user?.getTitle()[0]}
             </Avatar>
           }
           action={
@@ -46,8 +47,8 @@ const UserCard: React.FC = () => {
               <MoreVertIcon />
             </IconButton>
           }
-          title={user?.fullName}
-          subheader={user?.username}
+          title={user?.getTitle()}
+          subheader={user?.getSubtitle()}
           titleTypographyProps={{ color: 'primary' }}
         />
       </Card>
@@ -60,7 +61,7 @@ const UserCard: React.FC = () => {
       >
         <MenuItem onClick={handleChangeTheme}>
           <ListItemIcon>
-            {theme ? (
+            {mode === 'dark' ? (
               <DayIcon fontSize="small" />
             ) : (
               <NightIcon fontSize="small" />

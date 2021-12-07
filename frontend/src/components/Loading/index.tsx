@@ -1,7 +1,6 @@
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import useStyles from './styles';
+import CircularProgress from '@mui/material/CircularProgress';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
 
 interface Props {
   text: string;
@@ -9,15 +8,25 @@ interface Props {
 }
 
 function Loading({ text, fullScreen }: Props) {
-  const classes = useStyles();
   return (
     <Grid
       container
-      justify="center"
+      justifyContent="center"
       alignItems="center"
-      className={fullScreen ? classes.gridFullScreen : classes.grid}
+      sx={
+        fullScreen
+          ? {
+              height: '100vh',
+              width: '100vw',
+              flexGrow: 2,
+              overflowY: 'auto',
+              flexWrap: 'nowrap',
+              p: 2
+            }
+          : { flexGrow: 2, overflowY: 'auto', flexWrap: 'nowrap', p: 2 }
+      }
     >
-      <Typography variant="h6" color="textPrimary" className={classes.padding}>
+      <Typography variant="h6" color="textPrimary" sx={{ p: 2 }}>
         {text}
       </Typography>
       <CircularProgress />

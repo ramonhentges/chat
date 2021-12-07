@@ -4,15 +4,13 @@ import {
   InputLabel,
   OutlinedInput,
   IconButton
-} from '@material-ui/core';
-import SendIcon from '@material-ui/icons/Send';
+} from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
 import React, { useState } from 'react';
 import { useConversation } from '../../contexts/Conversation';
-import useStyles from './styles';
 
 export default function SendButton() {
   const [message, setMessage] = useState('');
-  const classes = useStyles();
   const { destination, loading, sendMessage } = useConversation();
 
   function sendMessageClick(event: React.FormEvent<HTMLFormElement>) {
@@ -26,7 +24,7 @@ export default function SendButton() {
   }
 
   return !!destination && !loading ? (
-    <Grid item className={classes.sendGrid}>
+    <Grid item sx={{ p: 2 }}>
       <form onSubmit={sendMessageClick}>
         <FormControl
           fullWidth
@@ -34,10 +32,9 @@ export default function SendButton() {
           variant="outlined"
           onChange={handleInputChange}
         >
-          <InputLabel htmlFor="outlined-adornment-amount">Mensagem</InputLabel>
           <OutlinedInput
+            label="Mensagem"
             autoComplete="off"
-            labelWidth={80}
             id="outlined-adornment-amount"
             value={message}
             endAdornment={
@@ -46,6 +43,9 @@ export default function SendButton() {
               </IconButton>
             }
           />
+          <InputLabel variant="outlined" htmlFor="outlined-adornment-amount">
+            Mensagem
+          </InputLabel>
         </FormControl>
       </form>
     </Grid>

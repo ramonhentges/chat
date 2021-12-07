@@ -4,20 +4,20 @@ import {
   Link,
   Paper,
   TextField,
-  Typography
-} from '@material-ui/core';
-import React, { useRef, useState } from 'react';
+  Typography,
+  Container,
+  Stack
+} from '@mui/material';
+import React, { useState } from 'react';
 import { Redirect, useHistory, Link as LinkDom } from 'react-router-dom';
 import Footer from '../../../components/Footer';
-import AlertSnackbar from '../../../components/AlertSnackbar';
 import { Login as LoginInterface } from '../../../interfaces/login';
-import useStyles from './styles';
 import { useAuth } from '../../../contexts/Auth';
+import { useAlert } from '../../../contexts/AlertSnackbar';
 
 export function Login(props: any) {
-  const classes = useStyles();
   const history = useHistory();
-  const alert = useRef<any>(null);
+  const { openAlert } = useAlert();
   const [user, setUser] = useState<LoginInterface>({
     username: '',
     password: ''
@@ -38,7 +38,10 @@ export function Login(props: any) {
         history.push('/');
       }
     } else {
-      alert.current.handleOpenSnackbar();
+      openAlert({
+        severity: 'error',
+        message: 'Usuário e/ou senha incorreto(s)'
+      });
     }
   }
 
@@ -49,75 +52,78 @@ export function Login(props: any) {
       }}
     />
   ) : (
-    <div className={classes.overflow}>
+    <Container maxWidth="sm">
       <Grid
         container
         spacing={1}
         direction="column"
-        justify="center"
+        justifyContent="center"
         alignItems="center"
         alignContent="center"
-        className={classes.grid}
+        sx={{ minHeight: '100vh' }}
       >
-        <Grid item lg={4} md={6} xs={8} className={classes.loginGrid}>
-          <Typography
-            className={classes.typography}
-            variant="h2"
-            color="initial"
-          >
-            Chatting
-          </Typography>
-          <Paper className={classes.paper}>
-            <Typography className={classes.accessText} variant="h6">
-              Acesso ao sistema
+        <Grid
+          item
+          container
+          direction="column"
+          sx={{ width: '100%' }}
+          spacing={2}
+        >
+          <Grid item>
+            <Typography sx={{ textAlign: 'center' }} variant="h2">
+              Chatting
             </Typography>
-            <form onSubmit={handleFormSubmit} autoComplete="off">
-              <TextField
-                fullWidth
-                id="username"
-                name="username"
-                label="Nome de Usuário"
-                variant="outlined"
-                value={user.username}
-                onChange={handleInputChange}
-              />
-              <TextField
-                fullWidth
-                id="password"
-                name="password"
-                label="Senha"
-                type="password"
-                variant="outlined"
-                value={user.password}
-                onChange={handleInputChange}
-              />
-              <Button
-                className={classes.button}
-                variant="contained"
-                color="primary"
-                type="submit"
-              >
-                Login
-              </Button>
-            </form>
-          </Paper>
+          </Grid>
+          <Grid item>
+            <Paper sx={{ p: 2 }}>
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                Acesso ao sistema
+              </Typography>
+              <form onSubmit={handleFormSubmit} autoComplete="off">
+                <Stack direction="column" spacing={2} sx={{ mb: 2 }}>
+                  <TextField
+                    fullWidth
+                    id="username"
+                    name="username"
+                    label="Nome de Usuário"
+                    variant="outlined"
+                    value={user.username}
+                    onChange={handleInputChange}
+                  />
+                  <TextField
+                    fullWidth
+                    id="password"
+                    name="password"
+                    label="Senha"
+                    type="password"
+                    variant="outlined"
+                    value={user.password}
+                    onChange={handleInputChange}
+                  />
+                </Stack>
+                <Button
+                  sx={{ float: 'right' }}
+                  variant="contained"
+                  color="primary"
+                  type="submit"
+                >
+                  Login
+                </Button>
+              </form>
+            </Paper>
+          </Grid>
         </Grid>
-        <Grid item className={classes.createAccountGrid} lg={4} md={6} xs={8}>
-          <Typography className={classes.createAccountText}>
+        <Grid item container justifyContent="flex-end">
+          <Typography sx={{ float: 'right', mr: 1 }}>
             {'Não possui conta? '}
             <Link component={LinkDom} color="primary" to="createAccount">
               Criar conta
             </Link>
           </Typography>
         </Grid>
-        <AlertSnackbar
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          ref={alert}
-          severity="error"
-          message="Login inválido"
-        />
+
         <Footer />
       </Grid>
-    </div>
+    </Container>
   );
 }
