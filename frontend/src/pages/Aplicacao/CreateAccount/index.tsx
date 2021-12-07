@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { AxiosResponse } from 'axios';
 import React, { useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Footer from '../../../components/Footer';
 import { useAlert } from '../../../contexts/AlertSnackbar';
 import { CreateUser, CreateUserError } from '../../../interfaces/create-user';
@@ -16,7 +16,7 @@ import { createUser } from '../../../services/user.service';
 import { transformErrorResponse } from '../../../util/transformErrorResponse';
 
 export function CreateAccount(props: any) {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { openAlert } = useAlert();
   const [user, setUser] = useState<CreateUser>({
     username: '',
@@ -42,9 +42,9 @@ export function CreateAccount(props: any) {
         });
 
         if (props.location.state) {
-          history.push(props.location.state.from.pathname);
+          navigate(props.location.state.from.pathname);
         } else {
-          history.push('/login');
+          navigate('/login');
         }
       } else {
         setError(transformErrorResponse(response.data.message));

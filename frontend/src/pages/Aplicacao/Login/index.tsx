@@ -9,14 +9,14 @@ import {
   Stack
 } from '@mui/material';
 import React, { useState } from 'react';
-import { Redirect, useHistory, Link as LinkDom } from 'react-router-dom';
+import { Navigate, useNavigate, Link as LinkDom } from 'react-router-dom';
 import Footer from '../../../components/Footer';
 import { Login as LoginInterface } from '../../../interfaces/login';
 import { useAuth } from '../../../contexts/Auth';
 import { useAlert } from '../../../contexts/AlertSnackbar';
 
 export function Login(props: any) {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { openAlert } = useAlert();
   const [user, setUser] = useState<LoginInterface>({
     username: '',
@@ -32,11 +32,7 @@ export function Login(props: any) {
   async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (await signIn(user)) {
-      if (props.location.state) {
-        history.push(props.location.state.from.pathname);
-      } else {
-        history.push('/');
-      }
+      navigate('/');
     } else {
       openAlert({
         severity: 'error',
@@ -46,7 +42,7 @@ export function Login(props: any) {
   }
 
   return signed ? (
-    <Redirect
+    <Navigate
       to={{
         pathname: '/'
       }}

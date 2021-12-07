@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Login } from '../../interfaces/login';
 import { User } from '../../models/user';
@@ -29,9 +28,9 @@ export const AuthProvider: React.FC = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   async function signIn(loginUser: Login) {
-    const response: AxiosResponse = await login(loginUser);
+    const response = await login(loginUser);
     if (response.status === 200) {
-      api.defaults.headers[
+      api.defaults.headers.common[
         'Authorization'
       ] = `Bearer ${response.data.accessToken}`;
       localStorage.setItem('accessToken', JSON.stringify(response.data));
@@ -49,7 +48,7 @@ export const AuthProvider: React.FC = ({ children }) => {
 
   function signOut() {
     localStorage.removeItem('accessToken');
-    api.defaults.headers['Authorization'] = null;
+    api.defaults.headers.common['Authorization'] = '';
     setAuthorizationToken('');
     setUser(null);
     socket.off('disconnect');
@@ -64,6 +63,7 @@ export const AuthProvider: React.FC = ({ children }) => {
     } else if (status === 401) {
       signOut();
     }
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -73,11 +73,12 @@ export const AuthProvider: React.FC = ({ children }) => {
     const storedToken = localStorage.getItem('accessToken');
     if (storedToken) {
       const token = JSON.parse(storedToken).accessToken;
-      api.defaults.headers['Authorization'] = `Bearer ${token}`;
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setAuthorizationToken(token);
       getInfo();
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   }, [getUserInfo]);
 
   return (

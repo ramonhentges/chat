@@ -1,50 +1,35 @@
-import { Redirect, Route, RouteProps, Router, Switch } from 'react-router-dom';
-import { createBrowserHistory } from 'history';
+import { Route, BrowserRouter, Routes, Navigate } from 'react-router-dom';
 import React from 'react';
 import { Login } from '../pages/Aplicacao/Login';
 import InitialPage from '../pages/Aplicacao/InitialPage';
 import { useAuth } from '../contexts/Auth';
 import { CreateAccount } from '../pages/Aplicacao/CreateAccount';
 
-const history = createBrowserHistory();
+const PrivateRoute = ({ children }: any) => {
+  const { signed } = useAuth();
+  return signed ? children : <Navigate to="/login" />;
+};
+const MyRoutes: React.FC = () => {
+  const { loading } = useAuth();
 
-interface IPrivateRouteProps extends RouteProps {
-  component: React.ComponentType<any>;
-}
-
-const Routes: React.FC = () => {
-  const { signed, loading } = useAuth();
-  const PrivateRoute = ({
-    component: Component,
-    ...rest
-  }: IPrivateRouteProps) => (
-    <Route
-      {...rest}
-      render={(props) =>
-        signed ? (
-          <Component {...props} />
-        ) : (
-          <Redirect
-            to={{
-              pathname: '/login',
-              state: { from: props.location }
-            }}
-          />
-        )
-      }
-    />
-  );
   return loading ? (
     <h1> Loading... </h1>
   ) : (
-    <Router history={history}>
-      <Switch>
-        <Route exact path="/login" component={Login} />
-        <PrivateRoute component={InitialPage} path="/" exact />
-        <Route exact path="/createAccount" component={CreateAccount} />
-      </Switch>
-    </Router>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          element={
+            <PrivateRoute>
+              <InitialPage />
+            </PrivateRoute>
+          }
+          path="/"
+        />
+        <Route path="/createAccount" element={<CreateAccount />} />
+      </Routes>
+    </BrowserRouter>
   );
 };
 
-export default Routes;
+export default MyRoutes;

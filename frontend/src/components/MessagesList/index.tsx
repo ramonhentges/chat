@@ -80,7 +80,7 @@ export default function MessagesList() {
       ref={messagesGrid}
     >
       {messages.map((message, idx) => (
-        <>
+        <React.Fragment key={message.id}>
           {(idx === 0 ||
             (idx > 0 &&
               !sameDay(message.createdAt, messages[idx - 1].createdAt))) && (
@@ -94,8 +94,8 @@ export default function MessagesList() {
               }
             />
           )}
-          <Message key={message.id} message={message} openMenu={handleOpen} />
-        </>
+          <Message message={message} openMenu={handleOpen} />
+        </React.Fragment>
       ))}
       <Menu
         id="fade-menu"

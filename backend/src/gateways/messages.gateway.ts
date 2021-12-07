@@ -9,14 +9,15 @@ import {
   WsResponse
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { wsOptions } from 'src/constants/constants';
 import { Message } from 'src/models/message.model';
 import { AuthService } from 'src/modules/auth/auth.service';
 import { MessageDto } from 'src/modules/message/dto/message.dto';
 import { MessageService } from 'src/modules/message/message.service';
 import { UserService } from 'src/modules/user/user.service';
 
-@WebSocketGateway(wsOptions)
+@WebSocketGateway({
+  cors: { origin: '*' }
+})
 export class MessagesGateway {
   constructor(
     private authService: AuthService,
@@ -42,23 +43,19 @@ export class MessagesGateway {
     client.disconnect();
   }
 
-  addUserToGroupRoom(userId: string, groupId: string) {
-    this.server.in(`user-${userId}`).clients((err, clients) => {
-      clients.forEach((clientId) => {
-        const clientSocket = this.server.sockets.connected[clientId];
-        clientSocket.emit('joined-group', { id: `${groupId}` });
-        clientSocket.join(`group-${groupId}`);
-      });
+  async addUserToGroupRoom(userId: string, groupId: string) {
+    const clients = await this.server.in(`user-${userId}`).fetchSockets();
+    clients.forEach((client) => {
+      client.emit('joined-group', { id: `${groupId}` });
+      client.join(`group-${groupId}`);
     });
   }
 
-  removeUserFromGroupRoom(userId: string, groupId: string) {
-    this.server.in(`user-${userId}`).clients((err, clients) => {
-      clients.forEach((clientId) => {
-        const clientSocket = this.server.sockets.connected[clientId];
-        clientSocket.emit('leaved-group', { id: `${groupId}` });
-        clientSocket.leave(`group-${groupId}`);
-      });
+  async removeUserFromGroupRoom(userId: string, groupId: string) {
+    const clients = await this.server.in(`user-${userId}`).fetchSockets();
+    clients.forEach((client) => {
+      client.emit('leaved-group', { id: `${groupId}` });
+      client.leave(`group-${groupId}`);
     });
   }
 

@@ -2,7 +2,7 @@ import ReactDOM from 'react-dom';
 import '@fontsource/roboto';
 import 'reflect-metadata';
 import React from 'react';
-import Routes from './routes/routes';
+import MyRoutes from './routes/routes';
 import { MyThemeProvider } from './contexts/MyTheme';
 import { AuthProvider } from './contexts/Auth';
 import { AlertProvider } from './contexts/AlertSnackbar';
@@ -13,7 +13,7 @@ ReactDOM.render(
     <AlertProvider>
       <ConfirmProvider>
         <AuthProvider>
-          <Routes />
+          <MyRoutes />
         </AuthProvider>
       </ConfirmProvider>
     </AlertProvider>
