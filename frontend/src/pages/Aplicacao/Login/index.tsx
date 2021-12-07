@@ -65,7 +65,7 @@ export function Login(props: any) {
             variant="h2"
             color="initial"
           >
-            ChatZERA
+            Chatting
           </Typography>
           <Paper className={classes.paper}>
             <Typography className={classes.accessText} variant="h6">
