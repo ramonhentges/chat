@@ -1,8 +1,19 @@
-import { Chip, CircularProgress, Grid, Typography } from '@material-ui/core';
-import React, { useEffect, useRef } from 'react';
+import {
+  Chip,
+  CircularProgress,
+  Grid,
+  ListItemIcon,
+  Menu,
+  MenuItem,
+  Typography
+} from '@material-ui/core';
+import React, { useEffect, useRef, useState } from 'react';
 import { useConversation } from '../../contexts/Conversation';
+import { deleteUserMessage } from '../../services/socket.service';
 import Message from '../Message';
 import useStyles from './styles';
+import Fade from '@material-ui/core/Fade';
+import { Delete } from '@material-ui/icons';
 
 const sameDay = (firstDate: Date, secondDate: Date): boolean => {
   return (
@@ -15,7 +26,24 @@ const sameDay = (firstDate: Date, secondDate: Date): boolean => {
 export default function MessagesList() {
   const classes = useStyles();
   const messagesGrid = useRef<HTMLDivElement>(null);
-  const { messages, loading } = useConversation();
+  const { messages, loading, selectedMessage, setSelectedMessage } =
+    useConversation();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setSelectedMessage(undefined);
+    setAnchorEl(null);
+  };
+
+  const deleteMessage = () => {
+    selectedMessage && deleteUserMessage(selectedMessage.id);
+    setAnchorEl(null);
+  };
 
   useEffect(() => {
     !loading && scrollToBottom();
@@ -60,9 +88,27 @@ export default function MessagesList() {
               }
             />
           )}
-          <Message key={message.id} message={message} />
+          <Message key={message.id} message={message} openMenu={handleOpen} />
         </>
       ))}
+      <Menu
+        id="fade-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={open}
+        onClose={handleClose}
+        TransitionComponent={Fade}
+        getContentAnchorEl={null}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <MenuItem onClick={deleteMessage}>
+          <ListItemIcon>
+            <Delete fontSize="small" />
+          </ListItemIcon>
+          <Typography variant="inherit">Deletar Mensagem</Typography>
+        </MenuItem>
+      </Menu>
     </Grid>
   );
 }

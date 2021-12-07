@@ -7,6 +7,7 @@ import useStyles from './styles';
 
 interface MessageProps {
   message: UserMessage;
+  openMenu: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
 const getMessageTime = (date: Date): string => {
@@ -15,9 +16,8 @@ const getMessageTime = (date: Date): string => {
   }`;
 };
 
-export default function Message(props: MessageProps) {
+export default function Message({ message, openMenu }: MessageProps) {
   const classes = useStyles();
-  const { message } = props;
   const { user } = useAuth();
   const { setSelectedMessage, selectedMessage } = useConversation();
   const myMessage = user?.username === message.origin.username ? true : false;
@@ -34,8 +34,9 @@ export default function Message(props: MessageProps) {
         variant={myMessage ? 'outlined' : 'default'}
         color={selectedMessage === message ? 'secondary' : undefined}
         onClick={
-          myMessage
-            ? () => {
+          myMessage && !message.deleted
+            ? (event) => {
+                openMenu(event);
                 setSelectedMessage(message);
               }
             : undefined

@@ -4,7 +4,6 @@ import CardHeader from '@material-ui/core/CardHeader';
 import Avatar from '@material-ui/core/Avatar';
 import useStyles from './styles';
 import { useConversation } from '../../contexts/Conversation';
-import SelectedMessageInfo from '../SelectedMessageInfo';
 
 export default function ConversationCard() {
   const classes = useStyles();
@@ -30,7 +29,6 @@ export default function ConversationCard() {
         title={title}
         subheader={subheader}
         titleTypographyProps={{ color: 'secondary' }}
-        action={<SelectedMessageInfo />}
       />
     </Card>
   ) : (
