@@ -22,3 +22,6 @@ export const deleteGroup = (groupId: string) =>
   api({ url: `groups/${groupId}`, method: 'DELETE' });
 
 export const getMyGroups = () => api({ url: 'groups', method: 'GET' });
+
+export const getGroupInfo = (groupId: string) =>
+  api({ url: `groups/${groupId}`, method: 'GET' });

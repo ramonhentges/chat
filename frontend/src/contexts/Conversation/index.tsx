@@ -33,6 +33,8 @@ interface ConversationContextProps {
   lastMessages: (UserMessage | GroupMessage)[];
   selectedMessage: UserMessage | GroupMessage | undefined;
   setSelectedMessage: (message: UserMessage | GroupMessage | undefined) => void;
+  showInfo: boolean;
+  setShowInfo: (show: boolean) => void;
   receiveMessage: (
     message: UserMessage | GroupMessage,
     messageType: MessageType
@@ -62,6 +64,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
   const [selectedMessage, setSelectedMessage] = useState<
     UserMessage | GroupMessage | undefined
   >();
+  const [showInfo, setShowInfo] = useState<boolean>(false);
 
   const { user } = useAuth();
 
@@ -209,12 +212,11 @@ export const ConversationProvider: React.FC = ({ children }) => {
         messageType === MessageType.Sended &&
         destination.getKey() === message.destination().getKey()
       ) {
-        console.log('here kraii')
+        console.log('here kraii');
         setMessages((oldMsgs) => [...oldMsgs, message]);
       }
-      console.log(destination)
+      console.log(destination);
       console.log(message);
-      
     },
     [destination, lastMessages]
   );
@@ -313,7 +315,9 @@ export const ConversationProvider: React.FC = ({ children }) => {
         lastMessages,
         selectedMessage,
         setSelectedMessage,
-        receiveMessage
+        receiveMessage,
+        showInfo,
+        setShowInfo
       }}
     >
       {children}

@@ -30,7 +30,7 @@ export class GroupService {
   async getByID(id: string, user: JwsTokenDto) {
     const userInGroup = await this.isUserInGroup(user.id, id);
     if (userInGroup) {
-      return await this.groupRepo.findOne({ id });
+      return await this.groupRepo.findOne({ id }, { relations: ['users'] });
     }
     throw new ForbiddenException({
       message: 'Você não possui permissão para visualizar este grupo'
