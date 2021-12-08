@@ -9,6 +9,10 @@ services:
             - 3011:3011
         volumes:
             - .:/home/node/app
+        deploy:
+            resources:
+                limits:
+                  memory: 1G
 
     db:
         build: .docker/postgres

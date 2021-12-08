@@ -29,7 +29,6 @@ export class GroupService {
 
   async getByID(id: string, user: JwsTokenDto) {
     const userInGroup = await this.isUserInGroup(user.id, id);
-
     if (userInGroup) {
       return await this.groupRepo.findOne({ id });
     }
@@ -124,7 +123,7 @@ export class GroupService {
         .createQueryBuilder('group')
         .leftJoinAndSelect('group.users', 'user')
         .where('user.id = :userId', { userId })
-        .andWhere('group.uuid = :groupId', { groupId })
+        .andWhere('group.id = :groupId', { groupId })
         .getCount()) > 0
     );
   }

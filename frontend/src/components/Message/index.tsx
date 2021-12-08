@@ -2,10 +2,11 @@ import { Chip, Grid, Typography } from '@mui/material';
 import React from 'react';
 import { useAuth } from '../../contexts/Auth';
 import { useConversation } from '../../contexts/Conversation';
+import { GroupMessage } from '../../models/group-message';
 import { UserMessage } from '../../models/user-message';
 
 interface MessageProps {
-  message: UserMessage;
+  message: UserMessage | GroupMessage;
   openMenu: (event: React.MouseEvent<HTMLElement>) => void;
 }
 

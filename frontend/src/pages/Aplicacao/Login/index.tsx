@@ -112,7 +112,7 @@ export function Login(props: any) {
         <Grid item container justifyContent="flex-end">
           <Typography sx={{ float: 'right', mr: 1 }}>
             {'Não possui conta? '}
-            <Link component={LinkDom} color="primary" to="createAccount">
+            <Link component={LinkDom} color="primary" to="/createAccount">
               Criar conta
             </Link>
           </Typography>

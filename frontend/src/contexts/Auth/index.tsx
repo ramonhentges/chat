@@ -6,6 +6,7 @@ import { login } from '../../services/auth.service';
 import { myUserInfo } from '../../services/user.service';
 import { socket, setAuthorizationToken } from '../../services/socket.service';
 import { plainToInstance } from 'class-transformer';
+import { HttpStatus } from '../../enum/http-status.enum';
 
 interface AuthContextProps {
   signed: boolean;
@@ -80,6 +81,41 @@ export const AuthProvider: React.FC = ({ children }) => {
       setLoading(false);
     }
   }, [getUserInfo]);
+
+  useEffect(() => {
+    const responseInterceptor = api.interceptors.response.use(
+      undefined,
+      async (err) => {
+        if (err.response === undefined) {
+          return { status: HttpStatus.INTERNAL_SERVER_ERROR };
+        }
+        if (err.response.status === HttpStatus.UNAUTHORIZED && user) {
+          //openAlert('Sua sessão expirou, realize o login novamente.', 'info');
+          signOut();
+          return err.response;
+        }
+        if (err.response.data instanceof Blob) {
+          try {
+            let resText = await new Promise((resolve, reject) => {
+              let reader = new FileReader();
+              reader.addEventListener('abort', reject);
+              reader.addEventListener('error', reject);
+              reader.addEventListener('loadend', () => {
+                resolve(reader.result);
+              });
+              reader.readAsText(err.response.data);
+            });
+            const data = JSON.parse(`${resText}`);
+            return { ...err.response, data };
+          } catch (err) {}
+        }
+        return err.response;
+      }
+    );
+    return () => {
+      api.interceptors.response.eject(responseInterceptor);
+    };
+  }, [user]);
 
   return (
     <AuthContext.Provider

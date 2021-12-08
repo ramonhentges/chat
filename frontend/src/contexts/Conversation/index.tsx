@@ -3,6 +3,8 @@ import { Group } from '../../models/group';
 import { User } from '../../models/user';
 import { UserMessage } from '../../models/user-message';
 import {
+  getGroupMessages,
+  getLastGroupMessage,
   getLatestMessages,
   getUserMessages
 } from '../../services/message.service';
@@ -13,8 +15,11 @@ import {
   sendGroupMessage
 } from '../../services/socket.service';
 import { plainToInstance } from 'class-transformer';
+import { HttpStatus } from '../../enum/http-status.enum';
+import { getMyGroups } from '../../services/group.service';
+import { GroupMessage } from '../../models/group-message';
 
-enum MessageType {
+export enum MessageType {
   Sended,
   Received
 }
@@ -23,14 +28,21 @@ interface ConversationContextProps {
   destination: Group | User | null;
   setDestination: (destination: Group | User) => void;
   loading: boolean;
-  messages: UserMessage[];
+  messages: (UserMessage | GroupMessage)[];
   sendMessage: (message: string) => void;
-  lastMessages: UserMessage[];
-  selectedMessage: UserMessage | undefined;
-  setSelectedMessage: (message: UserMessage | undefined) => void;
+  lastMessages: (UserMessage | GroupMessage)[];
+  selectedMessage: UserMessage | GroupMessage | undefined;
+  setSelectedMessage: (message: UserMessage | GroupMessage | undefined) => void;
+  receiveMessage: (
+    message: UserMessage | GroupMessage,
+    messageType: MessageType
+  ) => void;
 }
 
-const sortLastMessages = (a: UserMessage, b: UserMessage): number => {
+const sortLastMessages = (
+  a: UserMessage | GroupMessage,
+  b: UserMessage | GroupMessage
+): number => {
   return a.createdAt > b.createdAt ? -1 : a.createdAt === b.createdAt ? 0 : 1;
 };
 
@@ -43,37 +55,73 @@ export const ConversationProvider: React.FC = ({ children }) => {
     null
   );
   const [loading, setLoading] = useState(false);
-  const [messages, setMessages] = useState<UserMessage[]>([]);
-  const [lastMessages, setLastMessages] = useState<UserMessage[]>([]);
+  const [messages, setMessages] = useState<(UserMessage | GroupMessage)[]>([]);
+  const [lastMessages, setLastMessages] = useState<
+    (UserMessage | GroupMessage)[]
+  >([]);
   const [selectedMessage, setSelectedMessage] = useState<
-    UserMessage | undefined
+    UserMessage | GroupMessage | undefined
   >();
 
-  const { signOut } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     async function getLastMessages() {
-      const latestMessages = await getLatestMessages();
-      if (latestMessages?.status === 200) {
-        setLastMessages(
-          plainToInstance(UserMessage, latestMessages.data as []).sort(
-            sortLastMessages
-          )
-        );
+      if (user) {
+        const latestUserMessages = await getLatestMessages();
+        const myGroups = await getMyGroups();
+
+        if (
+          latestUserMessages?.status === HttpStatus.OK &&
+          myGroups?.status === HttpStatus.OK
+        ) {
+          const latestGroupsMessages = myGroups.data.map(
+            async (group: Group) => {
+              const message = await getLastGroupMessage(group.id);
+              if (message.status === HttpStatus.OK) {
+                if (message.data) {
+                  return { ...message.data, groupDestination: group };
+                } else {
+                  return {
+                    id: group.id,
+                    message: 'Grupo Criado',
+                    deleted: false,
+                    createdAt: group.createdAt,
+                    origin: user,
+                    groupDestination: group
+                  };
+                }
+              }
+            }
+          );
+          Promise.all(latestGroupsMessages).then((groupMessages) => {
+            const groupMessagesClass = plainToInstance(
+              GroupMessage,
+              groupMessages
+            );
+            const userMessages = plainToInstance(
+              UserMessage,
+              latestUserMessages.data as []
+            );
+            setLastMessages(
+              [...groupMessagesClass, ...userMessages].sort(sortLastMessages)
+            );
+          });
+        }
       }
     }
     getLastMessages();
-  }, []);
+  }, [user]);
 
-  const receiveUserMessage = useCallback(
-    (message: UserMessage, messageType: MessageType) => {
-      if (message.origin.username === message.userDestination.username) {
+  const receiveMessage = useCallback(
+    (message: UserMessage | GroupMessage, messageType: MessageType) => {
+      if (message.origin.getKey() === message.destination().getKey()) {
         if (
           lastMessages.some(
             (lastMessage) =>
-              lastMessage.origin.username === message.origin.username &&
-              lastMessage.userDestination.username ===
-                message.userDestination.username
+              lastMessage.origin.getKey() === message.origin.getKey() &&
+              lastMessage.destination().getKey() ===
+                message.destination().getKey()
           )
         ) {
           setLastMessages((prevState) =>
@@ -81,10 +129,9 @@ export const ConversationProvider: React.FC = ({ children }) => {
               .map((lastMessage) => {
                 if (
                   destination &&
-                  'username' in destination &&
-                  lastMessage.origin.username === message.origin.username &&
-                  lastMessage.userDestination.username ===
-                    message.userDestination.username
+                  lastMessage.origin.getKey() === message.origin.getKey() &&
+                  lastMessage.destination().getKey() ===
+                    message.destination().getKey()
                 ) {
                   return message;
                 }
@@ -101,15 +148,15 @@ export const ConversationProvider: React.FC = ({ children }) => {
         messageType === MessageType.Received
           ? lastMessages.some((lastMessage) =>
               [
-                lastMessage.origin.username,
-                lastMessage.userDestination.username
-              ].includes(message.origin.username)
+                lastMessage.origin.getKey(),
+                lastMessage.destination().getKey()
+              ].includes(message.origin.getKey())
             )
           : lastMessages.some((lastMessage) =>
               [
-                lastMessage.origin.username,
-                lastMessage.userDestination.username
-              ].includes(message.userDestination.username)
+                lastMessage.origin.getKey(),
+                lastMessage.destination().getKey()
+              ].includes(message.destination().getKey())
             )
       ) {
         if (messageType === MessageType.Received) {
@@ -118,9 +165,9 @@ export const ConversationProvider: React.FC = ({ children }) => {
               .map((lastMessage) => {
                 if (
                   [
-                    lastMessage.origin.username,
-                    lastMessage.userDestination.username
-                  ].includes(message.origin.username)
+                    lastMessage.origin.getKey(),
+                    lastMessage.destination().getKey()
+                  ].includes(message.origin.getKey())
                 ) {
                   return message;
                 }
@@ -134,9 +181,9 @@ export const ConversationProvider: React.FC = ({ children }) => {
               .map((lastMessage) => {
                 if (
                   [
-                    lastMessage.origin.username,
-                    lastMessage.userDestination.username
-                  ].includes(message.userDestination.username)
+                    lastMessage.origin.getKey(),
+                    lastMessage.destination().getKey()
+                  ].includes(message.destination().getKey())
                 ) {
                   return message;
                 }
@@ -154,18 +201,20 @@ export const ConversationProvider: React.FC = ({ children }) => {
       if (
         destination &&
         messageType === MessageType.Received &&
-        'username' in destination &&
-        destination.username === message.origin.username
+        destination.getKey() === message.origin.getKey()
       ) {
         setMessages((oldMsgs) => [...oldMsgs, message]);
       } else if (
         destination &&
         messageType === MessageType.Sended &&
-        'username' in destination &&
-        destination.username === message.userDestination.username
+        destination.getKey() === message.destination().getKey()
       ) {
+        console.log('here kraii')
         setMessages((oldMsgs) => [...oldMsgs, message]);
       }
+      console.log(destination)
+      console.log(message);
+      
     },
     [destination, lastMessages]
   );
@@ -186,27 +235,29 @@ export const ConversationProvider: React.FC = ({ children }) => {
   useEffect(() => {
     socket.off('sendedMsgFromUser');
     socket.on('sendedMsgFromUser', (message: UserMessage) => {
-      receiveUserMessage(
-        plainToInstance(UserMessage, message),
-        MessageType.Sended
-      );
+      receiveMessage(plainToInstance(UserMessage, message), MessageType.Sended);
     });
 
     socket.off('msgFromUser');
     socket.on('msgFromUser', (message: UserMessage) => {
-      receiveUserMessage(
+      receiveMessage(
         plainToInstance(UserMessage, message),
         MessageType.Received
       );
     });
-  }, [receiveUserMessage]);
+    socket.off('msgFromGroup');
+    socket.on('msgFromGroup', (message: GroupMessage) => {
+      receiveMessage(
+        plainToInstance(GroupMessage, message),
+        MessageType.Sended
+      );
+    });
+  }, [receiveMessage]);
 
   useEffect(() => {
     socket.off('deleteMsgFromUser');
     socket.on('deleteMsgFromUser', (message: UserMessage) => {
-      deleteMessage(
-        plainToInstance(UserMessage, { ...message, message: '' })
-      );
+      deleteMessage(plainToInstance(UserMessage, { ...message, message: '' }));
     });
   }, []);
 
@@ -232,16 +283,22 @@ export const ConversationProvider: React.FC = ({ children }) => {
   async function getMessages(destination: Group | User) {
     if ('username' in destination) {
       await getMessagesFromUser(destination);
+    } else {
+      await getGroupMessagesFromUser(destination);
     }
   }
 
   async function getMessagesFromUser(destination: User) {
     const response = await getUserMessages(destination);
-    if (response.status === 200) {
+    if (response.status === HttpStatus.OK) {
       setMessages(plainToInstance(UserMessage, response.data as []));
     }
-    if (response.status === 401) {
-      signOut();
+  }
+
+  async function getGroupMessagesFromUser(destination: Group) {
+    const response = await getGroupMessages(destination.id);
+    if (response.status === HttpStatus.OK) {
+      setMessages(plainToInstance(UserMessage, response.data as []));
     }
   }
 
@@ -255,7 +312,8 @@ export const ConversationProvider: React.FC = ({ children }) => {
         sendMessage,
         lastMessages,
         selectedMessage,
-        setSelectedMessage
+        setSelectedMessage,
+        receiveMessage
       }}
     >
       {children}

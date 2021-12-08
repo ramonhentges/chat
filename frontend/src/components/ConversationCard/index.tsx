@@ -8,7 +8,7 @@ export default function ConversationCard() {
   const { destination } = useConversation();
 
   return !!destination ? (
-    <Card sx={{ mb: 3 }} square={true}>
+    <Card square={true}>
       <CardHeader
         avatar={
           <Avatar

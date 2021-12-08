@@ -5,23 +5,36 @@ import { useRef } from 'react';
 import FindUserModal from '../FindUserModal';
 import { useConversation } from '../../contexts/Conversation';
 import { User } from '../../models/user';
+import CreateGroupModal from '../CreateGroupModal';
 
 const NewConversationButton: React.FC = () => {
   const { setDestination } = useConversation();
   const findUser = useRef<any>(null);
+  const createGroup = useRef<any>(null);
   const openFindUserModal = () => {
-    findUser.current.handleOpenFindUserModal();
+    findUser.current.handleOpenFindUserModal(false);
   };
-  const selectUser = (user: User) => {
-    setDestination(user);
-    findUser.current.handleClose();
+
+  const openCreateGroupModal = () => {
+    createGroup.current.handleOpen();
   };
+
+  const selectUser = (user: User | User[]) => {
+    if (Array.isArray(user)) {
+      setDestination(user[0]);
+      findUser.current.handleClose();
+    } else {
+      setDestination(user);
+      findUser.current.handleClose();
+    }
+  };
+
   const actions = [
     { icon: <Person />, name: 'Usuário', action: openFindUserModal },
     {
       icon: <Group />,
       name: 'Grupo',
-      action: () => console.log('other function')
+      action: openCreateGroupModal
     }
   ];
   return (
@@ -42,6 +55,7 @@ const NewConversationButton: React.FC = () => {
         ))}
       </SpeedDial>
       <FindUserModal ref={findUser} selectUserAction={selectUser} />
+      <CreateGroupModal ref={createGroup} />
     </>
   );
 };

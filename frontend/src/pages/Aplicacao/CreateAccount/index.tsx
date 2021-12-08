@@ -13,7 +13,6 @@ import Footer from '../../../components/Footer';
 import { useAlert } from '../../../contexts/AlertSnackbar';
 import { CreateUser, CreateUserError } from '../../../interfaces/create-user';
 import { createUser } from '../../../services/user.service';
-import { transformErrorResponse } from '../../../util/transformErrorResponse';
 
 export function CreateAccount(props: any) {
   const navigate = useNavigate();
@@ -47,7 +46,7 @@ export function CreateAccount(props: any) {
           navigate('/login');
         }
       } else {
-        setError(transformErrorResponse(response.data.message));
+        setError(response.data);
         openAlert({
           severity: 'error',
           message: 'Erro ao criar conta. Verifique os campos!'

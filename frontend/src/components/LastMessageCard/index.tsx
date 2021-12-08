@@ -6,9 +6,11 @@ import { useAuth } from '../../contexts/Auth';
 import { useConversation } from '../../contexts/Conversation';
 import { UserMessage } from '../../models/user-message';
 import { Typography } from '@mui/material';
+import { GroupMessage } from '../../models/group-message';
+import { Group } from '../../models/group';
 
 interface LastMessageCardProps {
-  lastMessage: UserMessage;
+  lastMessage: UserMessage | GroupMessage;
 }
 
 const getTime = (date: Date): string => {
@@ -29,16 +31,14 @@ const LastMessageCard: React.FC<LastMessageCardProps> = ({ lastMessage }) => {
   const { user } = useAuth();
   const { destination, setDestination } = useConversation();
   const contact =
-    user?.username === lastMessage.origin.username
-      ? lastMessage.userDestination
+    lastMessage.destination() instanceof Group
+      ? lastMessage.destination()
+      : user?.username === lastMessage.origin.username
+      ? lastMessage.destination()
       : lastMessage.origin;
 
   function isSelected() {
-    if (
-      destination &&
-      'username' in destination &&
-      destination.username === contact.username
-    ) {
+    if (destination && destination.getKey() === contact.getKey()) {
       return true;
     }
     return false;
@@ -61,7 +61,7 @@ const LastMessageCard: React.FC<LastMessageCardProps> = ({ lastMessage }) => {
       onClick={() => setDestination(contact)}
     >
       <CardHeader
-        avatar={<Avatar aria-label="recipe">{contact.fullName[0]}</Avatar>}
+        avatar={<Avatar aria-label="recipe">{contact.getTitle()[0]}</Avatar>}
         title={contact.getConversationTitle()}
         subheader={
           user?.username === lastMessage.origin.username

@@ -9,3 +9,7 @@ services:
             - 3000:3000
         volumes:
             - .:/home/node/app
+        deploy:
+            resources:
+                limits:
+                  memory: 2G

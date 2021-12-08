@@ -1,8 +1,11 @@
 import {
+  Button,
+  Checkbox,
   Grid,
   IconButton,
   Modal,
   Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -28,7 +31,7 @@ import Loading from '../Loading';
 import { plainToInstance } from 'class-transformer';
 
 type Props = {
-  selectUserAction: (user: User) => void;
+  selectUserAction: (user: User | User[]) => void;
 };
 
 const FindUserModal = forwardRef(
@@ -40,7 +43,10 @@ const FindUserModal = forwardRef(
     const [usersSearch, setUsersSearch] = useState<User[]>([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const handleOpen = () => {
+    const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+    const [selectMany, setSelectMany] = useState(false);
+    const handleOpen = (selectMany: boolean) => {
+      setSelectMany(selectMany);
       setOpen(true);
     };
 
@@ -51,6 +57,21 @@ const FindUserModal = forwardRef(
     const selectUser = (user: User) => {
       selectUserAction(user);
     };
+
+    const selectUsers = () => {
+      selectUserAction(selectedUsers);
+    };
+
+    const addUser = (user: User) => {
+      setSelectedUsers((users) => [...users, user]);
+    };
+
+    const removeUser = (user: User) => {
+      setSelectedUsers((users) =>
+        users.filter((val) => val.getKey() !== user.getKey())
+      );
+    };
+
     function handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
       event.preventDefault();
       setUsername(event.target.value);
@@ -167,16 +188,33 @@ const FindUserModal = forwardRef(
                                   {user.username}
                                 </TableCell>
                                 <TableCell align="right">
-                                  <IconButton
-                                    edge="end"
-                                    aria-label="tests"
-                                    component="a"
-                                    onClick={() => {
-                                      selectUser(user);
-                                    }}
-                                  >
-                                    <Send fontSize="small" />
-                                  </IconButton>
+                                  {selectMany ? (
+                                    <Checkbox
+                                      checked={selectedUsers.some(
+                                        (value) =>
+                                          value.getKey() === user.getKey()
+                                      )}
+                                      onChange={(e, checked) =>
+                                        checked
+                                          ? addUser(user)
+                                          : removeUser(user)
+                                      }
+                                      inputProps={{
+                                        'aria-label': 'controlled'
+                                      }}
+                                    />
+                                  ) : (
+                                    <IconButton
+                                      edge="end"
+                                      aria-label="tests"
+                                      component="a"
+                                      onClick={() => {
+                                        selectUser(user);
+                                      }}
+                                    >
+                                      <Send fontSize="small" />
+                                    </IconButton>
+                                  )}
                                 </TableCell>
                               </TableRow>
                             );
@@ -202,6 +240,23 @@ const FindUserModal = forwardRef(
                         </TableFooter>
                       </Table>
                     </TableContainer>
+                  </Grid>
+                  <Grid item container sx={{ mt: 2 }} justifyContent="right">
+                    <Stack spacing={2} direction="row">
+                      <Button
+                        variant="contained"
+                        //@ts-ignore
+                        color="default"
+                        onClick={handleClose}
+                      >
+                        Fechar
+                      </Button>
+                      {selectMany && (
+                        <Button variant="contained" onClick={selectUsers}>
+                          Selecionar
+                        </Button>
+                      )}
+                    </Stack>
                   </Grid>
                 </>
               )}

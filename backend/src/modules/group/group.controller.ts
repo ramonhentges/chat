@@ -7,9 +7,7 @@ import {
   HttpCode,
   Param,
   Post,
-  Put,
-  UnprocessableEntityException,
-  ValidationPipe
+  Put
 } from '@nestjs/common';
 import { AddRemoveUserToGroupDto } from './dto/add-user-to-group.dto';
 import { GroupDto } from './dto/group.dto';
@@ -30,36 +28,12 @@ export class GroupController {
   }
 
   @Post()
-  async store(
-    @Body(
-      new ValidationPipe({
-        validationError: {
-          target: false,
-          value: false
-        },
-        exceptionFactory: (errors) => new UnprocessableEntityException(errors)
-      })
-    )
-    body: GroupDto,
-    @Request() req
-  ) {
+  async store(@Body() body: GroupDto, @Request() req) {
     return this.groupService.create(req.user, body);
   }
 
   @Post('add-user')
-  async addUser(
-    @Body(
-      new ValidationPipe({
-        validationError: {
-          target: false,
-          value: false
-        },
-        exceptionFactory: (errors) => new UnprocessableEntityException(errors)
-      })
-    )
-    body: AddRemoveUserToGroupDto,
-    @Request() req
-  ) {
+  async addUser(@Body() body: AddRemoveUserToGroupDto, @Request() req) {
     return this.groupService.addUser(body, req.user);
   }
 
@@ -76,16 +50,7 @@ export class GroupController {
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body(
-      new ValidationPipe({
-        validationError: {
-          target: false,
-          value: false
-        },
-        exceptionFactory: (errors) => new UnprocessableEntityException(errors)
-      })
-    )
-    body: GroupDto,
+    @Body() body: GroupDto,
     @Request() req
   ) {
     return this.groupService.update(id, body, req.user);

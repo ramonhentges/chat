@@ -5,9 +5,7 @@ import {
   Get,
   Param,
   Post,
-  Put,
-  UnprocessableEntityException,
-  ValidationPipe
+  Put
 } from '@nestjs/common';
 import { Public } from 'src/constants/constants';
 import { UserDto } from './dto/user.dto';
@@ -35,35 +33,12 @@ export class UserController {
 
   @Public()
   @Post()
-  async store(
-    @Body(
-      new ValidationPipe({
-        validationError: {
-          target: false,
-          value: false
-        },
-        exceptionFactory: (errors) => new UnprocessableEntityException(errors)
-      })
-    )
-    body: UserDto
-  ) {
+  async store(@Body() body: UserDto) {
     return this.userService.store(body);
   }
 
   @Put()
-  async update(
-    @Request() req,
-    @Body(
-      new ValidationPipe({
-        validationError: {
-          target: false,
-          value: false
-        },
-        exceptionFactory: (errors) => new UnprocessableEntityException(errors)
-      })
-    )
-    body: UserDto
-  ) {
+  async update(@Request() req, @Body() body: UserDto) {
     const { user } = req;
     return this.userService.update(user, body);
   }

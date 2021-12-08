@@ -192,6 +192,7 @@ export class MessageService {
         username: originUser.username,
         fullName: originUser.fullName
       },
+      groupDestination: destinationGroup,
       ...returnMessage
     };
   }
@@ -243,7 +244,7 @@ export class MessageService {
         { id: messageId },
         { ...message, deleted: true, message: '' }
       );
-      return message.groupDestination;
+      return { id: messageId, ...message, deleted: true, message: '' };
     }
     throw new ForbiddenException({
       message: 'Você não tem permissão para excluir esta mensagem'
