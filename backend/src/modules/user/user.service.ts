@@ -58,14 +58,9 @@ export class UserService {
   async store(userDto: UserDto) {
     const user = this.userRepo.create(userDto);
     if (await AlreadyExists(this.userRepo, 'username', user.username)) {
-      throw new UnprocessableEntityException([
-        {
-          property: 'username',
-          constraints: {
-            exists: 'Nome de usuário já cadastrado'
-          }
-        }
-      ]);
+      throw new UnprocessableEntityException({
+        username: 'Nome de usuário já utilizado'
+      });
     }
     return this.userRepo.save(user);
   }
@@ -74,14 +69,9 @@ export class UserService {
     if (
       await AlreadyExists(this.userRepo, 'username', userDto.username, token.id)
     ) {
-      throw new UnprocessableEntityException([
-        {
-          property: 'username',
-          constraints: {
-            exists: 'Nome de usuário já cadastrado'
-          }
-        }
-      ]);
+      throw new UnprocessableEntityException({
+        username: 'Nome de usuário já utilizado'
+      });
     }
     this.userRepo.update({ id: token.id }, userDto);
     return await this.userRepo.findOne({ where: { id: token.id } });

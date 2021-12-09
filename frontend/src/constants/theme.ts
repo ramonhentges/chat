@@ -6,6 +6,12 @@ import {
 } from '@mui/material';
 import { ptBR } from '@mui/material/locale';
 
+declare module '@mui/material/Button' {
+  interface ButtonPropsColorOverrides {
+    default: true;
+  }
+}
+
 export const defaultAnchorOrigin: SnackbarProps['anchorOrigin'] = {
   vertical: 'bottom',
   horizontal: 'center'
@@ -36,6 +42,24 @@ export const light = createTheme(
         dark: '#d5d5d5',
         contrastText: 'rgba(0,0,0,0.87)'
       }
+    },
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          ':root': {
+            '*::-webkit-scrollbar': {
+              width: '6px'
+            },
+            '*::-webkit-scrollbar-track': {
+              background: 'rgba(0,0,0,0.00)'
+            },
+            '*::-webkit-scrollbar-thumb': {
+              backgroundColor: 'rgba(0,0,0,.1)',
+              borderRadius: '8px'
+            }
+          }
+        }
+      }
     }
   } as IThemeOptions,
   ptBR
@@ -56,6 +80,24 @@ export const dark = createTheme(
         main: '#e0e0e0',
         dark: '#d5d5d5',
         contrastText: 'rgba(0,0,0,0.87)'
+      }
+    },
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          ':root': {
+            '*::-webkit-scrollbar': {
+              width: '6px'
+            },
+            '*::-webkit-scrollbar-track': {
+              background: 'rgba(0,0,0,0.00)'
+            },
+            '*::-webkit-scrollbar-thumb': {
+              backgroundColor: '#d5d5d5',
+              borderRadius: '8px'
+            }
+          }
+        }
       }
     }
   } as IThemeOptions,

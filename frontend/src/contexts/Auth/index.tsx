@@ -30,7 +30,7 @@ export const AuthProvider: React.FC = ({ children }) => {
 
   async function signIn(loginUser: Login) {
     const response = await login(loginUser);
-    if (response.status === 200) {
+    if (response.status === HttpStatus.OK) {
       api.defaults.headers.common[
         'Authorization'
       ] = `Bearer ${response.data.accessToken}`;
@@ -58,10 +58,10 @@ export const AuthProvider: React.FC = ({ children }) => {
 
   const getUserInfo = useCallback(async () => {
     const { status, data } = await myUserInfo();
-    if (status === 200) {
+    if (status === HttpStatus.OK) {
       socket.connect();
       setUser(plainToInstance(User, data));
-    } else if (status === 401) {
+    } else if (status === HttpStatus.UNAUTHORIZED) {
       signOut();
     }
     setLoading(false);

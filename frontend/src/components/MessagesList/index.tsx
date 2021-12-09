@@ -9,11 +9,16 @@ import {
 } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { useConversation } from '../../contexts/Conversation';
-import { deleteUserMessage } from '../../services/socket.service';
+import {
+  deleteGroupMessage,
+  deleteUserMessage
+} from '../../services/socket.service';
 import Message from '../Message';
 import Fade from '@mui/material/Fade';
 import { Delete } from '@mui/icons-material';
 import { useConfirm } from '../../contexts/ConfirmDialog';
+import { UserMessage } from '../../models/user-message';
+import { GroupMessage } from '../../models/group-message';
 
 const sameDay = (firstDate: Date, secondDate: Date): boolean => {
   return (
@@ -45,7 +50,11 @@ export default function MessagesList() {
       title: 'Aviso de exclusão',
       message: 'Desaja mesmo excluir a mensagem?'
     }).then(() => {
-      selectedMessage && deleteUserMessage(selectedMessage.id);
+      if (selectedMessage instanceof UserMessage) {
+        deleteUserMessage(selectedMessage.id);
+      } else if (selectedMessage instanceof GroupMessage) {
+        deleteGroupMessage(selectedMessage.id);
+      }
       setSelectedMessage(undefined);
       setAnchorEl(null);
     });

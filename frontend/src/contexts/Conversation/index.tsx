@@ -18,6 +18,7 @@ import { plainToInstance } from 'class-transformer';
 import { HttpStatus } from '../../enum/http-status.enum';
 import { getMyGroups } from '../../services/group.service';
 import { GroupMessage } from '../../models/group-message';
+import { useAlert } from '../AlertSnackbar';
 
 export enum MessageType {
   Sended,
@@ -35,10 +36,7 @@ interface ConversationContextProps {
   setSelectedMessage: (message: UserMessage | GroupMessage | undefined) => void;
   showInfo: boolean;
   setShowInfo: (show: boolean) => void;
-  receiveMessage: (
-    message: UserMessage | GroupMessage,
-    messageType: MessageType
-  ) => void;
+  receiveMessage: (message: UserMessage | GroupMessage) => void;
 }
 
 const sortLastMessages = (
@@ -67,161 +65,82 @@ export const ConversationProvider: React.FC = ({ children }) => {
   const [showInfo, setShowInfo] = useState<boolean>(false);
 
   const { user } = useAuth();
+  const { openAlert } = useAlert();
+
+  const getGroupLastMessage = useCallback(async (group: Group) => {
+    const message = await getLastGroupMessage(group.id);
+    if (message.status === HttpStatus.OK) {
+      let data;
+      if (message.data) {
+        data = { ...message.data, groupDestination: group };
+      } else {
+        data = {
+          id: group.id,
+          message: 'Grupo Criado',
+          deleted: false,
+          createdAt: group.createdAt,
+          origin: new User(),
+          groupDestination: group
+        };
+      }
+      return plainToInstance(GroupMessage, data);
+    }
+  }, []);
 
   useEffect(() => {
     async function getLastMessages() {
       if (user) {
         const latestUserMessages = await getLatestMessages();
         const myGroups = await getMyGroups();
-
         if (
           latestUserMessages?.status === HttpStatus.OK &&
           myGroups?.status === HttpStatus.OK
         ) {
           const latestGroupsMessages = myGroups.data.map(
             async (group: Group) => {
-              const message = await getLastGroupMessage(group.id);
-              if (message.status === HttpStatus.OK) {
-                if (message.data) {
-                  return { ...message.data, groupDestination: group };
-                } else {
-                  return {
-                    id: group.id,
-                    message: 'Grupo Criado',
-                    deleted: false,
-                    createdAt: group.createdAt,
-                    origin: user,
-                    groupDestination: group
-                  };
-                }
-              }
+              return getGroupLastMessage(group);
             }
           );
           Promise.all(latestGroupsMessages).then((groupMessages) => {
-            const groupMessagesClass = plainToInstance(
-              GroupMessage,
-              groupMessages
-            );
             const userMessages = plainToInstance(
               UserMessage,
               latestUserMessages.data as []
             );
             setLastMessages(
-              [...groupMessagesClass, ...userMessages].sort(sortLastMessages)
+              [...groupMessages, ...userMessages].sort(sortLastMessages)
             );
           });
         }
       }
     }
     getLastMessages();
-  }, [user]);
+  }, [user, getGroupLastMessage]);
 
   const receiveMessage = useCallback(
-    (message: UserMessage | GroupMessage, messageType: MessageType) => {
-      if (message.origin.getKey() === message.destination().getKey()) {
-        if (
-          lastMessages.some(
-            (lastMessage) =>
-              lastMessage.origin.getKey() === message.origin.getKey() &&
-              lastMessage.destination().getKey() ===
-                message.destination().getKey()
-          )
-        ) {
-          setLastMessages((prevState) =>
-            prevState
-              .map((lastMessage) => {
-                if (
-                  destination &&
-                  lastMessage.origin.getKey() === message.origin.getKey() &&
-                  lastMessage.destination().getKey() ===
-                    message.destination().getKey()
-                ) {
-                  return message;
-                }
-                return lastMessage;
-              })
-              .sort(sortLastMessages)
-          );
-        } else {
-          setLastMessages((prevState) =>
-            [message, ...prevState].sort(sortLastMessages)
-          );
-        }
-      } else if (
-        messageType === MessageType.Received
-          ? lastMessages.some((lastMessage) =>
-              [
-                lastMessage.origin.getKey(),
-                lastMessage.destination().getKey()
-              ].includes(message.origin.getKey())
+    (message: UserMessage | GroupMessage) => {
+      if (user) {
+        setLastMessages((messages) => {
+          return [
+            message,
+            ...messages.filter(
+              (m) =>
+                m.getContact(user).getKey() !==
+                message.getContact(user).getKey()
             )
-          : lastMessages.some((lastMessage) =>
-              [
-                lastMessage.origin.getKey(),
-                lastMessage.destination().getKey()
-              ].includes(message.destination().getKey())
-            )
-      ) {
-        if (messageType === MessageType.Received) {
-          setLastMessages((prevState) =>
-            prevState
-              .map((lastMessage) => {
-                if (
-                  [
-                    lastMessage.origin.getKey(),
-                    lastMessage.destination().getKey()
-                  ].includes(message.origin.getKey())
-                ) {
-                  return message;
-                }
-                return lastMessage;
-              })
-              .sort(sortLastMessages)
-          );
-        } else if (messageType === MessageType.Sended) {
-          setLastMessages((prevState) =>
-            prevState
-              .map((lastMessage) => {
-                if (
-                  [
-                    lastMessage.origin.getKey(),
-                    lastMessage.destination().getKey()
-                  ].includes(message.destination().getKey())
-                ) {
-                  return message;
-                }
-                return lastMessage;
-              })
-              .sort(sortLastMessages)
-          );
-        }
-      } else {
-        setLastMessages((prevState) =>
-          [message, ...prevState].sort(sortLastMessages)
-        );
+          ];
+        });
       }
 
-      if (
-        destination &&
-        messageType === MessageType.Received &&
-        destination.getKey() === message.origin.getKey()
-      ) {
-        setMessages((oldMsgs) => [...oldMsgs, message]);
-      } else if (
-        destination &&
-        messageType === MessageType.Sended &&
-        destination.getKey() === message.destination().getKey()
-      ) {
-        console.log('here kraii');
-        setMessages((oldMsgs) => [...oldMsgs, message]);
+      if (destination && user) {
+        if (destination.getKey() === message.getContact(user).getKey()) {
+          setMessages((oldMsgs) => [...oldMsgs, message]);
+        }
       }
-      console.log(destination);
-      console.log(message);
     },
-    [destination, lastMessages]
+    [destination, user]
   );
 
-  const deleteMessage = (deletedMessage: UserMessage) => {
+  const deleteMessage = (deletedMessage: UserMessage | GroupMessage) => {
     setMessages((prevMessages) =>
       prevMessages.map((message) => {
         return message.id === deletedMessage.id ? deletedMessage : message;
@@ -237,34 +156,66 @@ export const ConversationProvider: React.FC = ({ children }) => {
   useEffect(() => {
     socket.off('sendedMsgFromUser');
     socket.on('sendedMsgFromUser', (message: UserMessage) => {
-      receiveMessage(plainToInstance(UserMessage, message), MessageType.Sended);
+      receiveMessage(plainToInstance(UserMessage, message));
     });
 
     socket.off('msgFromUser');
     socket.on('msgFromUser', (message: UserMessage) => {
-      receiveMessage(
-        plainToInstance(UserMessage, message),
-        MessageType.Received
-      );
+      receiveMessage(plainToInstance(UserMessage, message));
     });
     socket.off('msgFromGroup');
     socket.on('msgFromGroup', (message: GroupMessage) => {
-      receiveMessage(
-        plainToInstance(GroupMessage, message),
-        MessageType.Sended
-      );
+      receiveMessage(plainToInstance(GroupMessage, message));
     });
   }, [receiveMessage]);
 
   useEffect(() => {
-    socket.off('deleteMsgFromUser');
-    socket.on('deleteMsgFromUser', (message: UserMessage) => {
+    socket.off('deletedUserMessage');
+    socket.on('deletedUserMessage', (message: UserMessage) => {
       deleteMessage(plainToInstance(UserMessage, { ...message, message: '' }));
+    });
+    socket.off('deletedGroupMessage');
+    socket.on('deletedGroupMessage', (message: GroupMessage) => {
+      deleteMessage(plainToInstance(GroupMessage, { ...message, message: '' }));
     });
   }, []);
 
   useEffect(() => {
+    socket.off('joinedGroup');
+    socket.on('joinedGroup', async (group: Group) => {
+      const groupLastMessage = await getGroupLastMessage(group);
+      if (groupLastMessage) {
+        setLastMessages((messages) => [groupLastMessage, ...messages]);
+        openAlert({
+          severity: 'info',
+          message: `Você foi adicionado ao grupo ${groupLastMessage
+            .destination()
+            .getTitle()}`
+        });
+      }
+    });
+    socket.off('leavedGroup');
+    socket.on('leavedGroup', (group: Group) => {
+      const groupClass = plainToInstance(Group, group);
+      setLastMessages((messages) =>
+        messages.filter(
+          (message) => message.destination().getKey() !== groupClass.getKey()
+        )
+      );
+      if (destination?.getKey() === groupClass.getKey()) {
+        setDestinationState(null);
+        setMessages([]);
+      }
+      openAlert({
+        severity: 'info',
+        message: `Você foi removido do grupo ${groupClass.getTitle()}`
+      });
+    });
+  }, [getGroupLastMessage, openAlert, destination]);
+
+  useEffect(() => {
     setSelectedMessage(undefined);
+    setShowInfo(false);
   }, [destination]);
 
   async function setDestination(destination: Group | User) {
@@ -275,9 +226,9 @@ export const ConversationProvider: React.FC = ({ children }) => {
   }
 
   function sendMessage(message: string) {
-    if (destination && 'username' in destination) {
+    if (destination instanceof User) {
       sendUserMessage(destination.username, message);
-    } else if (destination && 'id' in destination) {
+    } else if (destination instanceof Group) {
       sendGroupMessage(destination.id, message);
     }
   }
@@ -300,7 +251,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
   async function getGroupMessagesFromUser(destination: Group) {
     const response = await getGroupMessages(destination.id);
     if (response.status === HttpStatus.OK) {
-      setMessages(plainToInstance(UserMessage, response.data as []));
+      setMessages(plainToInstance(GroupMessage, response.data as []));
     }
   }
 

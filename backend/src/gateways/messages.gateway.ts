@@ -9,6 +9,7 @@ import {
   WsResponse
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { Group } from 'src/models/group.model';
 import { Message } from 'src/models/message.model';
 import { AuthService } from 'src/modules/auth/auth.service';
 import { MessageDto } from 'src/modules/message/dto/message.dto';
@@ -43,19 +44,19 @@ export class MessagesGateway {
     client.disconnect();
   }
 
-  async addUserToGroupRoom(userId: string, groupId: string) {
+  async addUserToGroupRoom(userId: string, group: Group) {
     const clients = await this.server.in(`user-${userId}`).fetchSockets();
     clients.forEach((client) => {
-      client.emit('joined-group', { id: `${groupId}` });
-      client.join(`group-${groupId}`);
+      client.emit('joinedGroup', group);
+      client.join(`group-${group.id}`);
     });
   }
 
-  async removeUserFromGroupRoom(userId: string, groupId: string) {
+  async removeUserFromGroupRoom(userId: string, group: Group) {
     const clients = await this.server.in(`user-${userId}`).fetchSockets();
     clients.forEach((client) => {
-      client.emit('leaved-group', { id: `${groupId}` });
-      client.leave(`group-${groupId}`);
+      client.emit('leavedGroup', group);
+      client.leave(`group-${group.id}`);
     });
   }
 
@@ -138,11 +139,10 @@ export class MessagesGateway {
         }
         throw new WsException('Erro interno do sistema');
       });
-
     client.broadcast
       .to(`group-${returnMessage.groupDestination.id}`)
-      .emit('deleteMsgFromGroup', returnMessage);
-    return { event: 'deleteMsgFromGroup', data: returnMessage };
+      .emit('deletedGroupMessage', returnMessage);
+    return { event: 'deletedGroupMessage', data: returnMessage };
   }
 
   @SubscribeMessage('deleteUserMessage')
@@ -166,9 +166,9 @@ export class MessagesGateway {
     const returnMessage = deletedMessage;
     client.broadcast
       .to(`user-${deletedMessage.userDestination.id}`)
-      .emit('deleteMsgFromUser', returnMessage);
+      .emit('deletedUserMessage', returnMessage);
     return {
-      event: 'deleteMsgFromUser',
+      event: 'deletedUserMessage',
       data: returnMessage
     };
   }

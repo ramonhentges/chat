@@ -21,14 +21,12 @@ import { HttpStatus } from '../../enum/http-status.enum';
 import { plainToInstance } from 'class-transformer';
 import { Group } from '../../models/group';
 import { useAlert } from '../../contexts/AlertSnackbar';
-import { MessageType, useConversation } from '../../contexts/Conversation';
-import { useAuth } from '../../contexts/Auth';
-import { GroupMessage } from '../../models/group-message';
+import { useConversation } from '../../contexts/Conversation';
 
 const CreateGroupModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
   const [open, setOpen] = useState(false);
-  const { setDestination, receiveMessage } = useConversation();
-  const { user } = useAuth();
+  const { setDestination } = useConversation();
+
   const { openAlert } = useAlert();
 
   const handleOpen = () => {
@@ -60,18 +58,6 @@ const CreateGroupModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
       const { status, data } = await createGroup(values);
       if (status === HttpStatus.CREATED) {
         const group = plainToInstance(Group, data);
-        const newGroupMessage = {
-          id: `group-${group.id}`,
-          message: 'Grupo Criado',
-          deleted: false,
-          createdAt: group.createdAt,
-          origin: user,
-          groupDestination: group
-        };
-        receiveMessage(
-          plainToInstance(GroupMessage, newGroupMessage),
-          MessageType.Sended
-        );
         setDestination(group);
         openAlert({
           severity: 'success',
@@ -135,7 +121,6 @@ const CreateGroupModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
               <Stack spacing={2} direction="row">
                 <Button
                   variant="contained"
-                  //@ts-ignore
                   color="default"
                   onClick={handleClose}
                   disabled={isSubmitting}

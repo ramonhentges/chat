@@ -244,7 +244,7 @@ export class MessageService {
         { id: messageId },
         { ...message, deleted: true, message: '' }
       );
-      return { id: messageId, ...message, deleted: true, message: '' };
+      return { id: messageId, ...message, origin, deleted: true, message: '' };
     }
     throw new ForbiddenException({
       message: 'Você não tem permissão para excluir esta mensagem'

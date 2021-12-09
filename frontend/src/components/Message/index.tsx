@@ -42,7 +42,12 @@ export default function Message({ message, openMenu }: MessageProps) {
         }
         label={
           <>
-            <Typography variant="body2" style={{ whiteSpace: 'normal' }}>
+            {message instanceof GroupMessage && !myMessage && (
+              <Typography variant="body2" sx={{ color: 'primary.main' }}>
+                {message.origin.getTitle()}
+              </Typography>
+            )}
+            <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
               {message.getMessage()}
             </Typography>
             <Typography align="right" display="block" variant="caption">

@@ -63,11 +63,7 @@ const LastMessageCard: React.FC<LastMessageCardProps> = ({ lastMessage }) => {
       <CardHeader
         avatar={<Avatar aria-label="recipe">{contact.getTitle()[0]}</Avatar>}
         title={contact.getConversationTitle()}
-        subheader={
-          user?.username === lastMessage.origin.username
-            ? `Você: ${lastMessage.getMessage()}`
-            : `${lastMessage.getMessage()}`
-        }
+        subheader={user && lastMessage.getCardMessage(user)}
       />
       <Typography
         sx={{ marginTop: -3, paddingRight: 1 }}

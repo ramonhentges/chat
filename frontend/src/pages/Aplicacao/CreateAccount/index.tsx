@@ -11,6 +11,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Footer from '../../../components/Footer';
 import { useAlert } from '../../../contexts/AlertSnackbar';
+import { HttpStatus } from '../../../enum/http-status.enum';
 import { CreateUser, CreateUserError } from '../../../interfaces/create-user';
 import { createUser } from '../../../services/user.service';
 
@@ -34,18 +35,14 @@ export function CreateAccount(props: any) {
     event.preventDefault();
     if (user.password === user.confirmPassword) {
       const response: AxiosResponse = await createUser(user);
-      if (response.status === 201) {
+      if (response.status === HttpStatus.CREATED) {
         openAlert({
           severity: 'success',
           message: 'Conta cadastrada com sucesso!'
         });
-
-        if (props.location.state) {
-          navigate(props.location.state.from.pathname);
-        } else {
-          navigate('/login');
-        }
+        navigate('/login');
       } else {
+        console.log(response.data);
         setError(response.data);
         openAlert({
           severity: 'error',
@@ -146,7 +143,6 @@ export function CreateAccount(props: any) {
                   sx={{ marginLeft: 1, float: 'right' }}
                   component={Link}
                   variant="contained"
-                  //@ts-ignore
                   color="default"
                   to="/"
                 >

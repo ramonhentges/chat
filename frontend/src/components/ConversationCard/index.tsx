@@ -5,6 +5,7 @@ import Avatar from '@mui/material/Avatar';
 import { useConversation } from '../../contexts/Conversation';
 import { IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
+import { Group } from '../../models/group';
 
 export default function ConversationCard() {
   const { destination, setShowInfo, showInfo } = useConversation();
@@ -15,8 +16,14 @@ export default function ConversationCard() {
         avatar={
           <Avatar
             aria-label="recipe"
-            sx={{ backgroundColor: 'secondary.main', cursor: 'pointer' }}
-            onClick={() => setShowInfo(true)}
+            sx={
+              destination instanceof Group
+                ? { backgroundColor: 'secondary.main', cursor: 'pointer' }
+                : { backgroundColor: 'secondary.main' }
+            }
+            onClick={
+              destination instanceof Group ? () => setShowInfo(true) : undefined
+            }
           >
             {destination.getTitle()[0]}
           </Avatar>

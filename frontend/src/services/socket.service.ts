@@ -20,6 +20,10 @@ const deleteUserMessage = (messageId: string) => {
   socket.emit('deleteUserMessage', messageId);
 };
 
+const deleteGroupMessage = (messageId: string) => {
+  socket.emit('deleteGroupMessage', messageId);
+};
+
 const setAuthorizationToken = (token: string) => {
   socket.io.opts['transportOptions'] = {
     polling: {
@@ -39,5 +43,6 @@ export {
   sendUserMessage,
   setAuthorizationToken,
   sendGroupMessage,
-  deleteUserMessage
+  deleteUserMessage,
+  deleteGroupMessage
 };

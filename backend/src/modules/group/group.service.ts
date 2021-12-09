@@ -41,7 +41,9 @@ export class GroupService {
     const group = this.groupRepo.create(groupDto);
     const user = await this.userService.getByID(createUser.id);
     group.users = [user];
-    return this.groupRepo.save(group);
+    const savedGroup = await this.groupRepo.save(group);
+    this.messageGateway.addUserToGroupRoom(user.id, savedGroup);
+    return savedGroup;
   }
 
   async update(id: string, groupDto: GroupDto, user: JwsTokenDto) {
@@ -69,10 +71,11 @@ export class GroupService {
       });
       group.users.push(userToAdd);
       await this.groupRepo.save(group);
-      this.messageGateway.addUserToGroupRoom(userToAdd.id, group.id);
-      return await this.groupRepo.findOne({
+      const returnedGroup = await this.groupRepo.findOne({
         where: { id: addUserDto.groupId }
       });
+      this.messageGateway.addUserToGroupRoom(userToAdd.id, returnedGroup);
+      return returnedGroup;
     }
     throw new ForbiddenException({
       message: 'Você não possui permissão para alterar este grupo'
@@ -87,7 +90,7 @@ export class GroupService {
         removeUser.username
       );
       const group = await this.groupRepo.findOneOrFail({
-        where: { uuid: removeUser.groupId },
+        where: { id: removeUser.groupId },
         relations: ['users']
       });
 
@@ -95,10 +98,14 @@ export class GroupService {
         (user) => user.username !== userToRemove.username
       );
       await this.groupRepo.save(group);
-      this.messageGateway.removeUserFromGroupRoom(userToRemove.id, group.id);
-      return await this.groupRepo.findOne({
+      const returnedGroup = await this.groupRepo.findOne({
         where: { id: removeUser.groupId }
       });
+      this.messageGateway.removeUserFromGroupRoom(
+        userToRemove.id,
+        returnedGroup
+      );
+      return returnedGroup;
     }
     throw new ForbiddenException({
       message: 'Você não possui permissão para alterar este grupo'

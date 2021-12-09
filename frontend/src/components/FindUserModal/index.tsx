@@ -29,13 +29,18 @@ import { User } from '../../models/user';
 import { usersList } from '../../services/user.service';
 import Loading from '../Loading';
 import { plainToInstance } from 'class-transformer';
+import { HttpStatus } from '../../enum/http-status.enum';
 
 type Props = {
-  selectUserAction: (user: User | User[]) => void;
+  selectUserAction?: (user: User) => void;
+  selectUsersAction?: (user: User[]) => void;
 };
 
 const FindUserModal = forwardRef(
-  ({ selectUserAction }: Props, ref: ForwardedRef<unknown>) => {
+  (
+    { selectUserAction, selectUsersAction }: Props,
+    ref: ForwardedRef<unknown>
+  ) => {
     const [open, setOpen] = useState(false);
     const [users, setUsers] = useState<User[]>([]);
     const [username, setUsername] = useState('');
@@ -47,6 +52,7 @@ const FindUserModal = forwardRef(
     const [selectMany, setSelectMany] = useState(false);
     const handleOpen = (selectMany: boolean) => {
       setSelectMany(selectMany);
+      setSelectedUsers([]);
       setOpen(true);
     };
 
@@ -55,11 +61,11 @@ const FindUserModal = forwardRef(
     };
 
     const selectUser = (user: User) => {
-      selectUserAction(user);
+      selectUserAction && selectUserAction(user);
     };
 
     const selectUsers = () => {
-      selectUserAction(selectedUsers);
+      selectUsersAction && selectUsersAction(selectedUsers);
     };
 
     const addUser = (user: User) => {
@@ -107,7 +113,7 @@ const FindUserModal = forwardRef(
     useEffect(() => {
       const fetchData = async () => {
         const { data, status } = await usersList();
-        if (status && status === 200 && open) {
+        if (status === HttpStatus.OK && open) {
           setUsers(plainToInstance(User, data as []));
           setUsersSearch(plainToInstance(User, data as []));
           setLoading(false);
@@ -245,7 +251,6 @@ const FindUserModal = forwardRef(
                     <Stack spacing={2} direction="row">
                       <Button
                         variant="contained"
-                        //@ts-ignore
                         color="default"
                         onClick={handleClose}
                       >

@@ -10,13 +10,18 @@ import { User } from '../../../models/user';
 
 type Props = {
   user: User;
+  removeAction: (user: User) => void;
 };
 
-const GroupUserCard = ({ user }: Props) => {
+const GroupUserCard = ({ user, removeAction }: Props) => {
   return (
     <ListItem
       secondaryAction={
-        <IconButton edge="end" aria-label="delete">
+        <IconButton
+          edge="end"
+          aria-label="delete"
+          onClick={() => removeAction(user)}
+        >
           <Delete />
         </IconButton>
       }

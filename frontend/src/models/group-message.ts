@@ -1,9 +1,9 @@
 import { Type } from 'class-transformer';
-import { IDestinationMessage } from '../interfaces/i-destination-message';
+import { IMessage } from '../interfaces/i-message';
 import { Group } from './group';
 import { User } from './user';
 
-export class GroupMessage implements IDestinationMessage {
+export class GroupMessage implements IMessage {
   constructor() {
     this.id = '';
     this.message = '';
@@ -28,6 +28,19 @@ export class GroupMessage implements IDestinationMessage {
 
   getMessage() {
     return this.deleted ? 'Mensagem apagada' : this.message;
+  }
+
+  getCardMessage(user: User) {
+    if (user.getKey() === this.origin.getKey()) {
+      return `Você: ${this.getMessage()}`;
+    } else if (this.origin.getKey() === '') {
+      return this.getMessage();
+    }
+    return `${this.origin.getTitle()} - ${this.getMessage()}`;
+  }
+
+  getContact(user: User) {
+    return this.groupDestination;
   }
 
   destination() {
