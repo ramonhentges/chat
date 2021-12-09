@@ -4,6 +4,7 @@ import { Login } from '../pages/Aplicacao/Login';
 import InitialPage from '../pages/Aplicacao/InitialPage';
 import { useAuth } from '../contexts/Auth';
 import { CreateAccount } from '../pages/Aplicacao/CreateAccount';
+import { ConversationProvider } from '../contexts/Conversation';
 
 const PrivateRoute = ({ children }: any) => {
   const { signed } = useAuth();
@@ -21,7 +22,9 @@ const MyRoutes: React.FC = () => {
         <Route
           element={
             <PrivateRoute>
-              <InitialPage />
+              <ConversationProvider>
+                <InitialPage />
+              </ConversationProvider>
             </PrivateRoute>
           }
           path="/"
