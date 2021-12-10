@@ -1,0 +1,1 @@
+export const MINUTES_TO_DELETE_MESSAGE = 10;

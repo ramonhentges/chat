@@ -43,7 +43,7 @@ export class CreateMessagesTable1612965848634 implements MigrationInterface {
           },
           {
             name: 'createdAt',
-            type: 'timestamp',
+            type: 'timestamp with time zone',
             default: 'CURRENT_TIMESTAMP'
           }
         ]

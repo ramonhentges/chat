@@ -1,25 +1,13 @@
 import { Type } from 'class-transformer';
 import { IMessage } from '../interfaces/i-message';
+import { Message } from './message';
 import { User } from './user';
 
-export class UserMessage implements IMessage {
+export class UserMessage extends Message implements IMessage {
   constructor() {
-    this.id = '';
-    this.message = '';
-    this.deleted = false;
-    this.createdAt = new Date();
-    this.origin = new User();
+    super();
     this.userDestination = new User();
   }
-  id: string;
-  message: string;
-  deleted: boolean;
-
-  @Type(() => Date)
-  createdAt: Date;
-
-  @Type(() => User)
-  origin: User;
 
   @Type(() => User)
   userDestination: User;

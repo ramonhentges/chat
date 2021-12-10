@@ -19,6 +19,7 @@ import { HttpStatus } from '../../enum/http-status.enum';
 import { getMyGroups } from '../../services/group.service';
 import { GroupMessage } from '../../models/group-message';
 import { useAlert } from '../AlertSnackbar';
+import { QueryFilter } from '../../interfaces/query';
 
 export enum MessageType {
   Sended,
@@ -37,6 +38,7 @@ interface ConversationContextProps {
   showInfo: boolean;
   setShowInfo: (show: boolean) => void;
   receiveMessage: (message: UserMessage | GroupMessage) => void;
+  getMoreMessages: () => Promise<void>;
 }
 
 const sortLastMessages = (
@@ -221,7 +223,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
   async function setDestination(destination: Group | User) {
     setDestinationState(destination);
     setLoading(true);
-    await getMessages(destination);
+    await getMessages(destination, 0);
     setLoading(false);
   }
 
@@ -233,23 +235,44 @@ export const ConversationProvider: React.FC = ({ children }) => {
     }
   }
 
-  async function getMessages(destination: Group | User) {
-    if ('username' in destination) {
-      await getMessagesFromUser(destination);
-    } else {
-      await getGroupMessagesFromUser(destination);
+  async function getMessages(destination: Group | User, skip: number) {
+    if (destination instanceof User) {
+      await getMessagesFromUser(destination, skip);
+    } else if (destination instanceof Group) {
+      await getGroupMessagesFromUser(destination, skip);
     }
   }
 
-  async function getMessagesFromUser(destination: User) {
-    const response = await getUserMessages(destination);
+  async function getMoreMessages() {
+    if (destination instanceof User) {
+      await getMessagesFromUser(destination, messages.length);
+    } else if (destination instanceof Group) {
+      await getGroupMessagesFromUser(destination, messages.length);
+    }
+  }
+
+  async function getMessagesFromUser(destination: User, skip: number) {
+    const response = await getUserMessages(
+      destination,
+      new QueryFilter(20, skip)
+    );
     if (response.status === HttpStatus.OK) {
-      setMessages(plainToInstance(UserMessage, response.data as []));
+      if (skip > 0) {
+        setMessages((oldMessages) => [
+          ...plainToInstance(UserMessage, response.data as []),
+          ...oldMessages
+        ]);
+      } else {
+        setMessages(plainToInstance(UserMessage, response.data as []));
+      }
     }
   }
 
-  async function getGroupMessagesFromUser(destination: Group) {
-    const response = await getGroupMessages(destination.id);
+  async function getGroupMessagesFromUser(destination: Group, skip: number) {
+    const response = await getGroupMessages(
+      destination.id,
+      new QueryFilter(20, skip)
+    );
     if (response.status === HttpStatus.OK) {
       setMessages(plainToInstance(GroupMessage, response.data as []));
     }
@@ -268,7 +291,8 @@ export const ConversationProvider: React.FC = ({ children }) => {
         setSelectedMessage,
         receiveMessage,
         showInfo,
-        setShowInfo
+        setShowInfo,
+        getMoreMessages
       }}
     >
       {children}

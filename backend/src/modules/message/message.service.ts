@@ -14,6 +14,8 @@ import { User } from 'src/models/user.model';
 import { Repository } from 'typeorm';
 import { GroupService } from '../group/group.service';
 import { UserService } from '../user/user.service';
+import { plainToInstance } from 'class-transformer';
+import { QueryFilter } from 'src/global-dto/query';
 
 @Injectable()
 export class MessageService {
@@ -107,7 +109,11 @@ export class MessageService {
     }
   }
 
-  async listAllGroupMessages(idGroup: string, user: JwsTokenDto) {
+  async getGroupMessages(
+    idGroup: string,
+    user: JwsTokenDto,
+    query: QueryFilter
+  ) {
     const destination = await this.groupService.getByID(idGroup, user);
 
     return this.messageRepo
@@ -123,6 +129,8 @@ export class MessageService {
         'org.fullName'
       ])
       .orderBy({ 'msg.createdAt': 'ASC' })
+      .take(query.take)
+      .skip(query.skip)
       .getMany();
   }
 
@@ -145,9 +153,10 @@ export class MessageService {
       .getOne();
   }
 
-  async listAllContactMessages(
+  async getContactMessages(
     loggedUser: JwsTokenDto,
-    contactUsername: string
+    contactUsername: string,
+    query: QueryFilter
   ) {
     const logged = await this.userService.getByID(loggedUser.id);
     const contact = await this.userService.getByUsername(contactUsername);
@@ -166,6 +175,8 @@ export class MessageService {
         'org.username'
       ])
       .orderBy({ 'msg.createdAt': 'ASC' })
+      .take(query.take)
+      .skip(query.skip)
       .getMany();
   }
 
@@ -187,14 +198,14 @@ export class MessageService {
       select: ['id', 'message', 'createdAt', 'deleted']
     });
 
-    return {
+    return plainToInstance(Message, {
       origin: {
         username: originUser.username,
         fullName: originUser.fullName
       },
       groupDestination: destinationGroup,
       ...returnMessage
-    };
+    });
   }
 
   async postUserMessage(
@@ -217,7 +228,7 @@ export class MessageService {
     });
 
     return {
-      message: {
+      message: plainToInstance(Message, {
         origin: {
           username: originUser.username,
           fullName: originUser.fullName
@@ -227,7 +238,7 @@ export class MessageService {
           fullName: destination.fullName
         },
         ...returnMessage
-      },
+      }),
       destinationId: destination.id
     };
   }
@@ -239,7 +250,7 @@ export class MessageService {
       relations: ['groupDestination']
     });
 
-    if (message) {
+    if (message && message.canDelete()) {
       this.messageRepo.update(
         { id: messageId },
         { ...message, deleted: true, message: '' }
@@ -247,7 +258,7 @@ export class MessageService {
       return { id: messageId, ...message, origin, deleted: true, message: '' };
     }
     throw new ForbiddenException({
-      message: 'Você não tem permissão para excluir esta mensagem'
+      message: 'Você não tem pode excluir esta mensagem'
     });
   }
 
@@ -258,7 +269,7 @@ export class MessageService {
       relations: ['userDestination', 'origin']
     });
 
-    if (message) {
+    if (message && message.canDelete()) {
       this.messageRepo.update(
         { id: messageId },
         { ...message, deleted: true, message: '' }

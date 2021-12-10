@@ -1,27 +1,14 @@
 import { Type } from 'class-transformer';
 import { IMessage } from '../interfaces/i-message';
 import { Group } from './group';
+import { Message } from './message';
 import { User } from './user';
 
-export class GroupMessage implements IMessage {
+export class GroupMessage extends Message implements IMessage {
   constructor() {
-    this.id = '';
-    this.message = '';
-    this.deleted = false;
-    this.createdAt = new Date();
-    this.origin = new User();
+    super();
     this.groupDestination = new Group();
   }
-
-  id: string;
-  message: string;
-  deleted: boolean;
-
-  @Type(() => Date)
-  createdAt: Date;
-
-  @Type(() => User)
-  origin: User;
 
   @Type(() => Group)
   groupDestination: Group;

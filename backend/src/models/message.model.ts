@@ -1,3 +1,4 @@
+import { MINUTES_TO_DELETE_MESSAGE } from '../constants/constants';
 import {
   Column,
   CreateDateColumn,
@@ -36,4 +37,13 @@ export class Message {
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
+
+  canDelete(): boolean {
+    const endDate = new Date(this.createdAt);
+    endDate.setMinutes(this.createdAt.getMinutes() + MINUTES_TO_DELETE_MESSAGE);
+    if (endDate > new Date()) {
+      return true;
+    }
+    return false;
+  }
 }

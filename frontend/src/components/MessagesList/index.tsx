@@ -7,7 +7,7 @@ import {
   MenuItem,
   Typography
 } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useConversation } from '../../contexts/Conversation';
 import {
   deleteGroupMessage,
@@ -19,6 +19,8 @@ import { Delete } from '@mui/icons-material';
 import { useConfirm } from '../../contexts/ConfirmDialog';
 import { UserMessage } from '../../models/user-message';
 import { GroupMessage } from '../../models/group-message';
+import { useAlert } from '../../contexts/AlertSnackbar';
+import { MINUTES_TO_DELETE_MESSAGE } from '../../constants/message';
 
 const sameDay = (firstDate: Date, secondDate: Date): boolean => {
   return (
@@ -31,9 +33,19 @@ const sameDay = (firstDate: Date, secondDate: Date): boolean => {
 export default function MessagesList() {
   const messagesGrid = useRef<HTMLDivElement>(null);
   const { confirm } = useConfirm();
-  const { messages, loading, selectedMessage, setSelectedMessage } =
-    useConversation();
+  const {
+    messages,
+    loading,
+    selectedMessage,
+    destination,
+    setSelectedMessage,
+    getMoreMessages
+  } = useConversation();
+  const { openAlert } = useAlert();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const scrollDown = useRef(true);
+  const initialLoad = useRef(true);
+  const gettingMoreMessages = useRef(false);
   const open = Boolean(anchorEl);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -46,23 +58,64 @@ export default function MessagesList() {
   };
 
   const deleteMessage = () => {
-    confirm({
-      title: 'Aviso de exclusão',
-      message: 'Desaja mesmo excluir a mensagem?'
-    }).then(() => {
-      if (selectedMessage instanceof UserMessage) {
-        deleteUserMessage(selectedMessage.id);
-      } else if (selectedMessage instanceof GroupMessage) {
-        deleteGroupMessage(selectedMessage.id);
-      }
+    if (selectedMessage?.canDelete()) {
+      confirm({
+        title: 'Aviso de exclusão',
+        message: 'Desaja mesmo excluir a mensagem?'
+      }).then(() => {
+        if (selectedMessage instanceof UserMessage) {
+          deleteUserMessage(selectedMessage.id);
+        } else if (selectedMessage instanceof GroupMessage) {
+          deleteGroupMessage(selectedMessage.id);
+        }
+        setSelectedMessage(undefined);
+        setAnchorEl(null);
+      });
+    } else {
       setSelectedMessage(undefined);
       setAnchorEl(null);
-    });
+      openAlert({
+        severity: 'info',
+        message: `Você não pode remover mensagens com mais de ${MINUTES_TO_DELETE_MESSAGE} minutos`
+      });
+    }
   };
 
-  useEffect(() => {
-    !loading && scrollToBottom();
+  useLayoutEffect(() => {
+    !loading && scrollDown.current && scrollToBottom();
   }, [messages, loading]);
+
+  useEffect(() => {
+    scrollDown.current = true;
+    initialLoad.current = true;
+  }, [destination]);
+
+  useLayoutEffect(() => {
+    if (messagesGrid.current !== null) {
+      messagesGrid.current.onscroll = async () => {
+        if (messagesGrid.current !== null) {
+          const { scrollTop, offsetHeight, scrollHeight } =
+            messagesGrid.current;
+          const scrollPosition = scrollTop + offsetHeight;
+          if (
+            scrollTop < 300 &&
+            !initialLoad.current &&
+            !gettingMoreMessages.current
+          ) {
+            gettingMoreMessages.current = true;
+            scrollDown.current = false;
+            await getMoreMessages();
+            gettingMoreMessages.current = false;
+          } else if (scrollPosition === scrollHeight) {
+            initialLoad.current = false;
+            scrollDown.current = true;
+          } else {
+            scrollDown.current = false;
+          }
+        }
+      };
+    }
+  }, [getMoreMessages]);
 
   const scrollToBottom = () => {
     messagesGrid.current!.scroll({
