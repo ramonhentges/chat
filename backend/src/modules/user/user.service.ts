@@ -6,6 +6,7 @@ import { Group } from 'src/models/group.model';
 import { User } from 'src/models/user.model';
 import AlreadyExists from 'src/validation/already.exists.validator';
 import { Repository } from 'typeorm';
+import { UpdateUserDto } from './dto/edit-user.dto';
 
 @Injectable()
 export class UserService {
@@ -65,14 +66,7 @@ export class UserService {
     return this.userRepo.save(user);
   }
 
-  async update(token: JwsTokenDto, userDto: UserDto) {
-    if (
-      await AlreadyExists(this.userRepo, 'username', userDto.username, token.id)
-    ) {
-      throw new UnprocessableEntityException({
-        username: 'Nome de usuário já utilizado'
-      });
-    }
+  async update(token: JwsTokenDto, userDto: UpdateUserDto) {
     this.userRepo.update({ id: token.id }, userDto);
     return await this.userRepo.findOne({ where: { id: token.id } });
   }

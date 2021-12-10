@@ -9,13 +9,17 @@ import { ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import {
   ExitToApp as ExitIcon,
   Brightness4 as NightIcon,
-  Brightness7 as DayIcon
+  Brightness7 as DayIcon,
+  AccountCircle
 } from '@mui/icons-material';
 import { useMyTheme } from '../../contexts/MyTheme';
+import { useConversation } from '../../contexts/Conversation';
+import { ActualPage } from '../../enum/actual-page';
 
 const UserCard: React.FC = () => {
   const { user, signOut } = useAuth();
   const { mode, changeTheme } = useMyTheme();
+  const { actualPage, setActualPage } = useConversation();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -59,6 +63,18 @@ const UserCard: React.FC = () => {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
+        <MenuItem
+          disabled={actualPage === ActualPage.MY_USER_INFO}
+          onClick={() => {
+            setActualPage(ActualPage.MY_USER_INFO);
+            handleClose();
+          }}
+        >
+          <ListItemIcon>
+            <AccountCircle fontSize="small" />
+          </ListItemIcon>
+          <Typography variant="inherit">Meus Dados</Typography>
+        </MenuItem>
         <MenuItem onClick={handleChangeTheme}>
           <ListItemIcon>
             {mode === 'dark' ? (

@@ -4,17 +4,13 @@ import { useAuth } from '../../contexts/Auth';
 import { useConversation } from '../../contexts/Conversation';
 import { GroupMessage } from '../../models/group-message';
 import { UserMessage } from '../../models/user-message';
+import { getUserColor } from '../../stores/user-color.store';
+import { formatTime } from '../../util/date';
 
 interface MessageProps {
   message: UserMessage | GroupMessage;
   openMenu: (event: React.MouseEvent<HTMLElement>) => void;
 }
-
-const getMessageTime = (date: Date): string => {
-  return `${date.getHours()}:${
-    date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()
-  }`;
-};
 
 export default function Message({ message, openMenu }: MessageProps) {
   const { user } = useAuth();
@@ -43,7 +39,10 @@ export default function Message({ message, openMenu }: MessageProps) {
         label={
           <>
             {message instanceof GroupMessage && !myMessage && (
-              <Typography variant="body2" sx={{ color: 'primary.main' }}>
+              <Typography
+                variant="body2"
+                sx={{ color: getUserColor(message.origin.getKey()) }}
+              >
                 {message.origin.getTitle()}
               </Typography>
             )}
@@ -51,7 +50,7 @@ export default function Message({ message, openMenu }: MessageProps) {
               {message.getMessage()}
             </Typography>
             <Typography align="right" display="block" variant="caption">
-              {getMessageTime(message.createdAt)}
+              {formatTime(message.createdAt)}
             </Typography>
           </>
         }

@@ -14,6 +14,7 @@ interface AuthContextProps {
   user: User | null;
   signIn: (loginUser: Login) => Promise<boolean>;
   signOut: () => void;
+  refreshUserInfo: () => Promise<void>;
 }
 
 const AuthContext = React.createContext<AuthContextProps>(
@@ -119,7 +120,14 @@ export const AuthProvider: React.FC = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ signed: !!user, user, loading, signIn, signOut }}
+      value={{
+        signed: !!user,
+        user,
+        loading,
+        signIn,
+        signOut,
+        refreshUserInfo: getUserInfo
+      }}
     >
       {children}
     </AuthContext.Provider>

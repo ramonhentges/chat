@@ -41,7 +41,8 @@ export const light = createTheme(
         main: '#e0e0e0',
         dark: '#d5d5d5',
         contrastText: 'rgba(0,0,0,0.87)'
-      }
+      },
+      background: { paper: '#f3f3f3', default: '#fafafa' }
     },
     components: {
       MuiCssBaseline: {

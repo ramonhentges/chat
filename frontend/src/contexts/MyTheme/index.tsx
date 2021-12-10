@@ -34,7 +34,7 @@ export const MyThemeProvider: React.FC = ({ children }) => {
   }, []);
   const changeTheme = () => {
     const newMode = mode === 'light' ? 'dark' : 'light';
-    localStorage.setItem('colorMode', `newMode`);
+    localStorage.setItem('colorMode', newMode);
     setMode(newMode);
   };
   return (

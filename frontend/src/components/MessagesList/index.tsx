@@ -20,7 +20,10 @@ import { useConfirm } from '../../contexts/ConfirmDialog';
 import { UserMessage } from '../../models/user-message';
 import { GroupMessage } from '../../models/group-message';
 import { useAlert } from '../../contexts/AlertSnackbar';
-import { MINUTES_TO_DELETE_MESSAGE } from '../../constants/message';
+import {
+  MINUTES_TO_DELETE_MESSAGE,
+  SCROLL_POSITION_TO_TAKE_MORE_MESSAGES
+} from '../../constants/message';
 
 const sameDay = (firstDate: Date, secondDate: Date): boolean => {
   return (
@@ -98,7 +101,7 @@ export default function MessagesList() {
             messagesGrid.current;
           const scrollPosition = scrollTop + offsetHeight;
           if (
-            scrollTop < 300 &&
+            scrollTop <= SCROLL_POSITION_TO_TAKE_MORE_MESSAGES &&
             !initialLoad.current &&
             !gettingMoreMessages.current
           ) {

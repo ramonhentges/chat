@@ -1,7 +1,8 @@
 import { CreateUser } from '../interfaces/create-user';
+import { EditUser } from '../interfaces/edit-user';
 import { api } from './api';
 
-const createUser = (user: CreateUser) =>
+export const createUser = (user: CreateUser) =>
   api
     .post(`/users`, user)
     .then((response) => {
@@ -11,8 +12,9 @@ const createUser = (user: CreateUser) =>
       return err.response;
     });
 
-const myUserInfo = () => api.get(`users/my/user`);
+export const myUserInfo = () => api.get(`users/my/user`);
 
-const usersList = () => api.get(`users`);
+export const usersList = () => api.get(`users`);
 
-export { createUser, myUserInfo, usersList };
+export const updateUser = (data: EditUser) =>
+  api({ url: 'users', method: 'PUT', data });

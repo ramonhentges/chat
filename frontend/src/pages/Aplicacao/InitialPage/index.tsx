@@ -9,9 +9,11 @@ import SendButton from '../../../components/SendButton';
 import { useConversation } from '../../../contexts/Conversation';
 import NewConversationButton from '../../../components/NewConversationButton';
 import ShowGroupInfo from '../../../components/ShowGroupInfo';
+import { ActualPage } from '../../../enum/actual-page';
+import { ChangeUserInfo } from '../../../components/ChangeUserInfo';
 
 const InitialPage: React.FC = () => {
-  const { showInfo } = useConversation();
+  const { actualPage } = useConversation();
   return (
     <Grid
       container
@@ -38,6 +40,7 @@ const InitialPage: React.FC = () => {
       >
         <Grid container direction="row" sx={{ height: '100%', width: '100%' }}>
           <Paper
+            elevation={4}
             sx={{
               height: '100%',
               overflowX: 'hidden',
@@ -45,7 +48,8 @@ const InitialPage: React.FC = () => {
               width: 300,
               minWidth: 200,
               marginRight: 2,
-              position: 'relative'
+              position: 'relative',
+              borderRadius: 2
             }}
           >
             <Grid item>
@@ -55,7 +59,15 @@ const InitialPage: React.FC = () => {
             </Grid>
           </Paper>
 
-          <Paper sx={{ flexGrow: 2, height: '100%', flexWrap: 'nowrap' }}>
+          <Paper
+            elevation={4}
+            sx={{
+              flexGrow: 2,
+              height: '100%',
+              flexWrap: 'nowrap',
+              borderRadius: 2
+            }}
+          >
             <Grid
               item
               container
@@ -64,22 +76,30 @@ const InitialPage: React.FC = () => {
               sx={{ flexGrow: 2, height: '100%', flexWrap: 'nowrap' }}
               xs
             >
-              <Grid item>
-                <ConversationCard />
-              </Grid>
-              {showInfo ? (
+              {[ActualPage.GROUP_INFO, ActualPage.CHAT].includes(
+                actualPage
+              ) && (
+                <Grid item>
+                  <ConversationCard />
+                </Grid>
+              )}
+              {actualPage === ActualPage.GROUP_INFO ? (
                 <ShowGroupInfo />
-              ) : (
+              ) : actualPage === ActualPage.CHAT ? (
                 <>
                   <MessagesList />
                   <SendButton />
                 </>
+              ) : (
+                actualPage === ActualPage.MY_USER_INFO && <ChangeUserInfo />
               )}
             </Grid>
           </Paper>
         </Grid>
       </Grid>
-      <Footer />
+      <Grid item>
+        <Footer />
+      </Grid>
     </Grid>
   );
 };

@@ -1,4 +1,10 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react';
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef
+} from 'react';
 import { Group } from '../../models/group';
 import { User } from '../../models/user';
 import { UserMessage } from '../../models/user-message';
@@ -20,11 +26,8 @@ import { getMyGroups } from '../../services/group.service';
 import { GroupMessage } from '../../models/group-message';
 import { useAlert } from '../AlertSnackbar';
 import { QueryFilter } from '../../interfaces/query';
-
-export enum MessageType {
-  Sended,
-  Received
-}
+import { MESSAGES_TO_TAKE } from '../../constants/message';
+import { ActualPage } from '../../enum/actual-page';
 
 interface ConversationContextProps {
   destination: Group | User | null;
@@ -35,8 +38,8 @@ interface ConversationContextProps {
   lastMessages: (UserMessage | GroupMessage)[];
   selectedMessage: UserMessage | GroupMessage | undefined;
   setSelectedMessage: (message: UserMessage | GroupMessage | undefined) => void;
-  showInfo: boolean;
-  setShowInfo: (show: boolean) => void;
+  actualPage: ActualPage;
+  setActualPage: (page: ActualPage) => void;
   receiveMessage: (message: UserMessage | GroupMessage) => void;
   getMoreMessages: () => Promise<void>;
 }
@@ -64,7 +67,8 @@ export const ConversationProvider: React.FC = ({ children }) => {
   const [selectedMessage, setSelectedMessage] = useState<
     UserMessage | GroupMessage | undefined
   >();
-  const [showInfo, setShowInfo] = useState<boolean>(false);
+  const [actualPage, setActualPage] = useState<ActualPage>(ActualPage.CHAT);
+  const haveMoreMessages = useRef<boolean>(true);
 
   const { user } = useAuth();
   const { openAlert } = useAlert();
@@ -217,10 +221,11 @@ export const ConversationProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     setSelectedMessage(undefined);
-    setShowInfo(false);
+    setActualPage(ActualPage.CHAT);
   }, [destination]);
 
   async function setDestination(destination: Group | User) {
+    haveMoreMessages.current = true;
     setDestinationState(destination);
     setLoading(true);
     await getMessages(destination, 0);
@@ -244,37 +249,55 @@ export const ConversationProvider: React.FC = ({ children }) => {
   }
 
   async function getMoreMessages() {
-    if (destination instanceof User) {
-      await getMessagesFromUser(destination, messages.length);
-    } else if (destination instanceof Group) {
-      await getGroupMessagesFromUser(destination, messages.length);
+    if (haveMoreMessages.current) {
+      console.log('baixando mais mensagens');
+      if (destination instanceof User) {
+        await getMessagesFromUser(destination, messages.length);
+      } else if (destination instanceof Group) {
+        await getGroupMessagesFromUser(destination, messages.length);
+      }
     }
   }
 
   async function getMessagesFromUser(destination: User, skip: number) {
-    const response = await getUserMessages(
+    const { status, data } = await getUserMessages(
       destination,
-      new QueryFilter(20, skip)
+      new QueryFilter(MESSAGES_TO_TAKE, skip)
     );
-    if (response.status === HttpStatus.OK) {
-      if (skip > 0) {
-        setMessages((oldMessages) => [
-          ...plainToInstance(UserMessage, response.data as []),
-          ...oldMessages
-        ]);
+    if (status === HttpStatus.OK) {
+      if (data.length > 0) {
+        if (skip > 0) {
+          setMessages((oldMessages) => [
+            ...plainToInstance(UserMessage, data as []),
+            ...oldMessages
+          ]);
+        } else {
+          setMessages(plainToInstance(UserMessage, data as []));
+        }
       } else {
-        setMessages(plainToInstance(UserMessage, response.data as []));
+        haveMoreMessages.current = false;
       }
     }
   }
 
   async function getGroupMessagesFromUser(destination: Group, skip: number) {
-    const response = await getGroupMessages(
+    const { status, data } = await getGroupMessages(
       destination.id,
-      new QueryFilter(20, skip)
+      new QueryFilter(MESSAGES_TO_TAKE, skip)
     );
-    if (response.status === HttpStatus.OK) {
-      setMessages(plainToInstance(GroupMessage, response.data as []));
+    if (status === HttpStatus.OK) {
+      if (data.length > 0) {
+        if (skip > 0) {
+          setMessages((oldMessages) => [
+            ...plainToInstance(GroupMessage, data as []),
+            ...oldMessages
+          ]);
+        } else {
+          setMessages(plainToInstance(GroupMessage, data as []));
+        }
+      } else {
+        haveMoreMessages.current = false;
+      }
     }
   }
 
@@ -290,8 +313,8 @@ export const ConversationProvider: React.FC = ({ children }) => {
         selectedMessage,
         setSelectedMessage,
         receiveMessage,
-        showInfo,
-        setShowInfo,
+        actualPage: actualPage,
+        setActualPage: setActualPage,
         getMoreMessages
       }}
     >

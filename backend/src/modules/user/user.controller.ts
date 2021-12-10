@@ -8,6 +8,7 @@ import {
   Put
 } from '@nestjs/common';
 import { Public } from 'src/constants/constants';
+import { UpdateUserDto } from './dto/edit-user.dto';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 
@@ -38,7 +39,7 @@ export class UserController {
   }
 
   @Put()
-  async update(@Request() req, @Body() body: UserDto) {
+  async update(@Request() req, @Body() body: UpdateUserDto) {
     const { user } = req;
     return this.userService.update(user, body);
   }

@@ -15,7 +15,7 @@ import { HttpStatus } from '../../../enum/http-status.enum';
 import { CreateUser, CreateUserError } from '../../../interfaces/create-user';
 import { createUser } from '../../../services/user.service';
 
-export function CreateAccount(props: any) {
+export function CreateAccount() {
   const navigate = useNavigate();
   const { openAlert } = useAlert();
   const [user, setUser] = useState<CreateUser>({
@@ -42,7 +42,6 @@ export function CreateAccount(props: any) {
         });
         navigate('/login');
       } else {
-        console.log(response.data);
         setError(response.data);
         openAlert({
           severity: 'error',

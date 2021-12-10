@@ -6,9 +6,10 @@ import { useConversation } from '../../contexts/Conversation';
 import { IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { Group } from '../../models/group';
+import { ActualPage } from '../../enum/actual-page';
 
 export default function ConversationCard() {
-  const { destination, setShowInfo, showInfo } = useConversation();
+  const { destination, setActualPage, actualPage } = useConversation();
 
   return !!destination ? (
     <Card square={true}>
@@ -22,7 +23,9 @@ export default function ConversationCard() {
                 : { backgroundColor: 'secondary.main' }
             }
             onClick={
-              destination instanceof Group ? () => setShowInfo(true) : undefined
+              destination instanceof Group
+                ? () => setActualPage(ActualPage.GROUP_INFO)
+                : undefined
             }
           >
             {destination.getTitle()[0]}
@@ -32,9 +35,9 @@ export default function ConversationCard() {
         subheader={destination.getSubtitle()}
         titleTypographyProps={{ color: 'secondary' }}
         action={
-          showInfo && (
+          actualPage === ActualPage.GROUP_INFO && (
             <IconButton
-              onClick={() => setShowInfo(false)}
+              onClick={() => setActualPage(ActualPage.CHAT)}
               aria-label="close descritpion"
             >
               <Close />
