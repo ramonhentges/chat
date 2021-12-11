@@ -274,6 +274,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
           setMessages(plainToInstance(UserMessage, data as []));
         }
       } else {
+        openAlert({ severity: 'info', message: 'Você chegou ao início da conversa!' })
         haveMoreMessages.current = false;
       }
     }
@@ -295,6 +296,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
           setMessages(plainToInstance(GroupMessage, data as []));
         }
       } else {
+        openAlert({ severity: 'info', message: 'Você chegou ao início da conversa!' })
         haveMoreMessages.current = false;
       }
     }
