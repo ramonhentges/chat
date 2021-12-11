@@ -7,13 +7,14 @@ import { User } from 'src/models/user.model';
 import AlreadyExists from 'src/validation/already.exists.validator';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/edit-user.dto';
+import { hashSync, genSaltSync, compareSync } from 'bcrypt';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepo: Repository<User>
-  ) {}
+  ) { }
 
   listAll() {
     return this.userRepo.find({
@@ -57,7 +58,8 @@ export class UserService {
   }
 
   async store(userDto: UserDto) {
-    const user = this.userRepo.create(userDto);
+    const hashPassword = hashSync(userDto.password, genSaltSync());
+    const user = this.userRepo.create({ ...userDto, password: hashPassword });
     if (await AlreadyExists(this.userRepo, 'username', user.username)) {
       throw new UnprocessableEntityException({
         username: 'Nome de usuário já utilizado'
@@ -67,14 +69,25 @@ export class UserService {
   }
 
   async update(token: JwsTokenDto, userDto: UpdateUserDto) {
-    this.userRepo.update({ id: token.id }, userDto);
+    if (userDto.password) {
+      const hashPassword = hashSync(userDto.password, genSaltSync());
+      this.userRepo.update({ id: token.id }, { ...userDto, password: hashPassword });
+    } else {
+      this.userRepo.update({ id: token.id }, userDto);
+    }
     return await this.userRepo.findOne({ where: { id: token.id } });
   }
 
   async login(username: string, password: string) {
-    return this.userRepo.findOne({
-      where: { username, password },
-      select: ['username', 'id']
+    const user = await this.userRepo.findOne({
+      where: { username },
+      select: ['username', 'password', 'id']
     });
+    if (user) {
+      if (compareSync(password, user.password)) {
+        return user;
+      }
+    }
+    return undefined;
   }
 }
