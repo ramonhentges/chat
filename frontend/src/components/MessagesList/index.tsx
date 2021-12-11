@@ -25,14 +25,9 @@ import {
   SCROLL_POSITION_TO_TAKE_MORE_MESSAGES,
   SCROll_TO_BOTTOM_OFFSET
 } from '../../constants/message';
+import { sameDay } from '../../util/date';
 
-const sameDay = (firstDate: Date, secondDate: Date): boolean => {
-  return (
-    firstDate.getDate() === secondDate.getDate() &&
-    firstDate.getMonth() === secondDate.getMonth() &&
-    firstDate.getFullYear() === secondDate.getFullYear()
-  );
-};
+
 
 export default function MessagesList() {
   const messagesGrid = useRef<HTMLDivElement>(null);
