@@ -250,7 +250,6 @@ export const ConversationProvider: React.FC = ({ children }) => {
 
   async function getMoreMessages() {
     if (haveMoreMessages.current) {
-      console.log('baixando mais mensagens');
       if (destination instanceof User) {
         await getMessagesFromUser(destination, messages.length);
       } else if (destination instanceof Group) {
@@ -265,7 +264,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
       new QueryFilter(MESSAGES_TO_TAKE, skip)
     );
     if (status === HttpStatus.OK) {
-      if (data.length > 0) {
+      if (data.length > 0 || skip === 0) {
         if (skip > 0) {
           setMessages((oldMessages) => [
             ...plainToInstance(UserMessage, data as []),
@@ -286,7 +285,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
       new QueryFilter(MESSAGES_TO_TAKE, skip)
     );
     if (status === HttpStatus.OK) {
-      if (data.length > 0) {
+      if (data.length > 0 || skip === 0) {
         if (skip > 0) {
           setMessages((oldMessages) => [
             ...plainToInstance(GroupMessage, data as []),
