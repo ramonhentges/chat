@@ -22,7 +22,8 @@ import { GroupMessage } from '../../models/group-message';
 import { useAlert } from '../../contexts/AlertSnackbar';
 import {
   MINUTES_TO_DELETE_MESSAGE,
-  SCROLL_POSITION_TO_TAKE_MORE_MESSAGES
+  SCROLL_POSITION_TO_TAKE_MORE_MESSAGES,
+  SCROll_TO_BOTTOM_OFFSET
 } from '../../constants/message';
 
 const sameDay = (firstDate: Date, secondDate: Date): boolean => {
@@ -109,7 +110,7 @@ export default function MessagesList() {
             scrollDown.current = false;
             await getMoreMessages();
             gettingMoreMessages.current = false;
-          } else if (scrollPosition === scrollHeight) {
+          } else if (scrollPosition >= scrollHeight - SCROll_TO_BOTTOM_OFFSET) {
             initialLoad.current = false;
             scrollDown.current = true;
           } else {
@@ -149,16 +150,16 @@ export default function MessagesList() {
           {(idx === 0 ||
             (idx > 0 &&
               !sameDay(message.createdAt, messages[idx - 1].createdAt))) && (
-            <Chip
-              sx={{ alignSelf: 'center', mb: 2 }}
-              variant="outlined"
-              label={
-                <Typography variant="body2" style={{ whiteSpace: 'normal' }}>
-                  {message.createdAt.toLocaleDateString()}
-                </Typography>
-              }
-            />
-          )}
+              <Chip
+                sx={{ alignSelf: 'center', mb: 2 }}
+                variant="outlined"
+                label={
+                  <Typography variant="body2" style={{ whiteSpace: 'normal' }}>
+                    {message.createdAt.toLocaleDateString()}
+                  </Typography>
+                }
+              />
+            )}
           <Message message={message} openMenu={handleOpen} />
         </React.Fragment>
       ))}
