@@ -15,25 +15,47 @@ import React, {
   useState
 } from 'react';
 import { useFormik } from 'formik';
-import { ICreateGroup } from '../../interfaces/create-group';
-import { createGroup } from '../../services/group.service';
+import { CreateGroupDto } from '../../dto/create-group';
+import { createGroup, updateGroup } from '../../services/group.service';
 import { HttpStatus } from '../../enum/http-status.enum';
 import { plainToInstance } from 'class-transformer';
 import { Group } from '../../models/group';
 import { useAlert } from '../../contexts/AlertSnackbar';
 import { useConversation } from '../../contexts/Conversation';
+import createValidator from 'class-validator-formik';
+
+const getMessages = (editing: boolean) => {
+  if (editing) {
+    return {
+      error: 'Erro ao editar grupo. Verifique os campos!',
+      success: 'Grupo editado com sucesso!'
+    };
+  } else {
+    return {
+      error: 'Erro ao criar grupo. Verifique os campos!',
+      success: 'Grupo criado com sucesso!'
+    };
+  }
+};
 
 const CreateGroupModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
   const [open, setOpen] = useState(false);
-  const { setDestination } = useConversation();
+  const [groupId, setGroupId] = useState('');
+  const { setDestination, changeGroupInfo } = useConversation();
 
   const { openAlert } = useAlert();
 
-  const handleOpen = () => {
+  const handleOpen = (group?: Group) => {
+    if (group) {
+      setGroupId(group.id);
+      setValues({ description: group.description, name: group.name });
+    }
     setOpen(true);
   };
 
   const handleClose = () => {
+    resetForm();
+    setGroupId('');
     setOpen(false);
   };
 
@@ -51,24 +73,34 @@ const CreateGroupModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
     isSubmitting,
     setErrors,
     errors,
-    touched
-  } = useFormik<ICreateGroup>({
+    touched,
+    setValues,
+    resetForm
+  } = useFormik<CreateGroupDto>({
     initialValues: { description: '', name: '' },
+    validate: createValidator(CreateGroupDto),
     onSubmit: async (values) => {
-      const { status, data } = await createGroup(values);
-      if (status === HttpStatus.CREATED) {
+      const messages = getMessages(groupId !== '');
+      const { status, data } = await (groupId === ''
+        ? createGroup(values)
+        : updateGroup(groupId, values));
+      if ([HttpStatus.CREATED, HttpStatus.OK].includes(status)) {
         const group = plainToInstance(Group, data);
-        setDestination(group);
+        if (groupId === '') {
+          setDestination(group);
+        } else {
+          changeGroupInfo(group);
+        }
         openAlert({
           severity: 'success',
-          message: 'Grupo criado com sucesso!'
+          message: messages.success
         });
         handleClose();
       } else if (status === HttpStatus.UNPROCESSABLE_ENTITY) {
         setErrors(data);
         openAlert({
           severity: 'error',
-          message: 'Erro ao criar o grupo. Verifique os dados!'
+          message: messages.error
         });
       }
     }
@@ -91,7 +123,9 @@ const CreateGroupModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
         <Grid item md={6} sm={8} xs={12}>
           <Paper sx={{ p: 2 }}>
             <Stack spacing={2} sx={{ mb: 2 }}>
-              <Typography variant="h5">Criar Grupo</Typography>
+              <Typography variant="h5">
+                {groupId === '' ? 'Criar Grupo' : 'Editar Grupo'}
+              </Typography>
               <TextField
                 fullWidth
                 id="name"
@@ -133,7 +167,13 @@ const CreateGroupModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
                   onClick={() => handleSubmit()}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? <CircularProgress size="1.5rem" /> : 'Criar'}
+                  {isSubmitting ? (
+                    <CircularProgress size="1.5rem" />
+                  ) : groupId === '' ? (
+                    'Criar'
+                  ) : (
+                    'Editar'
+                  )}
                 </Button>
               </Stack>
             </Grid>

@@ -1,7 +1,7 @@
-import { Login } from '../interfaces/login';
+import { LoginDto } from '../dto/login';
 import { api } from './api';
 
-const login = (usuario: Login) => {
+const login = (usuario: LoginDto) => {
   return api
     .post('auth/login', usuario)
     .then((response) => {

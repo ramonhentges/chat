@@ -11,7 +11,7 @@ import {
 import React, { useState } from 'react';
 import { Navigate, useNavigate, Link as LinkDom } from 'react-router-dom';
 import Footer from '../../../components/Footer';
-import { Login as LoginInterface } from '../../../interfaces/login';
+import { LoginDto as LoginInterface } from '../../../dto/login';
 import { useAuth } from '../../../contexts/Auth';
 import { useAlert } from '../../../contexts/AlertSnackbar';
 

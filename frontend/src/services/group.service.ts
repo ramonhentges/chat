@@ -1,18 +1,18 @@
-import { AddRemoveUserToGroup } from '../interfaces/add-user-to-group';
-import { ICreateGroup } from '../interfaces/create-group';
+import { AddRemoveUserToGroupDto } from '../dto/add-user-to-group';
+import { CreateGroupDto } from '../dto/create-group';
 
 import { api } from './api';
 
-export const createGroup = (group: ICreateGroup) =>
+export const createGroup = (group: CreateGroupDto) =>
   api({ url: `groups`, method: 'POST', data: group });
 
-export const updateGroup = (groupId: string, group: ICreateGroup) =>
+export const updateGroup = (groupId: string, group: CreateGroupDto) =>
   api({ url: `groups/${groupId}`, method: 'PUT', data: group });
 
-export const addUser = (userGroup: AddRemoveUserToGroup) =>
+export const addUser = (userGroup: AddRemoveUserToGroupDto) =>
   api({ url: `groups/add-user`, method: 'POST', data: userGroup });
 
-export const removeUser = (userGroup: AddRemoveUserToGroup) =>
+export const removeUser = (userGroup: AddRemoveUserToGroupDto) =>
   api({
     url: `groups/remove-user/${userGroup.groupId}/${userGroup.username}`,
     method: 'DELETE'

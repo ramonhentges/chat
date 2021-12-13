@@ -1,6 +1,6 @@
-import { DestinationFunctions } from '../interfaces/destination-functions';
+import { IDestination } from '../interfaces/i-destination';
 
-export class User implements DestinationFunctions {
+export class User implements IDestination {
   constructor() {
     this.username = '';
     this.fullName = '';

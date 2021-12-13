@@ -10,6 +10,8 @@
     "@mui/material": "^5.2.3",
     "axios": "^0.24.0",
     "class-transformer": "^0.5.1",
+    "class-validator": "^0.13.2",
+    "class-validator-formik": "^1.0.1",
     "formik": "^2.2.9",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

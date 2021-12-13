@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { Login } from '../../interfaces/login';
+import { LoginDto } from '../../dto/login';
 import { User } from '../../models/user';
 import { api } from '../../services/api';
 import { login } from '../../services/auth.service';
@@ -12,7 +12,7 @@ interface AuthContextProps {
   signed: boolean;
   loading: boolean;
   user: User | null;
-  signIn: (loginUser: Login) => Promise<boolean>;
+  signIn: (loginUser: LoginDto) => Promise<boolean>;
   signOut: () => void;
   refreshUserInfo: () => Promise<void>;
 }
@@ -29,7 +29,7 @@ export const AuthProvider: React.FC = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function signIn(loginUser: Login) {
+  async function signIn(loginUser: LoginDto) {
     const response = await login(loginUser);
     if (response.status === HttpStatus.OK) {
       api.defaults.headers.common[

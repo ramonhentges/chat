@@ -42,6 +42,7 @@ interface ConversationContextProps {
   setActualPage: (page: ActualPage) => void;
   receiveMessage: (message: UserMessage | GroupMessage) => void;
   getMoreMessages: () => Promise<void>;
+  changeGroupInfo: (group: Group) => void;
 }
 
 const sortLastMessages = (
@@ -274,7 +275,10 @@ export const ConversationProvider: React.FC = ({ children }) => {
           setMessages(plainToInstance(UserMessage, data as []));
         }
       } else {
-        openAlert({ severity: 'info', message: 'Você chegou ao início da conversa!' })
+        openAlert({
+          severity: 'info',
+          message: 'Você chegou ao início da conversa!'
+        });
         haveMoreMessages.current = false;
       }
     }
@@ -296,10 +300,44 @@ export const ConversationProvider: React.FC = ({ children }) => {
           setMessages(plainToInstance(GroupMessage, data as []));
         }
       } else {
-        openAlert({ severity: 'info', message: 'Você chegou ao início da conversa!' })
+        openAlert({
+          severity: 'info',
+          message: 'Você chegou ao início da conversa!'
+        });
         haveMoreMessages.current = false;
       }
     }
+  }
+
+  function changeGroupInfo(group: Group) {
+    if (destination instanceof Group) {
+      if (destination.id === group.id) {
+        setDestination(
+          plainToInstance(Group, {
+            ...destination,
+            name: group.name,
+            description: group.description
+          })
+        );
+      }
+    }
+    setLastMessages((messages) =>
+      messages.map((message) => {
+        if (message instanceof GroupMessage) {
+          if (message.groupDestination.id === group.id) {
+            return plainToInstance(GroupMessage, {
+              ...message,
+              groupDestination: {
+                ...message.groupDestination,
+                name: group.name,
+                description: group.description
+              }
+            });
+          }
+        }
+        return message;
+      })
+    );
   }
 
   return (
@@ -316,7 +354,8 @@ export const ConversationProvider: React.FC = ({ children }) => {
         receiveMessage,
         actualPage: actualPage,
         setActualPage: setActualPage,
-        getMoreMessages
+        getMoreMessages,
+        changeGroupInfo
       }}
     >
       {children}

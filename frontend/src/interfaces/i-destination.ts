@@ -1,4 +1,4 @@
-export interface DestinationFunctions {
+export interface IDestination {
   getTitle: () => string;
   getSubtitle: () => string;
   getKey: () => string;

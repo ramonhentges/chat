@@ -11,7 +11,7 @@ import { useFormik } from 'formik';
 import { useAlert } from '../../contexts/AlertSnackbar';
 import { useAuth } from '../../contexts/Auth';
 import { HttpStatus } from '../../enum/http-status.enum';
-import { EditUser } from '../../interfaces/edit-user';
+import { UpdateUserDto } from '../../dto/update-user';
 import { updateUser } from '../../services/user.service';
 import { ActualPage } from '../../enum/actual-page';
 import { useConversation } from '../../contexts/Conversation';
@@ -29,7 +29,7 @@ export function ChangeUserInfo(props: any) {
     setErrors,
     errors,
     touched
-  } = useFormik<EditUser>({
+  } = useFormik<UpdateUserDto>({
     initialValues: {
       fullName: user?.fullName || '',
       password: '',

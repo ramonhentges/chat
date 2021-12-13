@@ -27,7 +27,21 @@ import {
 } from '../../constants/message';
 import { sameDay } from '../../util/date';
 
+function canTakeMoreMessages(
+  scrollTop: number,
+  initialLoad: boolean,
+  alreadyGettingMoreMessages: boolean
+) {
+  return (
+    scrollTop <= SCROLL_POSITION_TO_TAKE_MORE_MESSAGES &&
+    !initialLoad &&
+    !alreadyGettingMoreMessages
+  );
+}
 
+function canScrollDown(scrollPosition: number, scrollHeight: number) {
+  return scrollPosition >= scrollHeight - SCROll_TO_BOTTOM_OFFSET;
+}
 
 export default function MessagesList() {
   const messagesGrid = useRef<HTMLDivElement>(null);
@@ -42,7 +56,7 @@ export default function MessagesList() {
   } = useConversation();
   const { openAlert } = useAlert();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const scrollDown = useRef(true);
+  const autoScrollDown = useRef(true);
   const initialLoad = useRef(true);
   const gettingMoreMessages = useRef(false);
   const open = Boolean(anchorEl);
@@ -81,11 +95,11 @@ export default function MessagesList() {
   };
 
   useLayoutEffect(() => {
-    !loading && scrollDown.current && scrollToBottom();
+    !loading && autoScrollDown.current && scrollToBottom();
   }, [messages, loading]);
 
   useEffect(() => {
-    scrollDown.current = true;
+    autoScrollDown.current = true;
     initialLoad.current = true;
   }, [destination]);
 
@@ -97,19 +111,21 @@ export default function MessagesList() {
             messagesGrid.current;
           const scrollPosition = scrollTop + offsetHeight;
           if (
-            scrollTop <= SCROLL_POSITION_TO_TAKE_MORE_MESSAGES &&
-            !initialLoad.current &&
-            !gettingMoreMessages.current
+            canTakeMoreMessages(
+              scrollTop,
+              initialLoad.current,
+              gettingMoreMessages.current
+            )
           ) {
             gettingMoreMessages.current = true;
-            scrollDown.current = false;
+            autoScrollDown.current = false;
             await getMoreMessages();
             gettingMoreMessages.current = false;
-          } else if (scrollPosition >= scrollHeight - SCROll_TO_BOTTOM_OFFSET) {
+          } else if (canScrollDown(scrollPosition, scrollHeight)) {
             initialLoad.current = false;
-            scrollDown.current = true;
+            autoScrollDown.current = true;
           } else {
-            scrollDown.current = false;
+            autoScrollDown.current = false;
           }
         }
       };
@@ -145,16 +161,16 @@ export default function MessagesList() {
           {(idx === 0 ||
             (idx > 0 &&
               !sameDay(message.createdAt, messages[idx - 1].createdAt))) && (
-              <Chip
-                sx={{ alignSelf: 'center', mb: 2 }}
-                variant="outlined"
-                label={
-                  <Typography variant="body2" style={{ whiteSpace: 'normal' }}>
-                    {message.createdAt.toLocaleDateString()}
-                  </Typography>
-                }
-              />
-            )}
+            <Chip
+              sx={{ alignSelf: 'center', mb: 2 }}
+              variant="outlined"
+              label={
+                <Typography variant="body2" style={{ whiteSpace: 'normal' }}>
+                  {message.createdAt.toLocaleDateString()}
+                </Typography>
+              }
+            />
+          )}
           <Message message={message} openMenu={handleOpen} />
         </React.Fragment>
       ))}

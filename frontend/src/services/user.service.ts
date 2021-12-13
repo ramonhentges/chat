@@ -1,8 +1,8 @@
-import { CreateUser } from '../interfaces/create-user';
-import { EditUser } from '../interfaces/edit-user';
+import { CreateUserDto } from '../dto/create-user';
+import { UpdateUserDto } from '../dto/update-user';
 import { api } from './api';
 
-export const createUser = (user: CreateUser) =>
+export const createUser = (user: CreateUserDto) =>
   api
     .post(`/users`, user)
     .then((response) => {
@@ -16,5 +16,5 @@ export const myUserInfo = () => api.get(`users/my/user`);
 
 export const usersList = () => api.get(`users`);
 
-export const updateUser = (data: EditUser) =>
+export const updateUser = (data: UpdateUserDto) =>
   api({ url: 'users', method: 'PUT', data });

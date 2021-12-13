@@ -50,7 +50,7 @@ export class GroupService {
     const userInGroup = await this.isUserInGroup(user.id, id);
 
     if (userInGroup) {
-      this.groupRepo.update({ id }, groupDto);
+      await this.groupRepo.update({ id }, groupDto);
       return await this.groupRepo.findOne({ id });
     }
     throw new ForbiddenException({

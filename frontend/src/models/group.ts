@@ -1,8 +1,8 @@
 import { Type } from 'class-transformer';
-import { DestinationFunctions } from '../interfaces/destination-functions';
+import { IDestination } from '../interfaces/i-destination';
 import { User } from './user';
 
-export class Group implements DestinationFunctions {
+export class Group implements IDestination {
   constructor() {
     this.id = '';
     this.name = '';
