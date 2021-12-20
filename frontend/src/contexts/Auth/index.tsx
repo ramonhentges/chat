@@ -58,11 +58,12 @@ export const AuthProvider: React.FC = ({ children }) => {
   }
 
   const getUserInfo = useCallback(async () => {
-    const { status, data } = await myUserInfo();
-    if (status === HttpStatus.OK) {
+    const response = await myUserInfo().catch((e) => e.response);
+    if (response.status === HttpStatus.OK) {
       socket.connect();
-      setUser(plainToInstance(User, data));
-    } else if (status === HttpStatus.UNAUTHORIZED) {
+      setUser(plainToInstance(User, response.data));
+    } else if (response.status === HttpStatus.UNAUTHORIZED) {
+      console.log('aquii');
       signOut();
     }
     setLoading(false);

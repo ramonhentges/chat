@@ -118,10 +118,10 @@ export default function MessagesList() {
             )
           ) {
             gettingMoreMessages.current = true;
-            autoScrollDown.current = false;
             await getMoreMessages();
             gettingMoreMessages.current = false;
-          } else if (canScrollDown(scrollPosition, scrollHeight)) {
+          }
+          if (canScrollDown(scrollPosition, scrollHeight)) {
             initialLoad.current = false;
             autoScrollDown.current = true;
           } else {
