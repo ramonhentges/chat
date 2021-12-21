@@ -6,9 +6,9 @@ import { User } from 'src/models/user.model';
 import { LocalStrategy } from './strategys/local.strategy';
 import { JwtStrategy } from 'src/modules/auth/strategys/jwt.strategy';
 import { jwtSecretKey } from 'src/constants/constants';
-import { UserService } from '../user/user.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -17,9 +17,10 @@ import { AuthService } from './auth.service';
     JwtModule.register({
       secret: jwtSecretKey,
       signOptions: { expiresIn: '7d' }
-    })
+    }),
+    UserModule
   ],
-  providers: [AuthService, UserService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService, JwtModule],
   controllers: [AuthController]
 })

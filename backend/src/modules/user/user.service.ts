@@ -1,4 +1,8 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  UnprocessableEntityException
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwsTokenDto } from '../auth/dto/jws-token.dto';
 import { UserDto } from './dto/user.dto';
@@ -7,14 +11,16 @@ import { User } from 'src/models/user.model';
 import AlreadyExists from 'src/validation/already.exists.validator';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/edit-user.dto';
-import { hashSync, genSaltSync, compareSync } from 'bcrypt';
+import { Encoder } from 'src/ports/encoder';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private userRepo: Repository<User>
-  ) { }
+    private userRepo: Repository<User>,
+    @Inject('ENCODER')
+    private encoder: Encoder
+  ) {}
 
   listAll() {
     return this.userRepo.find({
@@ -58,7 +64,7 @@ export class UserService {
   }
 
   async store(userDto: UserDto) {
-    const hashPassword = hashSync(userDto.password, genSaltSync());
+    const hashPassword = await this.encoder.encode(userDto.password);
     const user = this.userRepo.create({ ...userDto, password: hashPassword });
     if (await AlreadyExists(this.userRepo, 'username', user.username)) {
       throw new UnprocessableEntityException({
@@ -70,8 +76,11 @@ export class UserService {
 
   async update(token: JwsTokenDto, userDto: UpdateUserDto) {
     if (userDto.password) {
-      const hashPassword = hashSync(userDto.password, genSaltSync());
-      this.userRepo.update({ id: token.id }, { ...userDto, password: hashPassword });
+      const hashPassword = await this.encoder.encode(userDto.password);
+      this.userRepo.update(
+        { id: token.id },
+        { ...userDto, password: hashPassword }
+      );
     } else {
       this.userRepo.update({ id: token.id }, userDto);
     }
@@ -84,7 +93,7 @@ export class UserService {
       select: ['username', 'password', 'id']
     });
     if (user) {
-      if (compareSync(password, user.password)) {
+      if (await this.encoder.compare(password, user.password)) {
         return user;
       }
     }
