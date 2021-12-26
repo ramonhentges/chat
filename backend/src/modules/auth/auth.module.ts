@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/models/user.model';
 import { LocalStrategy } from './strategys/local.strategy';
 import { JwtStrategy } from 'src/modules/auth/strategys/jwt.strategy';
 import { jwtSecretKey } from 'src/constants/constants';
@@ -12,7 +10,6 @@ import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
     PassportModule,
     JwtModule.register({
       secret: jwtSecretKey,
@@ -24,4 +21,4 @@ import { UserModule } from '../user/user.module';
   exports: [AuthService, JwtModule],
   controllers: [AuthController]
 })
-export class AuthModule {}
+export class AuthModule { }

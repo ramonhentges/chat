@@ -117,9 +117,9 @@ export class MessagesGateway {
         throw new WsException('Erro interno do sistema');
       });
     client.broadcast
-      .to(`user-${sendedMessage.destinationId}`)
-      .emit('msgFromUser', sendedMessage.message);
-    return { event: 'sendedMsgFromUser', data: sendedMessage.message };
+      .to(`user-${sendedMessage.userDestination.id}`)
+      .emit('msgFromUser', sendedMessage);
+    return { event: 'sendedMsgFromUser', data: sendedMessage };
   }
 
   @SubscribeMessage('deleteGroupMessage')
@@ -132,7 +132,7 @@ export class MessagesGateway {
       `${client.handshake.headers.authorization}`.replace('Bearer ', '')
     );
     const returnMessage = await this.messageService
-      .deleteGroupMessage(userToken, messageId)
+      .deleteMessage(userToken, messageId)
       .catch((err) => {
         if (err.status === 403) {
           throw new WsException(err.response.message);
@@ -155,7 +155,7 @@ export class MessagesGateway {
       `${client.handshake.headers.authorization}`.replace('Bearer ', '')
     );
     const deletedMessage = await this.messageService
-      .deleteUserMessage(userToken, messageId)
+      .deleteMessage(userToken, messageId)
       .catch((err) => {
         if (err.status === 403) {
           throw new WsException(err.response.message);
