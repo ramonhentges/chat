@@ -1,4 +1,5 @@
 import { Request, Controller, Get, Param, Query } from '@nestjs/common';
+import { UserDecorator } from 'src/decorators/user.decorator';
 import { QueryFilter } from 'src/global-dto/query';
 import { MessageService } from './message.service';
 
@@ -9,14 +10,14 @@ export class UserMessageController {
   @Get(':username')
   async index(
     @Param('username') username: string,
-    @Request() req,
+    @UserDecorator() user,
     @Query() query: QueryFilter
   ) {
-    return this.messageService.getContactMessages(req.user, username, query);
+    return this.messageService.getContactMessages(user, username, query);
   }
 
   @Get('last/messages')
-  async lastMessages(@Request() req) {
-    return this.messageService.userLastMessages(req.user);
+  async lastMessages(@UserDecorator() user) {
+    return this.messageService.userLastMessages(user);
   }
 }

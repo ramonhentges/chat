@@ -15,6 +15,16 @@ export default class UserBuilder {
     return new UserBuilder();
   }
 
+  public newUsername(): UserBuilder {
+    this.user.username = 'newuser';
+    return this;
+  }
+
+  public newId(): UserBuilder {
+    this.user.id = '1e63873a-ace2-43b2-bd4b-1040ea2b8c6f';
+    return this;
+  }
+
   public build(): User {
     return this.user;
   }

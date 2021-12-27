@@ -31,7 +31,7 @@ describe('AuthController', () => {
     it('should call and return from login on authService', async () => {
       const accessToken = { accessToken: 'someToken' };
       const user = UserBuilder.aUser().build();
-      const loginData = {username: user.username, password: '123456'}
+      const loginData = { username: user.username, password: '123456' };
       mockAuthService.login.mockResolvedValueOnce(accessToken);
       const result = await sut.login(loginData);
       expect(result).toStrictEqual(accessToken);

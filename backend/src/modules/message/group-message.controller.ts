@@ -1,4 +1,5 @@
 import { Request, Controller, Get, Param, Query } from '@nestjs/common';
+import { UserDecorator } from 'src/decorators/user.decorator';
 import { QueryFilter } from 'src/global-dto/query';
 import { MessageService } from './message.service';
 
@@ -9,14 +10,14 @@ export class GroupMessageController {
   @Get(':id')
   async index(
     @Param('id') id: string,
-    @Request() req,
+    @UserDecorator() user,
     @Query() query: QueryFilter
   ) {
-    return this.messageService.getGroupMessages(id, req.user, query);
+    return this.messageService.getGroupMessages(id, user, query);
   }
 
   @Get('/last/:id')
-  async last(@Param('id') id: string, @Request() req) {
-    return this.messageService.lastGroupMessage(id, req.user);
+  async last(@Param('id') id: string, @UserDecorator() user) {
+    return this.messageService.lastGroupMessage(id, user);
   }
 }
