@@ -8,6 +8,7 @@ import {
   Put
 } from '@nestjs/common';
 import { Public } from 'src/constants/constants';
+import { UserDecorator } from 'src/decorators/user.decorator';
 import { UpdateUserDto } from './dto/edit-user.dto';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
@@ -22,8 +23,7 @@ export class UserController {
   }
 
   @Get('/my/user')
-  myUser(@Request() req) {
-    const { user } = req;
+  myUser(@UserDecorator() user) {
     return this.userService.getByIDWithoutID(user.id);
   }
 
@@ -39,8 +39,7 @@ export class UserController {
   }
 
   @Put()
-  async update(@Request() req, @Body() body: UpdateUserDto) {
-    const { user } = req;
+  async update(@UserDecorator() user, @Body() body: UpdateUserDto) {
     return this.userService.update(user, body);
   }
 }
