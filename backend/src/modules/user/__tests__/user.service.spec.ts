@@ -58,7 +58,7 @@ describe('UserService', () => {
       const sutFunction = async () => {
         await sut.getByID('invalid-id');
       };
-      expect(sutFunction()).rejects.toThrow(NotFoundException);
+      await expect(sutFunction()).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -76,7 +76,7 @@ describe('UserService', () => {
       const sutFunction = async () => {
         await sut.getByIDWithoutID('invalid-id');
       };
-      expect(sutFunction()).rejects.toThrow(NotFoundException);
+      await expect(sutFunction()).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -93,7 +93,7 @@ describe('UserService', () => {
       const sutFunction = async () => {
         await sut.getByUsername('invalid-username');
       };
-      expect(sutFunction()).rejects.toThrow(NotFoundException);
+      await expect(sutFunction()).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -111,7 +111,7 @@ describe('UserService', () => {
       const sutFunction = async () => {
         await sut.getByUsernameWithoutID('invalid-username');
       };
-      expect(sutFunction()).rejects.toThrow(NotFoundException);
+      await expect(sutFunction()).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -128,7 +128,7 @@ describe('UserService', () => {
       const sutFunction = async () => {
         await sut.getUserGroups('invalid-id');
       };
-      expect(sutFunction()).rejects.toThrow(NotFoundException);
+      await expect(sutFunction()).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -145,7 +145,7 @@ describe('UserService', () => {
       const user = UserBuilder.aUser().build();
       await userRepository.add(user);
       const sutFunction = async () => await sut.store(user);
-      expect(sutFunction()).rejects.toThrow(UnprocessableEntityException);
+      await expect(sutFunction()).rejects.toThrow(UnprocessableEntityException);
     });
   });
 

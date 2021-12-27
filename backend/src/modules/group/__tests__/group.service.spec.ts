@@ -120,7 +120,7 @@ describe('GroupService', () => {
           id: 'invalidId',
           username: user.username
         });
-      expect(sutFunction).rejects.toThrow(ForbiddenException);
+      await expect(sutFunction()).rejects.toThrow(ForbiddenException);
       expect(groupRepository.updateById).toHaveBeenCalledTimes(0);
     });
   });
