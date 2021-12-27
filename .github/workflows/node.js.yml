@@ -73,7 +73,7 @@ jobs:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: 05f0870c313670f65643708adac6943c
         filename: chat-backend__${{ env.BRANCH }}.json
-        label: Test Coverage
+        label: Backend Coverage
         message: ${{ env.COVERAGE }}
         color: green
         namedLogo: jest
