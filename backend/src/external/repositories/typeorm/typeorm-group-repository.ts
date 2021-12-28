@@ -1,8 +1,8 @@
-import { Group } from 'src/models/group.model';
-import { User } from 'src/models/user.model';
-import { CreateGroupData } from 'src/ports/create-group-data';
-import { GroupRepository } from 'src/ports/group-repository';
-import { UpdateGroupData } from 'src/ports/update-group-data';
+import { Group } from '@/models/group.model';
+import { User } from '@/models/user.model';
+import { CreateGroupData } from '@/ports/create-group-data';
+import { GroupRepository } from '@/ports/group-repository';
+import { UpdateGroupData } from '@/ports/update-group-data';
 import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(Group)

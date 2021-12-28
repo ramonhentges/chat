@@ -8,11 +8,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AddRemoveUserToGroupDto } from './dto/add-user-to-group.dto';
 import { GroupDto } from './dto/group.dto';
 import { JwsTokenDto } from '../auth/dto/jws-token.dto';
-import { MessagesGateway } from 'src/gateways/messages.gateway';
+import { MessagesGateway } from '@/gateways/messages.gateway';
 import { UserService } from '../user/user.service';
-import { TypeormGroupRepository } from 'src/external/repositories/typeorm/typeorm-group-repository';
-import { GroupRepository } from 'src/ports/group-repository';
-import { CreateGroupData } from 'src/ports/create-group-data';
+import { TypeormGroupRepository } from '@/external/repositories/typeorm/typeorm-group-repository';
+import { GroupRepository } from '@/ports/group-repository';
+import { CreateGroupData } from '@/ports/create-group-data';
 
 @Injectable()
 export class GroupService {

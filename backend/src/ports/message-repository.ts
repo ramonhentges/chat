@@ -1,7 +1,7 @@
-import { QueryFilter } from 'src/global-dto/query';
-import { Group } from 'src/models/group.model';
-import { Message } from 'src/models/message.model';
-import { User } from 'src/models/user.model';
+import { QueryFilter } from '@/global-dto/query';
+import { Group } from '@/models/group.model';
+import { Message } from '@/models/message.model';
+import { User } from '@/models/user.model';
 
 export interface MessageRepository {
   findUserActiveContacts(user: User): Promise<User[]>;

@@ -1,16 +1,16 @@
 import { createMock } from '@golevelup/ts-jest';
 import { ForbiddenException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import GroupBuilder from 'src/__test__/builder/group-builder';
-import JWTTestUtil from 'src/__test__/builder/JwtTestUtil';
-import UserBuilder from 'src/__test__/builder/user-builder';
-import { InMemoryGroupRepository } from 'src/__test__/doubles/repositories/in-memory-group-repository';
-import { TypeormGroupRepository } from 'src/external/repositories/typeorm/typeorm-group-repository';
-import { MessagesGateway } from 'src/gateways/messages.gateway';
-import { Group } from 'src/models/group.model';
-import { User } from 'src/models/user.model';
-import { UserService } from 'src/modules/user/user.service';
-import { GroupRepository } from 'src/ports/group-repository';
+import GroupBuilder from '@/__test__/builder/group-builder';
+import JWTTestUtil from '@/__test__/builder/JwtTestUtil';
+import UserBuilder from '@/__test__/builder/user-builder';
+import { InMemoryGroupRepository } from '@/__test__/doubles/repositories/in-memory-group-repository';
+import { TypeormGroupRepository } from '@/external/repositories/typeorm/typeorm-group-repository';
+import { MessagesGateway } from '@/gateways/messages.gateway';
+import { Group } from '@/models/group.model';
+import { User } from '@/models/user.model';
+import { UserService } from '@/modules/user/user.service';
+import { GroupRepository } from '@/ports/group-repository';
 import { GroupService } from '../group.service';
 
 describe('GroupService', () => {

@@ -9,7 +9,7 @@ import {
   Post,
   Put
 } from '@nestjs/common';
-import { UserDecorator } from 'src/decorators/user.decorator';
+import { UserDecorator } from '@/decorators/user.decorator';
 import { AddRemoveUserToGroupDto } from './dto/add-user-to-group.dto';
 import { GroupDto } from './dto/group.dto';
 import { GroupService } from './group.service';

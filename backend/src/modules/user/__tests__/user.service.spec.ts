@@ -3,11 +3,11 @@ import {
   UnprocessableEntityException
 } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TypeormUserRepository } from 'src/external/repositories/typeorm/typeorm-user-repository';
-import { UserRepository } from 'src/ports/user-repository';
-import UserBuilder from 'src/__test__/builder/user-builder';
-import { DoubleEncoder } from 'src/__test__/doubles/encoder';
-import { InMemoryUserRepository } from 'src/__test__/doubles/repositories/in-memory-user-repository';
+import { TypeormUserRepository } from '@/external/repositories/typeorm/typeorm-user-repository';
+import { UserRepository } from '@/ports/user-repository';
+import UserBuilder from '@/__test__/builder/user-builder';
+import { DoubleEncoder } from '@/__test__/doubles/encoder';
+import { InMemoryUserRepository } from '@/__test__/doubles/repositories/in-memory-user-repository';
 import { UserService } from '../user.service';
 
 describe('UserService', () => {

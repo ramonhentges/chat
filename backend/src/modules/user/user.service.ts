@@ -7,14 +7,14 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwsTokenDto } from '../auth/dto/jws-token.dto';
 import { UserDto } from './dto/user.dto';
-import { Group } from 'src/models/group.model';
-import { User } from 'src/models/user.model';
-import AlreadyExists from 'src/validation/already.exists.validator';
+import { Group } from '@/models/group.model';
+import { User } from '@/models/user.model';
+import AlreadyExists from '@/validation/already.exists.validator';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/edit-user.dto';
-import { Encoder } from 'src/ports/encoder';
-import { TypeormUserRepository } from 'src/external/repositories/typeorm/typeorm-user-repository';
-import { UserRepository } from 'src/ports/user-repository';
+import { Encoder } from '@/ports/encoder';
+import { TypeormUserRepository } from '@/external/repositories/typeorm/typeorm-user-repository';
+import { UserRepository } from '@/ports/user-repository';
 
 @Injectable()
 export class UserService {

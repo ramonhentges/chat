@@ -1,5 +1,5 @@
-import { Group } from 'src/models/group.model';
-import { User } from 'src/models/user.model';
+import { Group } from '@/models/group.model';
+import { User } from '@/models/user.model';
 import { CreateGroupData } from './create-group-data';
 import { UpdateGroupData } from './update-group-data';
 

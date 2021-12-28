@@ -1,7 +1,7 @@
 import { Controller, Post, UseGuards, HttpCode } from '@nestjs/common';
-import { Public } from 'src/constants/constants';
-import { UserDecorator } from 'src/decorators/user.decorator';
-import { LocalAuthGuard } from 'src/modules/auth/guards/local-auth.guard';
+import { Public } from '@/constants/constants';
+import { UserDecorator } from '@/decorators/user.decorator';
+import { LocalAuthGuard } from '@/modules/auth/guards/local-auth.guard';
 import { AuthService } from './auth.service';
 
 @Controller('auth')

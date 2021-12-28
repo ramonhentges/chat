@@ -1,4 +1,4 @@
-import { Encoder } from 'src/ports/encoder';
+import { Encoder } from '@/ports/encoder';
 import { hash, compare, genSaltSync } from 'bcrypt';
 
 export class BcryptEncoder implements Encoder {

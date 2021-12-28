@@ -1,5 +1,5 @@
-import { BcryptEncoder } from 'src/external/bcrypt-encoder';
-import { Encoder } from 'src/ports/encoder';
+import { BcryptEncoder } from '@/external/bcrypt-encoder';
+import { Encoder } from '@/ports/encoder';
 
 export const makeEncoder = {
   provide: 'ENCODER',

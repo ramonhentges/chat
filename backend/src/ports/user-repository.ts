@@ -1,4 +1,4 @@
-import { User } from 'src/models/user.model';
+import { User } from '@/models/user.model';
 import { CreateUserData } from './create-user-data';
 import { UpdateUserData } from './update-user-data';
 

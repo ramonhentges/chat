@@ -1,7 +1,7 @@
 import { createMock } from '@golevelup/ts-jest';
 import { Test, TestingModule } from '@nestjs/testing';
-import JWTTestUtil from 'src/__test__/builder/JwtTestUtil';
-import UserBuilder from 'src/__test__/builder/user-builder';
+import JWTTestUtil from '@/__test__/builder/JwtTestUtil';
+import UserBuilder from '@/__test__/builder/user-builder';
 import { UserController } from '../user.controller';
 import { UserService } from '../user.service';
 

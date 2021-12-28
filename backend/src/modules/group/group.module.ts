@@ -1,7 +1,7 @@
 import { forwardRef } from '@nestjs/common';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TypeormGroupRepository } from 'src/external/repositories/typeorm/typeorm-group-repository';
+import { TypeormGroupRepository } from '@/external/repositories/typeorm/typeorm-group-repository';
 import { MessageModule } from '../message/message.module';
 import { UserModule } from '../user/user.module';
 import { GroupController } from './group.controller';

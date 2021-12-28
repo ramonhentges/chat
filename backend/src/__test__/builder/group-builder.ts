@@ -1,4 +1,4 @@
-import { Group } from 'src/models/group.model';
+import { Group } from '@/models/group.model';
 
 export default class GroupBuilder {
   private group = new Group();

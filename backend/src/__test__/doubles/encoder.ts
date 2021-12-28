@@ -1,4 +1,4 @@
-import { Encoder } from 'src/ports/encoder';
+import { Encoder } from '@/ports/encoder';
 
 export class DoubleEncoder implements Encoder {
   async encode(plain: string): Promise<string> {

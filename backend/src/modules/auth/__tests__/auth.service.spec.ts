@@ -1,8 +1,8 @@
 import { createMock } from '@golevelup/ts-jest';
 import { JwtModule } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserService } from 'src/modules/user/user.service';
-import UserBuilder from 'src/__test__/builder/user-builder';
+import { UserService } from '@/modules/user/user.service';
+import UserBuilder from '@/__test__/builder/user-builder';
 import { AuthService } from '../auth.service';
 
 describe('AuthService', () => {

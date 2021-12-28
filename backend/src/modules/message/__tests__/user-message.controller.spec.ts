@@ -1,8 +1,8 @@
 import { createMock } from '@golevelup/ts-jest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { QueryFilter } from 'src/global-dto/query';
-import JWTTestUtil from 'src/__test__/builder/JwtTestUtil';
-import MessageBuilder from 'src/__test__/builder/message-builder';
+import { QueryFilter } from '@/global-dto/query';
+import JWTTestUtil from '@/__test__/builder/JwtTestUtil';
+import MessageBuilder from '@/__test__/builder/message-builder';
 import { MessageService } from '../message.service';
 import { UserMessageController } from '../user-message.controller';
 

@@ -1,8 +1,8 @@
-import { QueryFilter } from 'src/global-dto/query';
-import { Group } from 'src/models/group.model';
-import { Message } from 'src/models/message.model';
-import { User } from 'src/models/user.model';
-import { MessageRepository } from 'src/ports/message-repository';
+import { QueryFilter } from '@/global-dto/query';
+import { Group } from '@/models/group.model';
+import { Message } from '@/models/message.model';
+import { User } from '@/models/user.model';
+import { MessageRepository } from '@/ports/message-repository';
 import { EntityRepository, Repository } from 'typeorm';
 
 @EntityRepository(Message)

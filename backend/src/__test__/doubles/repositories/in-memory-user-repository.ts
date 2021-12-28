@@ -1,7 +1,7 @@
-import { User } from 'src/models/user.model';
-import { CreateUserData } from 'src/ports/create-user-data';
-import { UpdateUserData } from 'src/ports/update-user-data';
-import { UserRepository } from 'src/ports/user-repository';
+import { User } from '@/models/user.model';
+import { CreateUserData } from '@/ports/create-user-data';
+import { UpdateUserData } from '@/ports/update-user-data';
+import { UserRepository } from '@/ports/user-repository';
 import GroupBuilder from '../../builder/group-builder';
 
 export class InMemoryUserRepository implements UserRepository {

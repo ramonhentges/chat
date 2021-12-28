@@ -9,12 +9,12 @@ import {
   WsResponse
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Group } from 'src/models/group.model';
-import { Message } from 'src/models/message.model';
-import { AuthService } from 'src/modules/auth/auth.service';
-import { MessageDto } from 'src/modules/message/dto/message.dto';
-import { MessageService } from 'src/modules/message/message.service';
-import { UserService } from 'src/modules/user/user.service';
+import { Group } from '@/models/group.model';
+import { Message } from '@/models/message.model';
+import { AuthService } from '@/modules/auth/auth.service';
+import { MessageDto } from '@/modules/message/dto/message.dto';
+import { MessageService } from '@/modules/message/message.service';
+import { UserService } from '@/modules/user/user.service';
 
 @WebSocketGateway({
   cors: { origin: '*' }

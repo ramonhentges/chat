@@ -2,10 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GroupController } from '../group.controller';
 import { createMock } from '@golevelup/ts-jest';
 import { GroupService } from '../group.service';
-import JWTTestUtil from 'src/__test__/builder/JwtTestUtil';
-import GroupBuilder from 'src/__test__/builder/group-builder';
+import JWTTestUtil from '@/__test__/builder/JwtTestUtil';
+import GroupBuilder from '@/__test__/builder/group-builder';
 import { AddRemoveUserToGroupDto } from '../dto/add-user-to-group.dto';
-import UserBuilder from 'src/__test__/builder/user-builder';
+import UserBuilder from '@/__test__/builder/user-builder';
 
 describe('GroupController', () => {
   let sut: GroupController;

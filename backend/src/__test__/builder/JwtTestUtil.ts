@@ -1,4 +1,4 @@
-import { JwsTokenDto } from 'src/modules/auth/dto/jws-token.dto';
+import { JwsTokenDto } from '@/modules/auth/dto/jws-token.dto';
 
 export default class JWTTestUtil {
   static giveAValidJwtTokenDto(): JwsTokenDto {

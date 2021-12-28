@@ -1,6 +1,6 @@
 import { createMock } from '@golevelup/ts-jest';
 import { Test, TestingModule } from '@nestjs/testing';
-import UserBuilder from 'src/__test__/builder/user-builder';
+import UserBuilder from '@/__test__/builder/user-builder';
 import { AuthController } from '../auth.controller';
 import { AuthService } from '../auth.service';
 

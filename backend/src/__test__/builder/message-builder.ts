@@ -1,4 +1,4 @@
-import { Message } from 'src/models/message.model';
+import { Message } from '@/models/message.model';
 
 export default class MessageBuilder {
   private message = new Message();

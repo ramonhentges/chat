@@ -1,6 +1,6 @@
 import { Request, Controller, Get, Param, Query } from '@nestjs/common';
-import { UserDecorator } from 'src/decorators/user.decorator';
-import { QueryFilter } from 'src/global-dto/query';
+import { UserDecorator } from '@/decorators/user.decorator';
+import { QueryFilter } from '@/global-dto/query';
 import { MessageService } from './message.service';
 
 @Controller('group-message')

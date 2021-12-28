@@ -1,7 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TypeormMessageRepository } from 'src/external/repositories/typeorm/typeorm-message-repository';
-import { MessagesGateway } from 'src/gateways/messages.gateway';
+import { TypeormMessageRepository } from '@/external/repositories/typeorm/typeorm-message-repository';
+import { MessagesGateway } from '@/gateways/messages.gateway';
 import { AuthModule } from '../auth/auth.module';
 import { GroupModule } from '../group/group.module';
 import { UserModule } from '../user/user.module';
