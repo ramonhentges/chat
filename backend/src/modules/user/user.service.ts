@@ -1,3 +1,8 @@
+import { TypeormUserRepository } from '@/external/repositories/typeorm/typeorm-user-repository';
+import { TYPES } from '@/factories/types';
+import { Group } from '@/models/group.model';
+import { Encoder } from '@/ports/encoder';
+import { UserRepository } from '@/ports/user-repository';
 import {
   Inject,
   Injectable,
@@ -6,27 +11,20 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwsTokenDto } from '../auth/dto/jws-token.dto';
-import { UserDto } from './dto/user.dto';
-import { Group } from '@/models/group.model';
-import { User } from '@/models/user.model';
-import AlreadyExists from '@/validation/already.exists.validator';
-import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/edit-user.dto';
-import { Encoder } from '@/ports/encoder';
-import { TypeormUserRepository } from '@/external/repositories/typeorm/typeorm-user-repository';
-import { UserRepository } from '@/ports/user-repository';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(TypeormUserRepository)
     private userRepo: UserRepository,
-    @Inject('ENCODER')
+    @Inject(TYPES.Encoder)
     private encoder: Encoder
-  ) { }
+  ) {}
 
   listAll() {
-    return this.userRepo.findAll()
+    return this.userRepo.findAll();
   }
 
   async getByID(id: string) {
@@ -86,12 +84,14 @@ export class UserService {
   async update(token: JwsTokenDto, userDto: UpdateUserDto) {
     if (userDto.password) {
       const hashPassword = await this.encoder.encode(userDto.password);
-      this.userRepo.updateById(token.id, { ...userDto, password: hashPassword })
-
+      this.userRepo.updateById(token.id, {
+        ...userDto,
+        password: hashPassword
+      });
     } else {
-      this.userRepo.updateById(token.id, userDto)
+      this.userRepo.updateById(token.id, userDto);
     }
-    return await this.userRepo.findOneById(token.id)
+    return await this.userRepo.findOneById(token.id);
   }
 
   async login(username: string, password: string) {

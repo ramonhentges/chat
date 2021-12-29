@@ -9,6 +9,7 @@ import UserBuilder from '@/__test__/builder/user-builder';
 import { DoubleEncoder } from '@/__test__/doubles/encoder';
 import { InMemoryUserRepository } from '@/__test__/doubles/repositories/in-memory-user-repository';
 import { UserService } from '../user.service';
+import { TYPES } from '@/factories/types';
 
 describe('UserService', () => {
   let sut: UserService;
@@ -20,7 +21,7 @@ describe('UserService', () => {
       providers: [
         UserService,
         { provide: TypeormUserRepository, useValue: userRepository },
-        { provide: 'ENCODER', useClass: DoubleEncoder }
+        { provide: TYPES.Encoder, useClass: DoubleEncoder }
       ]
     }).compile();
 
