@@ -2,11 +2,13 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { LoginDto } from '../../dto/login';
 import { User } from '../../models/user';
 import { api } from '../../services/api';
-import { login } from '../../services/auth.service';
 import { myUserInfo } from '../../services/user.service';
 import { socket, setAuthorizationToken } from '../../services/socket.service';
 import { plainToInstance } from 'class-transformer';
 import { HttpStatus } from '../../enum/http-status.enum';
+import { container } from '../../config/inversify.config';
+import { AuthService } from '../../services/AuthService';
+import { SERVICE_TYPES } from '../../types/Service';
 
 interface AuthContextProps {
   signed: boolean;
@@ -28,14 +30,11 @@ function reconnect() {
 export const AuthProvider: React.FC = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const _authService = container.get<AuthService>(SERVICE_TYPES.AuthService);
 
   async function signIn(loginUser: LoginDto) {
-    const response = await login(loginUser);
+    const response = await _authService.login(loginUser);
     if (response.status === HttpStatus.OK) {
-      api.defaults.headers.common[
-        'Authorization'
-      ] = `Bearer ${response.data.accessToken}`;
-      localStorage.setItem('accessToken', JSON.stringify(response.data));
       await getUserInfo();
       setAuthorizationToken(response.data.accessToken);
       socket.on('disconnect', function () {
