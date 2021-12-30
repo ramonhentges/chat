@@ -2,13 +2,13 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { LoginDto } from '../../dto/login';
 import { User } from '../../models/user';
 import { api } from '../../services/api';
-import { myUserInfo } from '../../services/user.service';
 import { socket, setAuthorizationToken } from '../../services/socket.service';
 import { plainToInstance } from 'class-transformer';
 import { HttpStatus } from '../../enum/http-status.enum';
 import { container } from '../../config/inversify.config';
 import { AuthService } from '../../services/AuthService';
 import { SERVICE_TYPES } from '../../types/Service';
+import { UserService } from '../../services/UserService';
 
 interface AuthContextProps {
   signed: boolean;
@@ -31,6 +31,7 @@ export const AuthProvider: React.FC = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const _authService = container.get<AuthService>(SERVICE_TYPES.AuthService);
+  const _userService = container.get<UserService>(SERVICE_TYPES.UserService);
 
   async function signIn(loginUser: LoginDto) {
     const response = await _authService.login(loginUser);
@@ -57,7 +58,7 @@ export const AuthProvider: React.FC = ({ children }) => {
   }
 
   const getUserInfo = useCallback(async () => {
-    const response = await myUserInfo().catch((e) => e.response);
+    const response = await _userService.myUserInfo().catch((e) => e.response);
     if (response.status === HttpStatus.OK) {
       socket.connect();
       setUser(plainToInstance(User, response.data));
@@ -66,7 +67,7 @@ export const AuthProvider: React.FC = ({ children }) => {
       signOut();
     }
     setLoading(false);
-  }, []);
+  }, [_userService]);
 
   useEffect(() => {
     async function getInfo() {

@@ -13,13 +13,16 @@ import Footer from '../../../components/Footer';
 import { useAlert } from '../../../contexts/AlertSnackbar';
 import { HttpStatus } from '../../../enum/http-status.enum';
 import { CreateUserDto } from '../../../dto/create-user';
-import { createUser } from '../../../services/user.service';
 import { useFormik } from 'formik';
 import createValidator from 'class-validator-formik';
+import { container } from '../../../config/inversify.config';
+import { UserService } from '../../../services/UserService';
+import { SERVICE_TYPES } from '../../../types/Service';
 
 export function CreateAccount() {
   const navigate = useNavigate();
   const { openAlert } = useAlert();
+  const _userService = container.get<UserService>(SERVICE_TYPES.UserService);
 
   const {
     values,
@@ -29,13 +32,13 @@ export function CreateAccount() {
     isSubmitting,
     setErrors,
     errors,
-    touched,
+    touched
   } = useFormik<CreateUserDto>({
     initialValues: new CreateUserDto(),
     validate: createValidator(CreateUserDto),
     onSubmit: async (values) => {
       if (values.password === values.confirmPassword) {
-        const { status, data } = await createUser(values);
+        const { status, data } = await _userService.createUser(values);
         if (status === HttpStatus.CREATED) {
           openAlert({
             severity: 'success',
@@ -158,7 +161,11 @@ export function CreateAccount() {
                   to="/"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? <CircularProgress size="1.5rem" /> : 'Cancelar'}
+                  {isSubmitting ? (
+                    <CircularProgress size="1.5rem" />
+                  ) : (
+                    'Cancelar'
+                  )}
                 </Button>
               </form>
             </Paper>

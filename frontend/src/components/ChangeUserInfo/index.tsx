@@ -12,14 +12,17 @@ import { useAlert } from '../../contexts/AlertSnackbar';
 import { useAuth } from '../../contexts/Auth';
 import { HttpStatus } from '../../enum/http-status.enum';
 import { UpdateUserDto } from '../../dto/update-user';
-import { updateUser } from '../../services/user.service';
 import { ActualPage } from '../../enum/actual-page';
 import { useConversation } from '../../contexts/Conversation';
+import { container } from '../../config/inversify.config';
+import { UserService } from '../../services/UserService';
+import { SERVICE_TYPES } from '../../types/Service';
 
 export function ChangeUserInfo(props: any) {
   const { user, refreshUserInfo } = useAuth();
   const { openAlert } = useAlert();
   const { setActualPage } = useConversation();
+  const _userService = container.get<UserService>(SERVICE_TYPES.UserService);
   const {
     values,
     handleChange,
@@ -40,7 +43,7 @@ export function ChangeUserInfo(props: any) {
         if (values.password === '') {
           delete values.password;
         }
-        const { status, data } = await updateUser(values);
+        const { status, data } = await _userService.updateUser(values);
         if (status === HttpStatus.OK) {
           openAlert({
             severity: 'success',
