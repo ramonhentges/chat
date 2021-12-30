@@ -1,7 +1,12 @@
 import { plainToInstance } from 'class-transformer';
 import React, {
-  useCallback, useContext, useEffect, useRef, useState
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState
 } from 'react';
+import { container } from '../../config/inversify.config';
 import { MESSAGES_TO_TAKE } from '../../constants/message';
 import { ActualPage } from '../../enum/actual-page';
 import { HttpStatus } from '../../enum/http-status.enum';
@@ -12,15 +17,13 @@ import { GroupMessage } from '../../models/group-message';
 import { User } from '../../models/user';
 import { UserMessage } from '../../models/user-message';
 import { getMyGroups } from '../../services/group.service';
+import { MessageService } from '../../services/MessageService';
 import {
-  getGroupMessages,
-  getLastGroupMessage,
-  getLatestMessages,
-  getUserMessages
-} from '../../services/message.service';
-import {
-  sendGroupMessage, sendUserMessage, socket
+  sendGroupMessage,
+  sendUserMessage,
+  socket
 } from '../../services/socket.service';
+import { SERVICE_TYPES } from '../../types/Service';
 import { useAlert } from '../AlertSnackbar';
 import { useAuth } from '../Auth';
 
@@ -31,19 +34,16 @@ interface ConversationContextProps {
   messages: IMessage[];
   sendMessage: (message: string) => void;
   lastMessages: IMessage[];
-  selectedMessage:IMessage | undefined;
-  setSelectedMessage: (message:IMessage | undefined) => void;
+  selectedMessage: IMessage | undefined;
+  setSelectedMessage: (message: IMessage | undefined) => void;
   actualPage: ActualPage;
   setActualPage: (page: ActualPage) => void;
-  receiveMessage: (message:IMessage) => void;
+  receiveMessage: (message: IMessage) => void;
   getMoreMessages: () => Promise<void>;
   changeGroupInfo: (group: Group) => void;
 }
 
-const sortLastMessages = (
-  a:IMessage,
-  b:IMessage
-): number => {
+const sortLastMessages = (a: IMessage, b: IMessage): number => {
   return a.createdAt > b.createdAt ? -1 : a.createdAt === b.createdAt ? 0 : 1;
 };
 
@@ -57,42 +57,46 @@ export const ConversationProvider: React.FC = ({ children }) => {
   );
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<IMessage[]>([]);
-  const [lastMessages, setLastMessages] = useState<
-    IMessage[]
-  >([]);
+  const [lastMessages, setLastMessages] = useState<IMessage[]>([]);
   const [selectedMessage, setSelectedMessage] = useState<
-   IMessage | undefined
+    IMessage | undefined
   >();
   const [actualPage, setActualPage] = useState<ActualPage>(ActualPage.CHAT);
   const haveMoreMessages = useRef<boolean>(true);
+  const _messageService = container.get<MessageService>(
+    SERVICE_TYPES.MessageService
+  );
 
   const { user } = useAuth();
   const { openAlert } = useAlert();
 
-  const getGroupLastMessage = useCallback(async (group: Group) => {
-    const message = await getLastGroupMessage(group.id);
-    if (message.status === HttpStatus.OK) {
-      let data;
-      if (message.data) {
-        data = { ...message.data, groupDestination: group };
-      } else {
-        data = {
-          id: group.id,
-          message: 'Grupo Criado',
-          deleted: false,
-          createdAt: group.createdAt,
-          origin: new User(),
-          groupDestination: group
-        };
+  const getGroupLastMessage = useCallback(
+    async (group: Group) => {
+      const message = await _messageService.getLastGroupMessage(group.id);
+      if (message.status === HttpStatus.OK) {
+        let data;
+        if (message.data) {
+          data = { ...message.data, groupDestination: group };
+        } else {
+          data = {
+            id: group.id,
+            message: 'Grupo Criado',
+            deleted: false,
+            createdAt: group.createdAt,
+            origin: new User(),
+            groupDestination: group
+          };
+        }
+        return plainToInstance(GroupMessage, data);
       }
-      return plainToInstance(GroupMessage, data);
-    }
-  }, []);
+    },
+    [_messageService]
+  );
 
   useEffect(() => {
     async function getLastMessages() {
       if (user) {
-        const latestUserMessages = await getLatestMessages();
+        const latestUserMessages = await _messageService.getLatestMessages();
         const myGroups = await getMyGroups();
         if (
           latestUserMessages?.status === HttpStatus.OK &&
@@ -116,10 +120,10 @@ export const ConversationProvider: React.FC = ({ children }) => {
       }
     }
     getLastMessages();
-  }, [user, getGroupLastMessage]);
+  }, [user, getGroupLastMessage, _messageService]);
 
   const receiveMessage = useCallback(
-    (message:IMessage) => {
+    (message: IMessage) => {
       if (user) {
         setLastMessages((messages) => {
           return [
@@ -142,7 +146,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
     [destination, user]
   );
 
-  const deleteMessage = (deletedMessage:IMessage) => {
+  const deleteMessage = (deletedMessage: IMessage) => {
     setMessages((prevMessages) =>
       prevMessages.map((message) => {
         return message.id === deletedMessage.id ? deletedMessage : message;
@@ -255,7 +259,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
   }
 
   async function getMessagesFromUser(destination: User, skip: number) {
-    const { status, data } = await getUserMessages(
+    const { status, data } = await _messageService.getUserMessages(
       destination,
       new QueryFilter(MESSAGES_TO_TAKE, skip)
     );
@@ -280,7 +284,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
   }
 
   async function getGroupMessagesFromUser(destination: Group, skip: number) {
-    const { status, data } = await getGroupMessages(
+    const { status, data } = await _messageService.getGroupMessages(
       destination.id,
       new QueryFilter(MESSAGES_TO_TAKE, skip)
     );
