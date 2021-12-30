@@ -8,4 +8,7 @@ export interface IMessage {
   getCardMessage: (user: User) => string;
   getContact: (user: User) => Group | User;
   canDelete: () => boolean;
+  createdAt: Date;
+  deleted: boolean;
+  origin: User;
 }

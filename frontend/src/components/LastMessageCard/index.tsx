@@ -1,16 +1,15 @@
-import React from 'react';
+import { Typography } from '@mui/material';
+import Avatar from '@mui/material/Avatar';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
-import Avatar from '@mui/material/Avatar';
+import React from 'react';
 import { useAuth } from '../../contexts/Auth';
 import { useConversation } from '../../contexts/Conversation';
-import { UserMessage } from '../../models/user-message';
-import { Typography } from '@mui/material';
-import { GroupMessage } from '../../models/group-message';
+import { IMessage } from '../../interfaces/i-message';
 import { Group } from '../../models/group';
 
 interface LastMessageCardProps {
-  lastMessage: UserMessage | GroupMessage;
+  lastMessage: IMessage;
 }
 
 const getTime = (date: Date): string => {

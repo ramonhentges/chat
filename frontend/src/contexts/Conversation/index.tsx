@@ -1,53 +1,48 @@
+import { plainToInstance } from 'class-transformer';
 import React, {
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-  useRef
+  useCallback, useContext, useEffect, useRef, useState
 } from 'react';
+import { MESSAGES_TO_TAKE } from '../../constants/message';
+import { ActualPage } from '../../enum/actual-page';
+import { HttpStatus } from '../../enum/http-status.enum';
+import { IMessage } from '../../interfaces/i-message';
+import { QueryFilter } from '../../interfaces/query';
 import { Group } from '../../models/group';
+import { GroupMessage } from '../../models/group-message';
 import { User } from '../../models/user';
 import { UserMessage } from '../../models/user-message';
+import { getMyGroups } from '../../services/group.service';
 import {
   getGroupMessages,
   getLastGroupMessage,
   getLatestMessages,
   getUserMessages
 } from '../../services/message.service';
-import { useAuth } from '../Auth';
 import {
-  socket,
-  sendUserMessage,
-  sendGroupMessage
+  sendGroupMessage, sendUserMessage, socket
 } from '../../services/socket.service';
-import { plainToInstance } from 'class-transformer';
-import { HttpStatus } from '../../enum/http-status.enum';
-import { getMyGroups } from '../../services/group.service';
-import { GroupMessage } from '../../models/group-message';
 import { useAlert } from '../AlertSnackbar';
-import { QueryFilter } from '../../interfaces/query';
-import { MESSAGES_TO_TAKE } from '../../constants/message';
-import { ActualPage } from '../../enum/actual-page';
+import { useAuth } from '../Auth';
 
 interface ConversationContextProps {
   destination: Group | User | null;
   setDestination: (destination: Group | User) => void;
   loading: boolean;
-  messages: (UserMessage | GroupMessage)[];
+  messages: IMessage[];
   sendMessage: (message: string) => void;
-  lastMessages: (UserMessage | GroupMessage)[];
-  selectedMessage: UserMessage | GroupMessage | undefined;
-  setSelectedMessage: (message: UserMessage | GroupMessage | undefined) => void;
+  lastMessages: IMessage[];
+  selectedMessage:IMessage | undefined;
+  setSelectedMessage: (message:IMessage | undefined) => void;
   actualPage: ActualPage;
   setActualPage: (page: ActualPage) => void;
-  receiveMessage: (message: UserMessage | GroupMessage) => void;
+  receiveMessage: (message:IMessage) => void;
   getMoreMessages: () => Promise<void>;
   changeGroupInfo: (group: Group) => void;
 }
 
 const sortLastMessages = (
-  a: UserMessage | GroupMessage,
-  b: UserMessage | GroupMessage
+  a:IMessage,
+  b:IMessage
 ): number => {
   return a.createdAt > b.createdAt ? -1 : a.createdAt === b.createdAt ? 0 : 1;
 };
@@ -61,12 +56,12 @@ export const ConversationProvider: React.FC = ({ children }) => {
     null
   );
   const [loading, setLoading] = useState(false);
-  const [messages, setMessages] = useState<(UserMessage | GroupMessage)[]>([]);
+  const [messages, setMessages] = useState<IMessage[]>([]);
   const [lastMessages, setLastMessages] = useState<
-    (UserMessage | GroupMessage)[]
+    IMessage[]
   >([]);
   const [selectedMessage, setSelectedMessage] = useState<
-    UserMessage | GroupMessage | undefined
+   IMessage | undefined
   >();
   const [actualPage, setActualPage] = useState<ActualPage>(ActualPage.CHAT);
   const haveMoreMessages = useRef<boolean>(true);
@@ -124,7 +119,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
   }, [user, getGroupLastMessage]);
 
   const receiveMessage = useCallback(
-    (message: UserMessage | GroupMessage) => {
+    (message:IMessage) => {
       if (user) {
         setLastMessages((messages) => {
           return [
@@ -147,7 +142,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
     [destination, user]
   );
 
-  const deleteMessage = (deletedMessage: UserMessage | GroupMessage) => {
+  const deleteMessage = (deletedMessage:IMessage) => {
     setMessages((prevMessages) =>
       prevMessages.map((message) => {
         return message.id === deletedMessage.id ? deletedMessage : message;

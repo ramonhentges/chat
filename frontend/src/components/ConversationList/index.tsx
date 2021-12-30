@@ -1,6 +1,5 @@
 import { useConversation } from '../../contexts/Conversation';
-import { GroupMessage } from '../../models/group-message';
-import { UserMessage } from '../../models/user-message';
+import { IMessage } from '../../interfaces/i-message';
 import LastMessageCard from '../LastMessageCard';
 
 export default function ConversationList() {
@@ -8,7 +7,7 @@ export default function ConversationList() {
 
   return (
     <>
-      {lastMessages.map((contactMessage: UserMessage | GroupMessage) => (
+      {lastMessages.map((contactMessage: IMessage) => (
         <LastMessageCard key={contactMessage.id} lastMessage={contactMessage} />
       ))}
     </>

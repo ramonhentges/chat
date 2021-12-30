@@ -2,13 +2,13 @@ import { Chip, Grid, Typography } from '@mui/material';
 import React from 'react';
 import { useAuth } from '../../contexts/Auth';
 import { useConversation } from '../../contexts/Conversation';
+import { IMessage } from '../../interfaces/i-message';
 import { GroupMessage } from '../../models/group-message';
-import { UserMessage } from '../../models/user-message';
 import { getUserColor } from '../../stores/user-color.store';
 import { formatTime } from '../../util/date';
 
 interface MessageProps {
-  message: UserMessage | GroupMessage;
+  message: IMessage;
   openMenu: (event: React.MouseEvent<HTMLElement>) => void;
 }
 
