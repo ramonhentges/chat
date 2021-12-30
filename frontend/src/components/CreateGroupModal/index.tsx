@@ -16,13 +16,15 @@ import React, {
 } from 'react';
 import { useFormik } from 'formik';
 import { CreateGroupDto } from '../../dto/create-group';
-import { createGroup, updateGroup } from '../../services/group.service';
 import { HttpStatus } from '../../enum/http-status.enum';
 import { plainToInstance } from 'class-transformer';
 import { Group } from '../../models/group';
 import { useAlert } from '../../contexts/AlertSnackbar';
 import { useConversation } from '../../contexts/Conversation';
 import createValidator from 'class-validator-formik';
+import { container } from '../../config/inversify.config';
+import { GroupService } from '../../services/GroupService';
+import { SERVICE_TYPES } from '../../types/Service';
 
 const getMessages = (editing: boolean) => {
   if (editing) {
@@ -42,6 +44,7 @@ const CreateGroupModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
   const [open, setOpen] = useState(false);
   const [groupId, setGroupId] = useState('');
   const { setDestination, changeGroupInfo } = useConversation();
+  const _groupService = container.get<GroupService>(SERVICE_TYPES.GroupService)
 
   const { openAlert } = useAlert();
 
@@ -82,8 +85,8 @@ const CreateGroupModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
     onSubmit: async (values) => {
       const messages = getMessages(groupId !== '');
       const { status, data } = await (groupId === ''
-        ? createGroup(values)
-        : updateGroup(groupId, values));
+        ? _groupService.createGroup(values)
+        : _groupService.updateGroup(groupId, values));
       if ([HttpStatus.CREATED, HttpStatus.OK].includes(status)) {
         const group = plainToInstance(Group, data);
         if (groupId === '') {

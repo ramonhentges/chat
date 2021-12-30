@@ -16,7 +16,7 @@ import { Group } from '../../models/group';
 import { GroupMessage } from '../../models/group-message';
 import { User } from '../../models/user';
 import { UserMessage } from '../../models/user-message';
-import { getMyGroups } from '../../services/group.service';
+import { GroupService } from '../../services/GroupService';
 import { MessageService } from '../../services/MessageService';
 import {
   sendGroupMessage,
@@ -63,6 +63,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
   >();
   const [actualPage, setActualPage] = useState<ActualPage>(ActualPage.CHAT);
   const haveMoreMessages = useRef<boolean>(true);
+  const _groupService = container.get<GroupService>(SERVICE_TYPES.GroupService);
   const _messageService = container.get<MessageService>(
     SERVICE_TYPES.MessageService
   );
@@ -97,7 +98,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
     async function getLastMessages() {
       if (user) {
         const latestUserMessages = await _messageService.getLatestMessages();
-        const myGroups = await getMyGroups();
+        const myGroups = await _groupService.getMyGroups();
         if (
           latestUserMessages?.status === HttpStatus.OK &&
           myGroups?.status === HttpStatus.OK
@@ -120,7 +121,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
       }
     }
     getLastMessages();
-  }, [user, getGroupLastMessage, _messageService]);
+  }, [user, getGroupLastMessage, _messageService, _groupService]);
 
   const receiveMessage = useCallback(
     (message: IMessage) => {
