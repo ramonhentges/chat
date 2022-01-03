@@ -1,14 +1,17 @@
+import { plainToInstance } from 'class-transformer';
+import { useInjection } from 'inversify-react';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { LoginDto } from '../../dto/login';
-import { User } from '../../models/user';
-import { api } from '../../services/api';
-import { socket, setAuthorizationToken } from '../../services/socket.service';
-import { plainToInstance } from 'class-transformer';
 import { HttpStatus } from '../../enum/http-status.enum';
-import { container } from '../../config/inversify.config';
-import { AuthService } from '../../services/AuthService';
+import { User } from '../../models/user';
+import { AuthService } from '../../ports/services/AuthService';
+import { HttpService } from '../../ports/services/HttpService';
+import {
+  setAuthorizationToken,
+  socket
+} from '../../ports/services/socket.service';
+import { UserService } from '../../ports/services/UserService';
 import { SERVICE_TYPES } from '../../types/Service';
-import { UserService } from '../../services/UserService';
 
 interface AuthContextProps {
   signed: boolean;
@@ -30,8 +33,9 @@ function reconnect() {
 export const AuthProvider: React.FC = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const _authService = container.get<AuthService>(SERVICE_TYPES.AuthService);
-  const _userService = container.get<UserService>(SERVICE_TYPES.UserService);
+  const _authService = useInjection<AuthService>(SERVICE_TYPES.AuthService);
+  const _userService = useInjection<UserService>(SERVICE_TYPES.UserService);
+  const _httpService = useInjection<HttpService>(SERVICE_TYPES.HttpService);
 
   async function signIn(loginUser: LoginDto) {
     const response = await _authService.login(loginUser);
@@ -48,14 +52,14 @@ export const AuthProvider: React.FC = ({ children }) => {
     return false;
   }
 
-  function signOut() {
+  const signOut = useCallback(() => {
     localStorage.removeItem('accessToken');
-    api.defaults.headers.common['Authorization'] = '';
+    _httpService.setAuthenticationToken('');
     setAuthorizationToken('');
     setUser(null);
     socket.off('disconnect');
     socket.disconnect();
-  }
+  }, [_httpService]);
 
   const getUserInfo = useCallback(async () => {
     const response = await _userService.myUserInfo().catch((e) => e.response);
@@ -67,7 +71,7 @@ export const AuthProvider: React.FC = ({ children }) => {
       signOut();
     }
     setLoading(false);
-  }, [_userService]);
+  }, [_userService, signOut]);
 
   useEffect(() => {
     async function getInfo() {
@@ -76,16 +80,16 @@ export const AuthProvider: React.FC = ({ children }) => {
     const storedToken = localStorage.getItem('accessToken');
     if (storedToken) {
       const token = JSON.parse(storedToken).accessToken;
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      _httpService.setAuthenticationToken(token);
       setAuthorizationToken(token);
       getInfo();
     } else {
       setLoading(false);
     }
-  }, [getUserInfo]);
+  }, [getUserInfo, _httpService]);
 
   useEffect(() => {
-    const responseInterceptor = api.interceptors.response.use(
+    const responseInterceptor = _httpService.addResponseInterceptor(
       undefined,
       async (err) => {
         if (err.response === undefined) {
@@ -115,9 +119,9 @@ export const AuthProvider: React.FC = ({ children }) => {
       }
     );
     return () => {
-      api.interceptors.response.eject(responseInterceptor);
+      _httpService.removeResponseInterceptor(responseInterceptor);
     };
-  }, [user]);
+  }, [user, _httpService, signOut]);
 
   return (
     <AuthContext.Provider

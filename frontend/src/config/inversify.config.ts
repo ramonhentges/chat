@@ -1,18 +1,25 @@
 import { Container } from 'inversify';
-import { AxiosAuthService } from '../external/services/axios/AxiosAuthService';
-import { AxiosGroupService } from '../external/services/axios/AxiosGroupService';
-import { AxiosMessageService } from '../external/services/axios/AxiosMessageService';
-import { AxiosUserService } from '../external/services/axios/AxiosUserService';
+import { AuthServiceImpl } from '../adapters/services/AuthServiceImpl';
+import { GroupServiceImpl } from '../adapters/services/GroupServiceImpl';
+import { MessageServiceImpl } from '../adapters/services/MessageServiceImpl';
+import { UserServiceImpl } from '../adapters/services/UserServiceImpl';
+import { AxiosHttpService } from '../external/services/axios/AxiosHttpService';
+
 import { SERVICE_TYPES } from '../types/Service';
 
 let container = new Container();
 
-container.bind(SERVICE_TYPES.AuthService).to(AxiosAuthService);
+container.bind(SERVICE_TYPES.AuthService).to(AuthServiceImpl);
 
-container.bind(SERVICE_TYPES.MessageService).to(AxiosMessageService);
+container.bind(SERVICE_TYPES.MessageService).to(MessageServiceImpl);
 
-container.bind(SERVICE_TYPES.GroupService).to(AxiosGroupService);
+container.bind(SERVICE_TYPES.GroupService).to(GroupServiceImpl);
 
-container.bind(SERVICE_TYPES.UserService).to(AxiosUserService);
+container.bind(SERVICE_TYPES.UserService).to(UserServiceImpl);
+
+container
+  .bind(SERVICE_TYPES.HttpService)
+  .to(AxiosHttpService)
+  .inSingletonScope();
 
 export { container };

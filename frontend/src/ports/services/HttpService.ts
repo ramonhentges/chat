@@ -1,5 +1,5 @@
-import { HttpResponse } from '../types/HttpResponse';
-import { ResponseType } from '../types/ResponseType';
+import { HttpResponse } from '../../types/HttpResponse';
+import { ResponseType } from '../../types/ResponseType';
 
 type T = any;
 

@@ -15,7 +15,7 @@ import { UpdateUserDto } from '../../dto/update-user';
 import { ActualPage } from '../../enum/actual-page';
 import { useConversation } from '../../contexts/Conversation';
 import { container } from '../../config/inversify.config';
-import { UserService } from '../../services/UserService';
+import { UserService } from '../../ports/services/UserService';
 import { SERVICE_TYPES } from '../../types/Service';
 
 export function ChangeUserInfo(props: any) {

@@ -16,7 +16,7 @@ import { CreateUserDto } from '../../../dto/create-user';
 import { useFormik } from 'formik';
 import createValidator from 'class-validator-formik';
 import { container } from '../../../config/inversify.config';
-import { UserService } from '../../../services/UserService';
+import { UserService } from '../../../ports/services/UserService';
 import { SERVICE_TYPES } from '../../../types/Service';
 
 export function CreateAccount() {

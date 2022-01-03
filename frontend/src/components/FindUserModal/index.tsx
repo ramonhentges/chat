@@ -29,7 +29,7 @@ import { User } from '../../models/user';
 import Loading from '../Loading';
 import { plainToInstance } from 'class-transformer';
 import { HttpStatus } from '../../enum/http-status.enum';
-import { UserService } from '../../services/UserService';
+import { UserService } from '../../ports/services/UserService';
 import { container } from '../../config/inversify.config';
 import { SERVICE_TYPES } from '../../types/Service';
 

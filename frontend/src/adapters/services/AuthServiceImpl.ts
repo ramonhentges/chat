@@ -1,0 +1,27 @@
+import { inject, injectable } from 'inversify';
+import { LoginDto } from '../../dto/login';
+import { HttpStatus } from '../../enum/http-status.enum';
+import { AuthService } from '../../ports/services/AuthService';
+import { HttpService } from '../../ports/services/HttpService';
+import { HttpResponse } from '../../types/HttpResponse';
+import { SERVICE_TYPES } from '../../types/Service';
+
+@injectable()
+export class AuthServiceImpl implements AuthService {
+  @inject(SERVICE_TYPES.HttpService) private _httpService: HttpService;
+
+  async login(usuario: LoginDto): Promise<HttpResponse> {
+    return this._httpService
+      .post('auth/login', usuario)
+      .then((response) => {
+        if (response.status === HttpStatus.OK) {
+          this._httpService.setAuthenticationToken(response.data.accessToken);
+          localStorage.setItem('accessToken', JSON.stringify(response.data));
+        }
+        return response;
+      })
+      .catch((err) => {
+        return err.response;
+      });
+  }
+}

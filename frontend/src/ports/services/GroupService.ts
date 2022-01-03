@@ -1,6 +1,6 @@
-import { AddRemoveUserToGroupDto } from '../dto/add-user-to-group';
-import { CreateGroupDto } from '../dto/create-group';
-import { HttpResponse } from '../types/HttpResponse';
+import { AddRemoveUserToGroupDto } from '../../dto/add-user-to-group';
+import { CreateGroupDto } from '../../dto/create-group';
+import { HttpResponse } from '../../types/HttpResponse';
 
 export interface GroupService {
   createGroup(group: CreateGroupDto): Promise<HttpResponse>;

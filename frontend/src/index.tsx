@@ -7,16 +7,20 @@ import { MyThemeProvider } from './contexts/MyTheme';
 import { AuthProvider } from './contexts/Auth';
 import { AlertProvider } from './contexts/AlertSnackbar';
 import { ConfirmProvider } from './contexts/ConfirmDialog';
+import { Provider } from 'inversify-react';
+import { container } from './config/inversify.config';
 
 ReactDOM.render(
-  <MyThemeProvider>
-    <AlertProvider>
-      <ConfirmProvider>
-        <AuthProvider>
-          <MyRoutes />
-        </AuthProvider>
-      </ConfirmProvider>
-    </AlertProvider>
-  </MyThemeProvider>,
+  <Provider container={container}>
+    <MyThemeProvider>
+      <AlertProvider>
+        <ConfirmProvider>
+          <AuthProvider>
+            <MyRoutes />
+          </AuthProvider>
+        </ConfirmProvider>
+      </AlertProvider>
+    </MyThemeProvider>
+  </Provider>,
   document.getElementById('root')
 );

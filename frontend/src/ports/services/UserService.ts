@@ -1,6 +1,6 @@
-import { CreateUserDto } from '../dto/create-user';
-import { UpdateUserDto } from '../dto/update-user';
-import { HttpResponse } from '../types/HttpResponse';
+import { CreateUserDto } from '../../dto/create-user';
+import { UpdateUserDto } from '../../dto/update-user';
+import { HttpResponse } from '../../types/HttpResponse';
 
 export interface UserService {
   createUser: (user: CreateUserDto) => Promise<HttpResponse>;

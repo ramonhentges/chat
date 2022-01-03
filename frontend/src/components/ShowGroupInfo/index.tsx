@@ -8,7 +8,7 @@ import { useConversation } from '../../contexts/Conversation';
 import { HttpStatus } from '../../enum/http-status.enum';
 import { Group } from '../../models/group';
 import { User } from '../../models/user';
-import { GroupService } from '../../services/GroupService';
+import { GroupService } from '../../ports/services/GroupService';
 import { SERVICE_TYPES } from '../../types/Service';
 import FindUserModal from '../FindUserModal';
 import GroupUserCard from './GroupUserCard';

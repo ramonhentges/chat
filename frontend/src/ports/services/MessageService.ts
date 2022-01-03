@@ -1,6 +1,6 @@
-import { QueryFilter } from '../interfaces/query';
-import { User } from '../models/user';
-import { HttpResponse } from '../types/HttpResponse';
+import { QueryFilter } from '../../interfaces/query';
+import { User } from '../../models/user';
+import { HttpResponse } from '../../types/HttpResponse';
 
 export interface MessageService {
   getLatestMessages: () => Promise<HttpResponse>;

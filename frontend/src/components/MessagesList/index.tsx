@@ -12,7 +12,7 @@ import { useConversation } from '../../contexts/Conversation';
 import {
   deleteGroupMessage,
   deleteUserMessage
-} from '../../services/socket.service';
+} from '../../ports/services/socket.service';
 import Message from '../Message';
 import Fade from '@mui/material/Fade';
 import { Delete } from '@mui/icons-material';

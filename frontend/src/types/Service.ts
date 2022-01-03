@@ -3,5 +3,6 @@ export const SERVICE_TYPES = {
   AuthService: Symbol.for('AuthService'),
   MessageService: Symbol.for('MessageService'),
   UserService: Symbol.for('UserService'),
-  SocketService: Symbol.for('SocketService')
+  SocketService: Symbol.for('SocketService'),
+  HttpService: Symbol.for('HttpService')
 };

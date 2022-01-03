@@ -16,13 +16,13 @@ import { Group } from '../../models/group';
 import { GroupMessage } from '../../models/group-message';
 import { User } from '../../models/user';
 import { UserMessage } from '../../models/user-message';
-import { GroupService } from '../../services/GroupService';
-import { MessageService } from '../../services/MessageService';
+import { GroupService } from '../../ports/services/GroupService';
+import { MessageService } from '../../ports/services/MessageService';
 import {
   sendGroupMessage,
   sendUserMessage,
   socket
-} from '../../services/socket.service';
+} from '../../ports/services/socket.service';
 import { SERVICE_TYPES } from '../../types/Service';
 import { useAlert } from '../AlertSnackbar';
 import { useAuth } from '../Auth';

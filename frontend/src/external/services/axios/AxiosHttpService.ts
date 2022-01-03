@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { injectable } from 'inversify';
-import { HttpService } from '../../../services/HttpService';
+import { HttpService } from '../../../ports/services/HttpService';
 import { HttpResponse } from '../../../types/HttpResponse';
 import { ResponseType } from '../../../types/ResponseType';
 

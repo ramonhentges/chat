@@ -23,7 +23,7 @@ import { useAlert } from '../../contexts/AlertSnackbar';
 import { useConversation } from '../../contexts/Conversation';
 import createValidator from 'class-validator-formik';
 import { container } from '../../config/inversify.config';
-import { GroupService } from '../../services/GroupService';
+import { GroupService } from '../../ports/services/GroupService';
 import { SERVICE_TYPES } from '../../types/Service';
 
 const getMessages = (editing: boolean) => {
