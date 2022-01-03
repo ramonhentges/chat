@@ -20,6 +20,7 @@ import { GroupService } from '../../ports/services/GroupService';
 import { MessageService } from '../../ports/services/MessageService';
 import { SocketService } from '../../ports/services/SocketService';
 import { TYPES } from '../../types/InversifyTypes';
+import { playNotificationSound } from '../../util/notification-sound';
 import { useAlert } from '../AlertSnackbar';
 import { useAuth } from '../Auth';
 
@@ -129,6 +130,9 @@ export const ConversationProvider: React.FC = ({ children }) => {
 
   const receiveMessage = useCallback(
     (message: IMessage) => {
+      if (user?.getKey() !== message.origin.getKey()) {
+        playNotificationSound();
+      }
       if (user) {
         setLastMessages((messages) => {
           return [
