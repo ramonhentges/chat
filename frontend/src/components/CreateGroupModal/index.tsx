@@ -22,9 +22,9 @@ import { Group } from '../../models/group';
 import { useAlert } from '../../contexts/AlertSnackbar';
 import { useConversation } from '../../contexts/Conversation';
 import createValidator from 'class-validator-formik';
-import { container } from '../../config/inversify.config';
 import { GroupService } from '../../ports/services/GroupService';
 import { SERVICE_TYPES } from '../../types/Service';
+import { useInjection } from 'inversify-react';
 
 const getMessages = (editing: boolean) => {
   if (editing) {
@@ -44,7 +44,7 @@ const CreateGroupModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
   const [open, setOpen] = useState(false);
   const [groupId, setGroupId] = useState('');
   const { setDestination, changeGroupInfo } = useConversation();
-  const _groupService = container.get<GroupService>(SERVICE_TYPES.GroupService)
+  const _groupService = useInjection<GroupService>(SERVICE_TYPES.GroupService)
 
   const { openAlert } = useAlert();
 

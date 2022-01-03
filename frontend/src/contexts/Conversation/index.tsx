@@ -1,4 +1,5 @@
 import { plainToInstance } from 'class-transformer';
+import { useInjection } from 'inversify-react';
 import React, {
   useCallback,
   useContext,
@@ -6,7 +7,6 @@ import React, {
   useRef,
   useState
 } from 'react';
-import { container } from '../../config/inversify.config';
 import { MESSAGES_TO_TAKE } from '../../constants/message';
 import { ActualPage } from '../../enum/actual-page';
 import { HttpStatus } from '../../enum/http-status.enum';
@@ -63,8 +63,8 @@ export const ConversationProvider: React.FC = ({ children }) => {
   >();
   const [actualPage, setActualPage] = useState<ActualPage>(ActualPage.CHAT);
   const haveMoreMessages = useRef<boolean>(true);
-  const _groupService = container.get<GroupService>(SERVICE_TYPES.GroupService);
-  const _messageService = container.get<MessageService>(
+  const _groupService = useInjection<GroupService>(SERVICE_TYPES.GroupService);
+  const _messageService = useInjection<MessageService>(
     SERVICE_TYPES.MessageService
   );
 

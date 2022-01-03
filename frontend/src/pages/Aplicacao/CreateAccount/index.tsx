@@ -15,14 +15,14 @@ import { HttpStatus } from '../../../enum/http-status.enum';
 import { CreateUserDto } from '../../../dto/create-user';
 import { useFormik } from 'formik';
 import createValidator from 'class-validator-formik';
-import { container } from '../../../config/inversify.config';
 import { UserService } from '../../../ports/services/UserService';
 import { SERVICE_TYPES } from '../../../types/Service';
+import { useInjection } from 'inversify-react';
 
 export function CreateAccount() {
   const navigate = useNavigate();
   const { openAlert } = useAlert();
-  const _userService = container.get<UserService>(SERVICE_TYPES.UserService);
+  const _userService = useInjection<UserService>(SERVICE_TYPES.UserService);
 
   const {
     values,

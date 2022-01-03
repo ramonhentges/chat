@@ -1,20 +1,17 @@
 import {
-  Button,
-  TextField,
-  Typography,
-  Stack,
-  CircularProgress,
-  Grid
+  Button, CircularProgress,
+  Grid, Stack, TextField,
+  Typography
 } from '@mui/material';
-import React from 'react';
 import { useFormik } from 'formik';
+import { useInjection } from 'inversify-react';
+import React from 'react';
 import { useAlert } from '../../contexts/AlertSnackbar';
 import { useAuth } from '../../contexts/Auth';
-import { HttpStatus } from '../../enum/http-status.enum';
+import { useConversation } from '../../contexts/Conversation';
 import { UpdateUserDto } from '../../dto/update-user';
 import { ActualPage } from '../../enum/actual-page';
-import { useConversation } from '../../contexts/Conversation';
-import { container } from '../../config/inversify.config';
+import { HttpStatus } from '../../enum/http-status.enum';
 import { UserService } from '../../ports/services/UserService';
 import { SERVICE_TYPES } from '../../types/Service';
 
@@ -22,7 +19,7 @@ export function ChangeUserInfo(props: any) {
   const { user, refreshUserInfo } = useAuth();
   const { openAlert } = useAlert();
   const { setActualPage } = useConversation();
-  const _userService = container.get<UserService>(SERVICE_TYPES.UserService);
+  const _userService = useInjection<UserService>(SERVICE_TYPES.UserService);
   const {
     values,
     handleChange,

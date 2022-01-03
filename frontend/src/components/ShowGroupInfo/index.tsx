@@ -1,7 +1,7 @@
 import { Button, Divider, List, Stack, Typography } from '@mui/material';
 import { plainToInstance } from 'class-transformer';
+import { useInjection } from 'inversify-react';
 import React, { useEffect, useRef, useState } from 'react';
-import { container } from '../../config/inversify.config';
 import { useAlert } from '../../contexts/AlertSnackbar';
 import { useConfirm } from '../../contexts/ConfirmDialog';
 import { useConversation } from '../../contexts/Conversation';
@@ -19,7 +19,7 @@ const ShowGroupInfo = () => {
   const { confirm } = useConfirm();
   const [group, setGroup] = useState<Group>(new Group());
   const addUsersRef = useRef<any>(null);
-  const _groupService = container.get<GroupService>(SERVICE_TYPES.GroupService);
+  const _groupService = useInjection<GroupService>(SERVICE_TYPES.GroupService);
 
   const selectUsersAction = (users: User[]) => {
     const addedUsers: User[] = [];
