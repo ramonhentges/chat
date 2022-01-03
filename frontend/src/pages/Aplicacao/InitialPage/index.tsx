@@ -48,13 +48,20 @@ const InitialPage: React.FC = () => {
               width: 300,
               minWidth: 200,
               marginRight: 2,
-              position: 'relative',
               borderRadius: 2
             }}
           >
-            <Grid item>
-              <UserCard />
-              <ConversationList />
+            <Grid
+              container
+              item
+              sx={{ minHeight: '100%', flexDirection: 'column' }}
+            >
+              <Grid item>
+                <UserCard />
+              </Grid>
+              <Grid item sx={{ flexGrow: 2 }}>
+                <ConversationList />
+              </Grid>
               <NewConversationButton />
             </Grid>
           </Paper>

@@ -40,7 +40,7 @@ const NewConversationButton: React.FC = () => {
   return (
     <>
       <SpeedDial
-        sx={{ position: 'absolute', bottom: 10, right: 10 }}
+        sx={{ position: 'sticky', bottom: 10, transform: 'translateX(37%)' }}
         color="primary"
         ariaLabel="add conversation"
         icon={<SpeedDialIcon />}
