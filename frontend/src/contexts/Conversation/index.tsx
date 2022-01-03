@@ -18,11 +18,7 @@ import { User } from '../../models/user';
 import { UserMessage } from '../../models/user-message';
 import { GroupService } from '../../ports/services/GroupService';
 import { MessageService } from '../../ports/services/MessageService';
-import {
-  sendGroupMessage,
-  sendUserMessage,
-  socket
-} from '../../ports/services/socket.service';
+import { SocketService } from '../../ports/services/SocketService';
 import { SERVICE_TYPES } from '../../types/Service';
 import { useAlert } from '../AlertSnackbar';
 import { useAuth } from '../Auth';
@@ -67,6 +63,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
   const _messageService = useInjection<MessageService>(
     SERVICE_TYPES.MessageService
   );
+  const _socketService = useInjection<SocketService>(SERVICE_TYPES.SocketService);
 
   const { user } = useAuth();
   const { openAlert } = useAlert();
@@ -161,35 +158,35 @@ export const ConversationProvider: React.FC = ({ children }) => {
   };
 
   useEffect(() => {
-    socket.off('sendedMsgFromUser');
-    socket.on('sendedMsgFromUser', (message: UserMessage) => {
+    _socketService.removeListner('sendedMsgFromUser');
+    _socketService.addListner('sendedMsgFromUser', (message: UserMessage) => {
       receiveMessage(plainToInstance(UserMessage, message));
     });
 
-    socket.off('msgFromUser');
-    socket.on('msgFromUser', (message: UserMessage) => {
+    _socketService.removeListner('msgFromUser');
+    _socketService.addListner('msgFromUser', (message: UserMessage) => {
       receiveMessage(plainToInstance(UserMessage, message));
     });
-    socket.off('msgFromGroup');
-    socket.on('msgFromGroup', (message: GroupMessage) => {
+    _socketService.removeListner('msgFromGroup');
+    _socketService.addListner('msgFromGroup', (message: GroupMessage) => {
       receiveMessage(plainToInstance(GroupMessage, message));
     });
-  }, [receiveMessage]);
+  }, [receiveMessage, _socketService]);
 
   useEffect(() => {
-    socket.off('deletedUserMessage');
-    socket.on('deletedUserMessage', (message: UserMessage) => {
+    _socketService.removeListner('deletedUserMessage');
+    _socketService.addListner('deletedUserMessage', (message: UserMessage) => {
       deleteMessage(plainToInstance(UserMessage, { ...message, message: '' }));
     });
-    socket.off('deletedGroupMessage');
-    socket.on('deletedGroupMessage', (message: GroupMessage) => {
+    _socketService.removeListner('deletedGroupMessage');
+    _socketService.addListner('deletedGroupMessage', (message: GroupMessage) => {
       deleteMessage(plainToInstance(GroupMessage, { ...message, message: '' }));
     });
-  }, []);
+  }, [_socketService]);
 
   useEffect(() => {
-    socket.off('joinedGroup');
-    socket.on('joinedGroup', async (group: Group) => {
+    _socketService.removeListner('joinedGroup');
+    _socketService.addListner('joinedGroup', async (group: Group) => {
       const groupLastMessage = await getGroupLastMessage(group);
       if (groupLastMessage) {
         setLastMessages((messages) => [groupLastMessage, ...messages]);
@@ -201,8 +198,8 @@ export const ConversationProvider: React.FC = ({ children }) => {
         });
       }
     });
-    socket.off('leavedGroup');
-    socket.on('leavedGroup', (group: Group) => {
+    _socketService.removeListner('leavedGroup');
+    _socketService.addListner('leavedGroup', (group: Group) => {
       const groupClass = plainToInstance(Group, group);
       setLastMessages((messages) =>
         messages.filter(
@@ -218,7 +215,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
         message: `Você foi removido do grupo ${groupClass.getTitle()}`
       });
     });
-  }, [getGroupLastMessage, openAlert, destination]);
+  }, [getGroupLastMessage, openAlert, destination, _socketService]);
 
   useEffect(() => {
     setSelectedMessage(undefined);
@@ -235,9 +232,9 @@ export const ConversationProvider: React.FC = ({ children }) => {
 
   function sendMessage(message: string) {
     if (destination instanceof User) {
-      sendUserMessage(destination.username, message);
+      _socketService.sendUserMessage(destination.username, message);
     } else if (destination instanceof Group) {
-      sendGroupMessage(destination.id, message);
+      _socketService.sendGroupMessage(destination.id, message);
     }
   }
 

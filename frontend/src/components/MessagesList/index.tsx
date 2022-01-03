@@ -9,10 +9,6 @@ import {
 } from '@mui/material';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useConversation } from '../../contexts/Conversation';
-import {
-  deleteGroupMessage,
-  deleteUserMessage
-} from '../../ports/services/socket.service';
 import Message from '../Message';
 import Fade from '@mui/material/Fade';
 import { Delete } from '@mui/icons-material';
@@ -26,6 +22,9 @@ import {
   SCROll_TO_BOTTOM_OFFSET
 } from '../../constants/message';
 import { sameDay } from '../../util/date';
+import { useInjection } from 'inversify-react';
+import { SocketService } from '../../ports/services/SocketService';
+import { SERVICE_TYPES } from '../../types/Service';
 
 function canTakeMoreMessages(
   scrollTop: number,
@@ -44,6 +43,9 @@ function canScrollDown(scrollPosition: number, scrollHeight: number) {
 }
 
 export default function MessagesList() {
+  const _socketService = useInjection<SocketService>(
+    SERVICE_TYPES.SocketService
+  );
   const messagesGrid = useRef<HTMLDivElement>(null);
   const { confirm } = useConfirm();
   const {
@@ -77,9 +79,9 @@ export default function MessagesList() {
         message: 'Desaja mesmo excluir a mensagem?'
       }).then(() => {
         if (selectedMessage instanceof UserMessage) {
-          deleteUserMessage(selectedMessage.id);
+          _socketService.deleteUserMessage(selectedMessage.id);
         } else if (selectedMessage instanceof GroupMessage) {
-          deleteGroupMessage(selectedMessage.id);
+          _socketService.deleteGroupMessage(selectedMessage.id);
         }
         setSelectedMessage(undefined);
         setAnchorEl(null);

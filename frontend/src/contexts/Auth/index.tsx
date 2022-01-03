@@ -6,10 +6,7 @@ import { HttpStatus } from '../../enum/http-status.enum';
 import { User } from '../../models/user';
 import { AuthService } from '../../ports/services/AuthService';
 import { HttpService } from '../../ports/services/HttpService';
-import {
-  setAuthorizationToken,
-  socket
-} from '../../ports/services/socket.service';
+import { SocketService } from '../../ports/services/SocketService';
 import { UserService } from '../../ports/services/UserService';
 import { SERVICE_TYPES } from '../../types/Service';
 
@@ -26,27 +23,26 @@ const AuthContext = React.createContext<AuthContextProps>(
   {} as AuthContextProps
 );
 
-function reconnect() {
-  socket.connect();
-}
-
 export const AuthProvider: React.FC = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const _authService = useInjection<AuthService>(SERVICE_TYPES.AuthService);
   const _userService = useInjection<UserService>(SERVICE_TYPES.UserService);
   const _httpService = useInjection<HttpService>(SERVICE_TYPES.HttpService);
+  const _socketService = useInjection<SocketService>(
+    SERVICE_TYPES.SocketService
+  );
 
   async function signIn(loginUser: LoginDto) {
     const response = await _authService.login(loginUser);
     if (response.status === HttpStatus.OK) {
       await getUserInfo();
-      setAuthorizationToken(response.data.accessToken);
-      socket.on('disconnect', function () {
+      _socketService.setAuthorizationToken(response.data.accessToken);
+      _socketService.addListner('disconnect', function () {
         console.log('Disconnected');
-        setTimeout(reconnect, 5000);
+        setTimeout(_socketService.connect, 5000);
       });
-      socket.connect();
+      _socketService.connect();
       return true;
     }
     return false;
@@ -55,23 +51,23 @@ export const AuthProvider: React.FC = ({ children }) => {
   const signOut = useCallback(() => {
     localStorage.removeItem('accessToken');
     _httpService.setAuthenticationToken('');
-    setAuthorizationToken('');
+    _socketService.setAuthorizationToken('');
     setUser(null);
-    socket.off('disconnect');
-    socket.disconnect();
-  }, [_httpService]);
+    _socketService.removeListner('disconnect');
+    _socketService.disconnect();
+  }, [_httpService, _socketService]);
 
   const getUserInfo = useCallback(async () => {
     const response = await _userService.myUserInfo().catch((e) => e.response);
     if (response.status === HttpStatus.OK) {
-      socket.connect();
+      _socketService.connect();
       setUser(plainToInstance(User, response.data));
     } else if (response.status === HttpStatus.UNAUTHORIZED) {
       console.log('aquii');
       signOut();
     }
     setLoading(false);
-  }, [_userService, signOut]);
+  }, [_userService, signOut, _socketService]);
 
   useEffect(() => {
     async function getInfo() {
@@ -81,12 +77,12 @@ export const AuthProvider: React.FC = ({ children }) => {
     if (storedToken) {
       const token = JSON.parse(storedToken).accessToken;
       _httpService.setAuthenticationToken(token);
-      setAuthorizationToken(token);
+      _socketService.setAuthorizationToken(token);
       getInfo();
     } else {
       setLoading(false);
     }
-  }, [getUserInfo, _httpService]);
+  }, [getUserInfo, _httpService, _socketService]);
 
   useEffect(() => {
     const responseInterceptor = _httpService.addResponseInterceptor(

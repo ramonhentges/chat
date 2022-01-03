@@ -4,6 +4,7 @@ import { GroupServiceImpl } from '../adapters/services/GroupServiceImpl';
 import { MessageServiceImpl } from '../adapters/services/MessageServiceImpl';
 import { UserServiceImpl } from '../adapters/services/UserServiceImpl';
 import { AxiosHttpService } from '../external/services/axios/AxiosHttpService';
+import { SocketIOSocketService } from '../external/services/socket-io/SocketIOSocketService';
 
 import { SERVICE_TYPES } from '../types/Service';
 
@@ -20,6 +21,11 @@ container.bind(SERVICE_TYPES.UserService).to(UserServiceImpl);
 container
   .bind(SERVICE_TYPES.HttpService)
   .to(AxiosHttpService)
+  .inSingletonScope();
+
+container
+  .bind(SERVICE_TYPES.SocketService)
+  .to(SocketIOSocketService)
   .inSingletonScope();
 
 export { container };
