@@ -1,4 +1,3 @@
-import { plainToInstance } from 'class-transformer';
 import { useInjection } from 'inversify-react';
 import React, {
   useCallback,
@@ -16,6 +15,7 @@ import { Group } from '../../models/group';
 import { GroupMessage } from '../../models/group-message';
 import { User } from '../../models/user';
 import { UserMessage } from '../../models/user-message';
+import { PlainClassConverter } from '../../ports/PlainClassConverter';
 import { GroupService } from '../../ports/services/GroupService';
 import { MessageService } from '../../ports/services/MessageService';
 import { SocketService } from '../../ports/services/SocketService';
@@ -60,10 +60,11 @@ export const ConversationProvider: React.FC = ({ children }) => {
   const [actualPage, setActualPage] = useState<ActualPage>(ActualPage.CHAT);
   const haveMoreMessages = useRef<boolean>(true);
   const _groupService = useInjection<GroupService>(TYPES.GroupService);
-  const _messageService = useInjection<MessageService>(
-    TYPES.MessageService
-  );
+  const _messageService = useInjection<MessageService>(TYPES.MessageService);
   const _socketService = useInjection<SocketService>(TYPES.SocketService);
+  const _plainClassConverter = useInjection<PlainClassConverter>(
+    TYPES.PlainClassConverter
+  );
 
   const { user } = useAuth();
   const { openAlert } = useAlert();
@@ -85,10 +86,10 @@ export const ConversationProvider: React.FC = ({ children }) => {
             groupDestination: group
           };
         }
-        return plainToInstance(GroupMessage, data);
+        return _plainClassConverter.plainToClass(GroupMessage, data);
       }
     },
-    [_messageService]
+    [_messageService, _plainClassConverter]
   );
 
   useEffect(() => {
@@ -106,9 +107,9 @@ export const ConversationProvider: React.FC = ({ children }) => {
             }
           );
           Promise.all(latestGroupsMessages).then((groupMessages) => {
-            const userMessages = plainToInstance(
+            const userMessages = _plainClassConverter.plainToClassArray(
               UserMessage,
-              latestUserMessages.data as []
+              latestUserMessages.data
             );
             setLastMessages(
               [...groupMessages, ...userMessages].sort(sortLastMessages)
@@ -118,7 +119,13 @@ export const ConversationProvider: React.FC = ({ children }) => {
       }
     }
     getLastMessages();
-  }, [user, getGroupLastMessage, _messageService, _groupService]);
+  }, [
+    user,
+    getGroupLastMessage,
+    _messageService,
+    _groupService,
+    _plainClassConverter
+  ]);
 
   const receiveMessage = useCallback(
     (message: IMessage) => {
@@ -160,29 +167,42 @@ export const ConversationProvider: React.FC = ({ children }) => {
   useEffect(() => {
     _socketService.removeListner('sendedMsgFromUser');
     _socketService.addListner('sendedMsgFromUser', (message: UserMessage) => {
-      receiveMessage(plainToInstance(UserMessage, message));
+      receiveMessage(_plainClassConverter.plainToClass(UserMessage, message));
     });
 
     _socketService.removeListner('msgFromUser');
     _socketService.addListner('msgFromUser', (message: UserMessage) => {
-      receiveMessage(plainToInstance(UserMessage, message));
+      receiveMessage(_plainClassConverter.plainToClass(UserMessage, message));
     });
     _socketService.removeListner('msgFromGroup');
     _socketService.addListner('msgFromGroup', (message: GroupMessage) => {
-      receiveMessage(plainToInstance(GroupMessage, message));
+      receiveMessage(_plainClassConverter.plainToClass(GroupMessage, message));
     });
-  }, [receiveMessage, _socketService]);
+  }, [receiveMessage, _socketService, _plainClassConverter]);
 
   useEffect(() => {
     _socketService.removeListner('deletedUserMessage');
     _socketService.addListner('deletedUserMessage', (message: UserMessage) => {
-      deleteMessage(plainToInstance(UserMessage, { ...message, message: '' }));
+      deleteMessage(
+        _plainClassConverter.plainToClass(UserMessage, {
+          ...message,
+          message: ''
+        })
+      );
     });
     _socketService.removeListner('deletedGroupMessage');
-    _socketService.addListner('deletedGroupMessage', (message: GroupMessage) => {
-      deleteMessage(plainToInstance(GroupMessage, { ...message, message: '' }));
-    });
-  }, [_socketService]);
+    _socketService.addListner(
+      'deletedGroupMessage',
+      (message: GroupMessage) => {
+        deleteMessage(
+          _plainClassConverter.plainToClass(GroupMessage, {
+            ...message,
+            message: ''
+          })
+        );
+      }
+    );
+  }, [_socketService, _plainClassConverter]);
 
   useEffect(() => {
     _socketService.removeListner('joinedGroup');
@@ -200,7 +220,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
     });
     _socketService.removeListner('leavedGroup');
     _socketService.addListner('leavedGroup', (group: Group) => {
-      const groupClass = plainToInstance(Group, group);
+      const groupClass = _plainClassConverter.plainToClass(Group, group);
       setLastMessages((messages) =>
         messages.filter(
           (message) => message.destination().getKey() !== groupClass.getKey()
@@ -215,7 +235,13 @@ export const ConversationProvider: React.FC = ({ children }) => {
         message: `Você foi removido do grupo ${groupClass.getTitle()}`
       });
     });
-  }, [getGroupLastMessage, openAlert, destination, _socketService]);
+  }, [
+    getGroupLastMessage,
+    openAlert,
+    destination,
+    _socketService,
+    _plainClassConverter
+  ]);
 
   useEffect(() => {
     setSelectedMessage(undefined);
@@ -265,11 +291,13 @@ export const ConversationProvider: React.FC = ({ children }) => {
       if (data.length > 0 || skip === 0) {
         if (skip > 0) {
           setMessages((oldMessages) => [
-            ...plainToInstance(UserMessage, data as []),
+            ..._plainClassConverter.plainToClassArray(UserMessage, data),
             ...oldMessages
           ]);
         } else {
-          setMessages(plainToInstance(UserMessage, data as []));
+          setMessages(
+            _plainClassConverter.plainToClassArray(UserMessage, data)
+          );
         }
       } else {
         openAlert({
@@ -290,11 +318,13 @@ export const ConversationProvider: React.FC = ({ children }) => {
       if (data.length > 0 || skip === 0) {
         if (skip > 0) {
           setMessages((oldMessages) => [
-            ...plainToInstance(GroupMessage, data as []),
+            ..._plainClassConverter.plainToClassArray(GroupMessage, data),
             ...oldMessages
           ]);
         } else {
-          setMessages(plainToInstance(GroupMessage, data as []));
+          setMessages(
+            _plainClassConverter.plainToClassArray(GroupMessage, data)
+          );
         }
       } else {
         openAlert({
@@ -310,7 +340,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
     if (destination instanceof Group) {
       if (destination.id === group.id) {
         setDestination(
-          plainToInstance(Group, {
+          _plainClassConverter.plainToClass(Group, {
             ...destination,
             name: group.name,
             description: group.description
@@ -322,7 +352,7 @@ export const ConversationProvider: React.FC = ({ children }) => {
       messages.map((message) => {
         if (message instanceof GroupMessage) {
           if (message.groupDestination.id === group.id) {
-            return plainToInstance(GroupMessage, {
+            return _plainClassConverter.plainToClass(GroupMessage, {
               ...message,
               groupDestination: {
                 ...message.groupDestination,

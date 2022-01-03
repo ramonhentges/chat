@@ -27,11 +27,11 @@ import {
 } from 'react';
 import { User } from '../../models/user';
 import Loading from '../Loading';
-import { plainToInstance } from 'class-transformer';
 import { HttpStatus } from '../../enum/http-status.enum';
 import { UserService } from '../../ports/services/UserService';
 import { TYPES } from '../../types/InversifyTypes';
 import { useInjection } from 'inversify-react';
+import { PlainClassConverter } from '../../ports/PlainClassConverter';
 
 type Props = {
   selectUserAction?: (user: User) => void;
@@ -53,7 +53,10 @@ const FindUserModal = forwardRef(
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     const [selectMany, setSelectMany] = useState(false);
     const _userService = useInjection<UserService>(TYPES.UserService);
-
+    const _plainClassConverter = useInjection<PlainClassConverter>(
+      TYPES.PlainClassConverter
+    );
+    
     const handleOpen = (selectMany: boolean) => {
       setSelectMany(selectMany);
       setSelectedUsers([]);
@@ -118,8 +121,8 @@ const FindUserModal = forwardRef(
       const fetchData = async () => {
         const { data, status } = await _userService.usersList();
         if (status === HttpStatus.OK && open) {
-          setUsers(plainToInstance(User, data as []));
-          setUsersSearch(plainToInstance(User, data as []));
+          setUsers(_plainClassConverter.plainToClassArray(User, data));
+          setUsersSearch(_plainClassConverter.plainToClassArray(User, data));
           setLoading(false);
         }
       };
@@ -128,7 +131,7 @@ const FindUserModal = forwardRef(
         setLoading(true);
         setUsername('');
       };
-    }, [open, _userService]);
+    }, [open, _userService, _plainClassConverter]);
 
     useImperativeHandle(ref, () => {
       return {

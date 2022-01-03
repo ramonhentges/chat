@@ -1,9 +1,9 @@
-import { plainToInstance } from 'class-transformer';
 import { useInjection } from 'inversify-react';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { LoginDto } from '../../dto/login';
 import { HttpStatus } from '../../enum/http-status.enum';
 import { User } from '../../models/user';
+import { PlainClassConverter } from '../../ports/PlainClassConverter';
 import { AuthService } from '../../ports/services/AuthService';
 import { HttpService } from '../../ports/services/HttpService';
 import { SocketService } from '../../ports/services/SocketService';
@@ -31,6 +31,9 @@ export const AuthProvider: React.FC = ({ children }) => {
   const _httpService = useInjection<HttpService>(TYPES.HttpService);
   const _socketService = useInjection<SocketService>(
     TYPES.SocketService
+  );
+  const _plainClassConverter = useInjection<PlainClassConverter>(
+    TYPES.PlainClassConverter
   );
 
   async function signIn(loginUser: LoginDto) {
@@ -61,13 +64,13 @@ export const AuthProvider: React.FC = ({ children }) => {
     const response = await _userService.myUserInfo().catch((e) => e.response);
     if (response.status === HttpStatus.OK) {
       _socketService.connect();
-      setUser(plainToInstance(User, response.data));
+      setUser(_plainClassConverter.plainToClass(User, response.data));
     } else if (response.status === HttpStatus.UNAUTHORIZED) {
       console.log('aquii');
       signOut();
     }
     setLoading(false);
-  }, [_userService, signOut, _socketService]);
+  }, [_userService, signOut, _socketService, _plainClassConverter]);
 
   useEffect(() => {
     async function getInfo() {

@@ -1,5 +1,4 @@
 import { Button, Divider, List, Stack, Typography } from '@mui/material';
-import { plainToInstance } from 'class-transformer';
 import { useInjection } from 'inversify-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useAlert } from '../../contexts/AlertSnackbar';
@@ -8,6 +7,7 @@ import { useConversation } from '../../contexts/Conversation';
 import { HttpStatus } from '../../enum/http-status.enum';
 import { Group } from '../../models/group';
 import { User } from '../../models/user';
+import { PlainClassConverter } from '../../ports/PlainClassConverter';
 import { GroupService } from '../../ports/services/GroupService';
 import { TYPES } from '../../types/InversifyTypes';
 import FindUserModal from '../FindUserModal';
@@ -20,6 +20,9 @@ const ShowGroupInfo = () => {
   const [group, setGroup] = useState<Group>(new Group());
   const addUsersRef = useRef<any>(null);
   const _groupService = useInjection<GroupService>(TYPES.GroupService);
+  const _plainClassConverter = useInjection<PlainClassConverter>(
+    TYPES.PlainClassConverter
+  );
 
   const selectUsersAction = (users: User[]) => {
     const addedUsers: User[] = [];
@@ -93,9 +96,11 @@ const ShowGroupInfo = () => {
   useEffect(() => {
     async function getData() {
       if (destination instanceof Group) {
-        const { status, data } = await _groupService.getGroupInfo(destination.id);
+        const { status, data } = await _groupService.getGroupInfo(
+          destination.id
+        );
         if (open && status === HttpStatus.OK) {
-          setGroup(plainToInstance(Group, data));
+          setGroup(_plainClassConverter.plainToClass(Group, data));
         }
       }
     }
@@ -104,7 +109,7 @@ const ShowGroupInfo = () => {
     return () => {
       open = false;
     };
-  }, [destination, _groupService]);
+  }, [destination, _groupService, _plainClassConverter]);
   return destination instanceof Group ? (
     <>
       <Stack spacing={2} sx={{ p: 2, flex: 1 }}>
