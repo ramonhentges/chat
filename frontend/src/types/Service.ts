@@ -4,5 +4,6 @@ export const SERVICE_TYPES = {
   MessageService: Symbol.for('MessageService'),
   UserService: Symbol.for('UserService'),
   SocketService: Symbol.for('SocketService'),
-  HttpService: Symbol.for('HttpService')
+  HttpService: Symbol.for('HttpService'),
+  PlainClassConverter: Symbol.for('PlainClassConverter')
 };

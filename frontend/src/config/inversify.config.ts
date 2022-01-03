@@ -3,6 +3,7 @@ import { AuthServiceImpl } from '../adapters/services/AuthServiceImpl';
 import { GroupServiceImpl } from '../adapters/services/GroupServiceImpl';
 import { MessageServiceImpl } from '../adapters/services/MessageServiceImpl';
 import { UserServiceImpl } from '../adapters/services/UserServiceImpl';
+import { ClassTransformerPlainClassConverter } from '../external/ClassTransformerPlainClassConverter';
 import { AxiosHttpService } from '../external/services/axios/AxiosHttpService';
 import { SocketIOSocketService } from '../external/services/socket-io/SocketIOSocketService';
 
@@ -27,5 +28,9 @@ container
   .bind(SERVICE_TYPES.SocketService)
   .to(SocketIOSocketService)
   .inSingletonScope();
+
+container
+  .bind(SERVICE_TYPES.PlainClassConverter)
+  .to(ClassTransformerPlainClassConverter);
 
 export { container };
