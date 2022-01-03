@@ -3,11 +3,11 @@ import { QueryFilter } from '../../interfaces/query';
 import { User } from '../../models/user';
 import { HttpService } from '../../ports/services/HttpService';
 import { MessageService } from '../../ports/services/MessageService';
-import { SERVICE_TYPES } from '../../types/Service';
+import { TYPES } from '../../types/InversifyTypes';
 
 @injectable()
 export class MessageServiceImpl implements MessageService {
-  @inject(SERVICE_TYPES.HttpService) private _httpService: HttpService;
+  @inject(TYPES.HttpService) private _httpService: HttpService;
 
   getLatestMessages = () => this._httpService.get(`user-message/last/messages`);
 

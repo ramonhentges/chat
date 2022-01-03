@@ -7,30 +7,30 @@ import { ClassTransformerPlainClassConverter } from '../external/ClassTransforme
 import { AxiosHttpService } from '../external/services/axios/AxiosHttpService';
 import { SocketIOSocketService } from '../external/services/socket-io/SocketIOSocketService';
 
-import { SERVICE_TYPES } from '../types/Service';
+import { TYPES } from '../types/InversifyTypes';
 
 let container = new Container();
 
-container.bind(SERVICE_TYPES.AuthService).to(AuthServiceImpl);
+container.bind(TYPES.AuthService).to(AuthServiceImpl);
 
-container.bind(SERVICE_TYPES.MessageService).to(MessageServiceImpl);
+container.bind(TYPES.MessageService).to(MessageServiceImpl);
 
-container.bind(SERVICE_TYPES.GroupService).to(GroupServiceImpl);
+container.bind(TYPES.GroupService).to(GroupServiceImpl);
 
-container.bind(SERVICE_TYPES.UserService).to(UserServiceImpl);
+container.bind(TYPES.UserService).to(UserServiceImpl);
 
 container
-  .bind(SERVICE_TYPES.HttpService)
+  .bind(TYPES.HttpService)
   .to(AxiosHttpService)
   .inSingletonScope();
 
 container
-  .bind(SERVICE_TYPES.SocketService)
+  .bind(TYPES.SocketService)
   .to(SocketIOSocketService)
   .inSingletonScope();
 
 container
-  .bind(SERVICE_TYPES.PlainClassConverter)
+  .bind(TYPES.PlainClassConverter)
   .to(ClassTransformerPlainClassConverter);
 
 export { container };

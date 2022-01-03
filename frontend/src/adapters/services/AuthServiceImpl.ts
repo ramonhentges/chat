@@ -4,11 +4,11 @@ import { HttpStatus } from '../../enum/http-status.enum';
 import { AuthService } from '../../ports/services/AuthService';
 import { HttpService } from '../../ports/services/HttpService';
 import { HttpResponse } from '../../types/HttpResponse';
-import { SERVICE_TYPES } from '../../types/Service';
+import { TYPES } from '../../types/InversifyTypes';
 
 @injectable()
 export class AuthServiceImpl implements AuthService {
-  @inject(SERVICE_TYPES.HttpService) private _httpService: HttpService;
+  @inject(TYPES.HttpService) private _httpService: HttpService;
 
   async login(usuario: LoginDto): Promise<HttpResponse> {
     return this._httpService

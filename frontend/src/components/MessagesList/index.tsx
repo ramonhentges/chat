@@ -24,7 +24,7 @@ import {
 import { sameDay } from '../../util/date';
 import { useInjection } from 'inversify-react';
 import { SocketService } from '../../ports/services/SocketService';
-import { SERVICE_TYPES } from '../../types/Service';
+import { TYPES } from '../../types/InversifyTypes';
 
 function canTakeMoreMessages(
   scrollTop: number,
@@ -44,7 +44,7 @@ function canScrollDown(scrollPosition: number, scrollHeight: number) {
 
 export default function MessagesList() {
   const _socketService = useInjection<SocketService>(
-    SERVICE_TYPES.SocketService
+    TYPES.SocketService
   );
   const messagesGrid = useRef<HTMLDivElement>(null);
   const { confirm } = useConfirm();

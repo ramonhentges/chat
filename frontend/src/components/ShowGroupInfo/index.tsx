@@ -9,7 +9,7 @@ import { HttpStatus } from '../../enum/http-status.enum';
 import { Group } from '../../models/group';
 import { User } from '../../models/user';
 import { GroupService } from '../../ports/services/GroupService';
-import { SERVICE_TYPES } from '../../types/Service';
+import { TYPES } from '../../types/InversifyTypes';
 import FindUserModal from '../FindUserModal';
 import GroupUserCard from './GroupUserCard';
 
@@ -19,7 +19,7 @@ const ShowGroupInfo = () => {
   const { confirm } = useConfirm();
   const [group, setGroup] = useState<Group>(new Group());
   const addUsersRef = useRef<any>(null);
-  const _groupService = useInjection<GroupService>(SERVICE_TYPES.GroupService);
+  const _groupService = useInjection<GroupService>(TYPES.GroupService);
 
   const selectUsersAction = (users: User[]) => {
     const addedUsers: User[] = [];

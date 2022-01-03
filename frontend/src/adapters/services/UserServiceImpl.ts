@@ -3,11 +3,11 @@ import { CreateUserDto } from '../../dto/create-user';
 import { UpdateUserDto } from '../../dto/update-user';
 import { UserService } from '../../ports/services/UserService';
 import { HttpService } from '../../ports/services/HttpService';
-import { SERVICE_TYPES } from '../../types/Service';
+import { TYPES } from '../../types/InversifyTypes';
 
 @injectable()
 export class UserServiceImpl implements UserService {
-  @inject(SERVICE_TYPES.HttpService) private _httpService: HttpService;
+  @inject(TYPES.HttpService) private _httpService: HttpService;
 
   createUser = (user: CreateUserDto) =>
     this._httpService

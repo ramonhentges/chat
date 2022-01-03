@@ -30,7 +30,7 @@ import Loading from '../Loading';
 import { plainToInstance } from 'class-transformer';
 import { HttpStatus } from '../../enum/http-status.enum';
 import { UserService } from '../../ports/services/UserService';
-import { SERVICE_TYPES } from '../../types/Service';
+import { TYPES } from '../../types/InversifyTypes';
 import { useInjection } from 'inversify-react';
 
 type Props = {
@@ -52,7 +52,7 @@ const FindUserModal = forwardRef(
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     const [selectMany, setSelectMany] = useState(false);
-    const _userService = useInjection<UserService>(SERVICE_TYPES.UserService);
+    const _userService = useInjection<UserService>(TYPES.UserService);
 
     const handleOpen = (selectMany: boolean) => {
       setSelectMany(selectMany);

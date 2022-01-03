@@ -1,4 +1,4 @@
-export const SERVICE_TYPES = {
+export const TYPES = {
   GroupService: Symbol.for('GroupService'),
   AuthService: Symbol.for('AuthService'),
   MessageService: Symbol.for('MessageService'),

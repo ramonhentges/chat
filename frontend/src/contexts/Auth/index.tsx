@@ -8,7 +8,7 @@ import { AuthService } from '../../ports/services/AuthService';
 import { HttpService } from '../../ports/services/HttpService';
 import { SocketService } from '../../ports/services/SocketService';
 import { UserService } from '../../ports/services/UserService';
-import { SERVICE_TYPES } from '../../types/Service';
+import { TYPES } from '../../types/InversifyTypes';
 
 interface AuthContextProps {
   signed: boolean;
@@ -26,11 +26,11 @@ const AuthContext = React.createContext<AuthContextProps>(
 export const AuthProvider: React.FC = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const _authService = useInjection<AuthService>(SERVICE_TYPES.AuthService);
-  const _userService = useInjection<UserService>(SERVICE_TYPES.UserService);
-  const _httpService = useInjection<HttpService>(SERVICE_TYPES.HttpService);
+  const _authService = useInjection<AuthService>(TYPES.AuthService);
+  const _userService = useInjection<UserService>(TYPES.UserService);
+  const _httpService = useInjection<HttpService>(TYPES.HttpService);
   const _socketService = useInjection<SocketService>(
-    SERVICE_TYPES.SocketService
+    TYPES.SocketService
   );
 
   async function signIn(loginUser: LoginDto) {

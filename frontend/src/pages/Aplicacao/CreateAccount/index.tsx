@@ -16,13 +16,13 @@ import { CreateUserDto } from '../../../dto/create-user';
 import { useFormik } from 'formik';
 import createValidator from 'class-validator-formik';
 import { UserService } from '../../../ports/services/UserService';
-import { SERVICE_TYPES } from '../../../types/Service';
+import { TYPES } from '../../../types/InversifyTypes';
 import { useInjection } from 'inversify-react';
 
 export function CreateAccount() {
   const navigate = useNavigate();
   const { openAlert } = useAlert();
-  const _userService = useInjection<UserService>(SERVICE_TYPES.UserService);
+  const _userService = useInjection<UserService>(TYPES.UserService);
 
   const {
     values,

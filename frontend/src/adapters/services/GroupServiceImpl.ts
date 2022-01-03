@@ -3,11 +3,11 @@ import { AddRemoveUserToGroupDto } from '../../dto/add-user-to-group';
 import { CreateGroupDto } from '../../dto/create-group';
 import { GroupService } from '../../ports/services/GroupService';
 import { HttpService } from '../../ports/services/HttpService';
-import { SERVICE_TYPES } from '../../types/Service';
+import { TYPES } from '../../types/InversifyTypes';
 
 @injectable()
 export class GroupServiceImpl implements GroupService {
-  @inject(SERVICE_TYPES.HttpService) private _httpService: HttpService;
+  @inject(TYPES.HttpService) private _httpService: HttpService;
 
   createGroup = (group: CreateGroupDto) =>
     this._httpService.post(`groups`, group);

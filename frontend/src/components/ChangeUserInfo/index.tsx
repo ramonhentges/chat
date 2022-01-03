@@ -13,13 +13,13 @@ import { UpdateUserDto } from '../../dto/update-user';
 import { ActualPage } from '../../enum/actual-page';
 import { HttpStatus } from '../../enum/http-status.enum';
 import { UserService } from '../../ports/services/UserService';
-import { SERVICE_TYPES } from '../../types/Service';
+import { TYPES } from '../../types/InversifyTypes';
 
 export function ChangeUserInfo(props: any) {
   const { user, refreshUserInfo } = useAuth();
   const { openAlert } = useAlert();
   const { setActualPage } = useConversation();
-  const _userService = useInjection<UserService>(SERVICE_TYPES.UserService);
+  const _userService = useInjection<UserService>(TYPES.UserService);
   const {
     values,
     handleChange,

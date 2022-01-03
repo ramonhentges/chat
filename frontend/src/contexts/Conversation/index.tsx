@@ -19,7 +19,7 @@ import { UserMessage } from '../../models/user-message';
 import { GroupService } from '../../ports/services/GroupService';
 import { MessageService } from '../../ports/services/MessageService';
 import { SocketService } from '../../ports/services/SocketService';
-import { SERVICE_TYPES } from '../../types/Service';
+import { TYPES } from '../../types/InversifyTypes';
 import { useAlert } from '../AlertSnackbar';
 import { useAuth } from '../Auth';
 
@@ -59,11 +59,11 @@ export const ConversationProvider: React.FC = ({ children }) => {
   >();
   const [actualPage, setActualPage] = useState<ActualPage>(ActualPage.CHAT);
   const haveMoreMessages = useRef<boolean>(true);
-  const _groupService = useInjection<GroupService>(SERVICE_TYPES.GroupService);
+  const _groupService = useInjection<GroupService>(TYPES.GroupService);
   const _messageService = useInjection<MessageService>(
-    SERVICE_TYPES.MessageService
+    TYPES.MessageService
   );
-  const _socketService = useInjection<SocketService>(SERVICE_TYPES.SocketService);
+  const _socketService = useInjection<SocketService>(TYPES.SocketService);
 
   const { user } = useAuth();
   const { openAlert } = useAlert();
