@@ -1,11 +1,11 @@
 import {
-  Modal,
-  Paper,
-  TextField,
   Button,
   CircularProgress,
-  Stack,
   Grid,
+  Modal,
+  Paper,
+  Stack,
+  TextField,
   Typography
 } from '@mui/material';
 import React, {
@@ -14,42 +14,12 @@ import React, {
   useImperativeHandle,
   useState
 } from 'react';
-import { useFormik } from 'formik';
-import { CreateGroupDto } from '../../dto/create-group';
-import { HttpStatus } from '../../enum/http-status.enum';
+import { useCreateUpdateGroup } from '../../hooks/useCreateUpdateGroup';
 import { Group } from '../../models/group';
-import { useAlert } from '../../contexts/AlertSnackbar';
-import { useConversation } from '../../contexts/Conversation';
-import createValidator from 'class-validator-formik';
-import { GroupService } from '../../ports/services/GroupService';
-import { TYPES } from '../../types/InversifyTypes';
-import { useInjection } from 'inversify-react';
-import { PlainClassConverter } from '../../ports/PlainClassConverter';
-
-const getMessages = (editing: boolean) => {
-  if (editing) {
-    return {
-      error: 'Erro ao editar grupo. Verifique os campos!',
-      success: 'Grupo editado com sucesso!'
-    };
-  } else {
-    return {
-      error: 'Erro ao criar grupo. Verifique os campos!',
-      success: 'Grupo criado com sucesso!'
-    };
-  }
-};
 
 const CreateGroupModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
   const [open, setOpen] = useState(false);
   const [groupId, setGroupId] = useState('');
-  const { setDestination, changeGroupInfo } = useConversation();
-  const _groupService = useInjection<GroupService>(TYPES.GroupService);
-  const _plainClassConverter = useInjection<PlainClassConverter>(
-    TYPES.PlainClassConverter
-  );
-
-  const { openAlert } = useAlert();
 
   const handleOpen = (group?: Group) => {
     if (group) {
@@ -77,40 +47,11 @@ const CreateGroupModal = forwardRef((props, ref: ForwardedRef<unknown>) => {
     handleSubmit,
     handleBlur,
     isSubmitting,
-    setErrors,
     errors,
     touched,
     setValues,
     resetForm
-  } = useFormik<CreateGroupDto>({
-    initialValues: { description: '', name: '' },
-    validate: createValidator(CreateGroupDto),
-    onSubmit: async (values) => {
-      const messages = getMessages(groupId !== '');
-      const { status, data } = await (groupId === ''
-        ? _groupService.createGroup(values)
-        : _groupService.updateGroup(groupId, values));
-      if ([HttpStatus.CREATED, HttpStatus.OK].includes(status)) {
-        const group = _plainClassConverter.plainToClass(Group, data);
-        if (groupId === '') {
-          setDestination(group);
-        } else {
-          changeGroupInfo(group);
-        }
-        openAlert({
-          severity: 'success',
-          message: messages.success
-        });
-        handleClose();
-      } else if (status === HttpStatus.UNPROCESSABLE_ENTITY) {
-        setErrors(data);
-        openAlert({
-          severity: 'error',
-          message: messages.error
-        });
-      }
-    }
-  });
+  } = useCreateUpdateGroup(groupId, handleClose);
 
   return (
     <Modal
