@@ -1,3 +1,4 @@
+import { Send } from '@mui/icons-material';
 import {
   Button,
   Checkbox,
@@ -17,7 +18,6 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { Send } from '@mui/icons-material';
 import {
   ForwardedRef,
   forwardRef,
@@ -25,13 +25,9 @@ import {
   useImperativeHandle,
   useState
 } from 'react';
+import { useGetAllUsers } from '../../hooks/useGetAllUsers';
 import { User } from '../../models/user';
 import Loading from '../Loading';
-import { HttpStatus } from '../../enum/http-status.enum';
-import { UserService } from '../../ports/services/UserService';
-import { TYPES } from '../../types/InversifyTypes';
-import { useInjection } from 'inversify-react';
-import { PlainClassConverter } from '../../ports/PlainClassConverter';
 
 type Props = {
   selectUserAction?: (user: User) => void;
@@ -44,19 +40,37 @@ const FindUserModal = forwardRef(
     ref: ForwardedRef<unknown>
   ) => {
     const [open, setOpen] = useState(false);
-    const [users, setUsers] = useState<User[]>([]);
     const [username, setUsername] = useState('');
-    const [loading, setLoading] = useState<boolean>(true);
     const [usersSearch, setUsersSearch] = useState<User[]>([]);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     const [selectMany, setSelectMany] = useState(false);
-    const _userService = useInjection<UserService>(TYPES.UserService);
-    const _plainClassConverter = useInjection<PlainClassConverter>(
-      TYPES.PlainClassConverter
-    );
-    
+    const { users, loading: loadingUsers } = useGetAllUsers();
+
+    useEffect(() => {
+      setUsersSearch(users);
+    }, [users]);
+
+    useEffect(() => {
+      if (!open) {
+        setUsername('');
+        setUsersSearch(users);
+      }
+    }, [open, users]);
+
+    useEffect(() => {
+      setPage(0);
+      setUsersSearch(
+        users.filter((user) => {
+          return (
+            user.fullName.toLowerCase().includes(username.toLowerCase()) ||
+            user.username.toLowerCase().includes(username.toLowerCase())
+          );
+        })
+      );
+    }, [username, users]);
+
     const handleOpen = (selectMany: boolean) => {
       setSelectMany(selectMany);
       setSelectedUsers([]);
@@ -88,19 +102,6 @@ const FindUserModal = forwardRef(
     function handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
       event.preventDefault();
       setUsername(event.target.value);
-      setPage(0);
-      setUsersSearch(
-        users.filter((user) => {
-          return (
-            user.fullName
-              .toLowerCase()
-              .includes(event.target.value.toLowerCase()) ||
-            user.username
-              .toLowerCase()
-              .includes(event.target.value.toLowerCase())
-          );
-        })
-      );
     }
 
     const handleChangePage = (
@@ -116,22 +117,6 @@ const FindUserModal = forwardRef(
       setRowsPerPage(parseInt(event.target.value, 10));
       setPage(0);
     };
-
-    useEffect(() => {
-      const fetchData = async () => {
-        const { data, status } = await _userService.usersList();
-        if (status === HttpStatus.OK && open) {
-          setUsers(_plainClassConverter.plainToClassArray(User, data));
-          setUsersSearch(_plainClassConverter.plainToClassArray(User, data));
-          setLoading(false);
-        }
-      };
-      open && fetchData();
-      return () => {
-        setLoading(true);
-        setUsername('');
-      };
-    }, [open, _userService, _plainClassConverter]);
 
     useImperativeHandle(ref, () => {
       return {
@@ -159,7 +144,7 @@ const FindUserModal = forwardRef(
               <Grid item sx={{ mb: 2 }}>
                 <Typography variant="h5">Buscar Contato</Typography>
               </Grid>
-              {loading ? (
+              {loadingUsers ? (
                 <Loading text="Carregando" />
               ) : (
                 <>
