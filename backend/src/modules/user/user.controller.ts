@@ -1,14 +1,12 @@
+import { Public } from '@/constants/constants';
+import { UserDecorator } from '@/decorators/user.decorator';
 import {
   Body,
-  Controller,
-  Request,
-  Get,
+  Controller, Get,
   Param,
   Post,
   Put
 } from '@nestjs/common';
-import { Public } from '@/constants/constants';
-import { UserDecorator } from '@/decorators/user.decorator';
 import { UpdateUserDto } from './dto/edit-user.dto';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';

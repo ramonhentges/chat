@@ -6,7 +6,7 @@ import { UpdateGroupData } from '@/ports/update-group-data';
 
 export class InMemoryGroupRepository implements GroupRepository {
   private readonly _data: Group[];
-  private idcounter: number = 0;
+  private idcounter = 0;
   private get data() {
     return this._data;
   }

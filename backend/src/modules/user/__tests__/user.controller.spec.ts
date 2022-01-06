@@ -7,7 +7,7 @@ import { UserService } from '../user.service';
 
 describe('UserController', () => {
   let sut: UserController;
-  let mockUserService = createMock<UserService>();
+  const mockUserService = createMock<UserService>();
   const jwtDto = JWTTestUtil.giveAValidJwtTokenDto();
 
   beforeAll(async () => {
