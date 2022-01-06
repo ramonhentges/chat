@@ -15,6 +15,7 @@ import { AuthService } from '@/modules/auth/auth.service';
 import { MessageDto } from '@/modules/message/dto/message.dto';
 import { MessageService } from '@/modules/message/message.service';
 import { UserService } from '@/modules/user/user.service';
+import { getValidationPipe } from '@/validation/validation-pipe';
 
 @WebSocketGateway({
   cors: { origin: '*' }
@@ -63,15 +64,7 @@ export class MessagesGateway {
   @SubscribeMessage('msgToGroup')
   async handleGroupMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody(
-      new ValidationPipe({
-        validationError: {
-          target: false,
-          value: false
-        },
-        exceptionFactory: (errors) => new WsException(errors)
-      })
-    )
+    @MessageBody(getValidationPipe('websocket'))
     message: MessageDto
   ): Promise<WsResponse<Message>> {
     const userToken = await this.authService.validate(
@@ -94,15 +87,7 @@ export class MessagesGateway {
   @SubscribeMessage('msgToUser')
   async handleUserMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody(
-      new ValidationPipe({
-        validationError: {
-          target: false,
-          value: false
-        },
-        exceptionFactory: (errors) => new WsException(errors)
-      })
-    )
+    @MessageBody(getValidationPipe('websocket'))
     message: MessageDto
   ): Promise<WsResponse<Message>> {
     const userToken = await this.authService.validate(

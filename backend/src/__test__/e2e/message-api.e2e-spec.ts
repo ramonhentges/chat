@@ -20,7 +20,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
-import { initializeApp } from '../initilize-app';
+import { initializeApp } from '../helpers';
 
 describe('MessageController (e2e)', () => {
   let sut: INestApplication;

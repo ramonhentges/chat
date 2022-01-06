@@ -11,7 +11,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
 import { DoubleEncoder } from '../doubles/encoder';
-import { initializeApp } from '../initilize-app';
+import { initializeApp } from '../helpers';
 
 describe('AuthController (e2e)', () => {
   let sut: INestApplication;
