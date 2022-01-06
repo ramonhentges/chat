@@ -9,6 +9,7 @@ export default class UserBuilder {
     this.user.fullName = 'Test User';
     this.user.password = 'Hashed-12345678';
     this.user.createdAt = new Date();
+    this.user.groups = [];
   }
 
   public static aUser(): UserBuilder {

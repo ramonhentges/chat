@@ -45,8 +45,6 @@ export class InMemoryGroupRepository implements GroupRepository {
 
   async removeUser(user: User, groupId: string): Promise<Group> {
     const originalGroup = await this.findOneByIdWithUsers(groupId);
-    console.log(originalGroup);
-    
     originalGroup.users = originalGroup.users.filter(
       (value) => value.id !== user.id
     );

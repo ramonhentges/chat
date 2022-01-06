@@ -8,6 +8,7 @@ export default class GroupBuilder {
     this.group.name = 'My Group';
     this.group.description = 'Cool Group';
     this.group.createdAt = new Date();
+    this.group.users = [];
   }
 
   public static aGroup(): GroupBuilder {
