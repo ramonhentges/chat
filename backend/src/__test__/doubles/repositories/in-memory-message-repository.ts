@@ -21,7 +21,7 @@ export class InMemoryMessageRepository implements MessageRepository {
       let userToAdd: User;
       if (message.origin.username === user.username) {
         userToAdd = message.userDestination;
-      } else if (message?.userDestination.username === user.username) {
+      } else if (message.userDestination?.username === user.username) {
         userToAdd = message.origin;
       }
       if (userToAdd) {
@@ -39,13 +39,13 @@ export class InMemoryMessageRepository implements MessageRepository {
       const message = this.data[i];
       if (
         message.origin.username === user.username &&
-        message?.userDestination.username === contact.username
+        message.userDestination?.username === contact.username
       ) {
         lastMessage = message;
         i = this.data.length;
       } else if (
         message.origin.username === contact.username &&
-        message?.userDestination.username === user.username
+        message.userDestination?.username === user.username
       ) {
         lastMessage = message;
         i = this.data.length;
@@ -59,7 +59,7 @@ export class InMemoryMessageRepository implements MessageRepository {
     query: QueryFilter
   ): Promise<Message[]> {
     const messages: Message[] = this.data.filter(
-      (message) => message?.groupDestination.id === group.id
+      (message) => message.groupDestination?.id === group.id
     );
     return messages.slice(query.skip, query.take);
   }
@@ -68,7 +68,7 @@ export class InMemoryMessageRepository implements MessageRepository {
     let returnMessage: Message;
     for (let i = 0; i < this.data.length; i++) {
       const message = this.data[i];
-      if (message?.groupDestination.id === group.id) {
+      if (message.groupDestination?.id === group.id) {
         returnMessage = message;
         i = this.data.length;
       }
@@ -84,12 +84,12 @@ export class InMemoryMessageRepository implements MessageRepository {
     const messages = this.data.filter((message) => {
       if (
         message.origin.username === user.username &&
-        message?.userDestination.username === contact.username
+        message.userDestination?.username === contact.username
       ) {
         return true;
       } else if (
         message.origin.username === contact.username &&
-        message?.userDestination.username === user.username
+        message.userDestination?.username === user.username
       ) {
         return true;
       }
