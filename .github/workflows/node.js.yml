@@ -32,6 +32,8 @@ jobs:
         key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}-${{ matrix.node-version }}
     - name: Install dependencies
       run: yarn install
+    - name: Lint test
+      run: yarn lint
     - name: Create .env for testing on backend
       run: cp ".env.test" ".env"
       working-directory: ./backend
