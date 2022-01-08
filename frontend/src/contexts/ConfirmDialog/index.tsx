@@ -16,6 +16,7 @@ const defaultOptions = {
 interface Props {
   title?: string;
   message?: string;
+  cancelAction?: boolean;
 }
 
 interface ConfirmContextProps {
@@ -68,6 +69,11 @@ export const ConfirmProvider: React.FC = ({ children }) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
+          {props.cancelAction && (
+            <Button onClick={handleCancel} color="default">
+              Cancelar
+            </Button>
+          )}
           <Button onClick={handleClose} color="inherit">
             Não
           </Button>
