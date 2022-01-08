@@ -1,4 +1,10 @@
-import { ValidationPipe } from '@nestjs/common';
+import { Group } from '@/models/group.model';
+import { Message } from '@/models/message.model';
+import { AuthService } from '@/modules/auth/auth.service';
+import { MessageDto } from '@/modules/message/dto/message.dto';
+import { MessageService } from '@/modules/message/message.service';
+import { UserService } from '@/modules/user/user.service';
+import { getValidationPipe } from '@/validation/validation-pipe';
 import {
   ConnectedSocket,
   MessageBody,
@@ -9,13 +15,6 @@ import {
   WsResponse
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Group } from '@/models/group.model';
-import { Message } from '@/models/message.model';
-import { AuthService } from '@/modules/auth/auth.service';
-import { MessageDto } from '@/modules/message/dto/message.dto';
-import { MessageService } from '@/modules/message/message.service';
-import { UserService } from '@/modules/user/user.service';
-import { getValidationPipe } from '@/validation/validation-pipe';
 
 @WebSocketGateway({
   cors: { origin: '*' }

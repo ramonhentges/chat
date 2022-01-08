@@ -1,22 +1,17 @@
+import { TypeormMessageRepository } from '@/external/repositories/typeorm/typeorm-message-repository';
+import { QueryFilter } from '@/global-dto/query';
+import { Message } from '@/models/message.model';
+import { User } from '@/models/user.model';
+import { MessageRepository } from '@/ports/message-repository';
 import {
-  ForbiddenException,
-  Injectable,
-  Inject,
-  forwardRef
+  ForbiddenException, forwardRef, Inject, Injectable
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Socket } from 'socket.io';
 import { JwsTokenDto } from '../auth/dto/jws-token.dto';
-import { MessageDto } from './dto/message.dto';
-import { ReturnedUserMessage } from '@/interfaces/returned-user-message.interface';
-import { Message } from '@/models/message.model';
-import { User } from '@/models/user.model';
 import { GroupService } from '../group/group.service';
 import { UserService } from '../user/user.service';
-import { plainToInstance } from 'class-transformer';
-import { QueryFilter } from '@/global-dto/query';
-import { TypeormMessageRepository } from '@/external/repositories/typeorm/typeorm-message-repository';
-import { MessageRepository } from '@/ports/message-repository';
+import { MessageDto } from './dto/message.dto';
 
 @Injectable()
 export class MessageService {

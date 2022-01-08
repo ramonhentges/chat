@@ -29,7 +29,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     //user.username user.uuid validar se conferem
     //info TokenExpiredError -> expirou || JsonWebTokenError -> token inválido
     if (err || !user) {
-      throw err || new UnauthorizedException();
+      throw err || new UnauthorizedException(info);
     }
     return user;
   }
