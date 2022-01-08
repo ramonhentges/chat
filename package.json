@@ -2,10 +2,15 @@
   "name": "chat-turbo-repo",
   "version": "0.0.1",
   "private": true,
-  "workspaces": [
-    "backend/",
-    "frontend/"
-  ],
+  "workspaces": {
+    "packages": [
+      "backend/",
+      "frontend/"
+    ],
+    "nohoist": [
+      "**/**"
+    ]
+  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
@@ -34,8 +39,13 @@
           ".next/**"
         ]
       },
-      "lint": {},
+      "lint": {
+        "outputs": []
+      },
       "test": {
+        "dependsOn": [
+          "^build"
+        ],
         "outputs": []
       },
       "dev": {
