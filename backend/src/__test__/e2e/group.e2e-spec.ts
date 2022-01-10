@@ -1,12 +1,13 @@
 import {
   TypeormGroupRepository,
   TypeormMessageRepository,
+  TypeormReadedByRepository,
   TypeormUserRepository
 } from '@/external/repositories/typeorm';
 import { MessagesGateway } from '@/gateways/messages.gateway';
 import { AddRemoveUserToGroupDto, GroupDto } from '@/modules/group/dto';
 import { GroupModule } from '@/modules/group/group.module';
-import { GroupRepository, MessageRepository, UserRepository } from '@/ports';
+import { GroupRepository, MessageRepository, ReadedByRepository, UserRepository } from '@/ports';
 import GroupBuilder from '@/__test__/builder/group-builder';
 import UserBuilder from '@/__test__/builder/user-builder';
 import { JwtAuthGuardDouble } from '@/__test__/doubles/auth';
@@ -28,6 +29,7 @@ describe('GroupController (e2e)', () => {
   let groupRepository: GroupRepository;
   const mockMessageGateway = createMock<MessagesGateway>();
   const mockMessageRepository = createMock<MessageRepository>();
+  const mockReadedByRepository = createMock<ReadedByRepository>();
   const user = UserBuilder.aUser().build();
   const group = GroupBuilder.aGroup().build();
   const authToken = JSON.stringify(user);
@@ -59,6 +61,8 @@ describe('GroupController (e2e)', () => {
       .useValue(groupRepository)
       .overrideProvider(TypeormMessageRepository)
       .useValue(mockMessageRepository)
+      .overrideProvider(TypeormReadedByRepository)
+      .useValue(mockReadedByRepository)
       .overrideProvider(MessagesGateway)
       .useValue(mockMessageGateway)
       .compile();
