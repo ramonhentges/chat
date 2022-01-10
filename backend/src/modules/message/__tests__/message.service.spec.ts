@@ -16,6 +16,9 @@ import UserBuilder from '@/__test__/builder/user-builder';
 import { InMemoryMessageRepository } from '@/__test__/doubles/repositories/in-memory-message-repository';
 import { MessageDto } from '../dto/message.dto';
 import { MessageService } from '../message.service';
+import { TypeormReadedByRepository } from '@/external/repositories/typeorm';
+import { InMemoryReadedByRepository } from '@/__test__/doubles/repositories';
+import { ReadedByRepository } from '@/ports';
 
 describe('MessageService', () => {
   let sut: MessageService;
@@ -24,15 +27,19 @@ describe('MessageService', () => {
   const mockGroupService = createMock<GroupService>();
   const mockUserService = createMock<UserService>();
   let messageRepository: MessageRepository;
+  let readedByRepository: ReadedByRepository;
 
   beforeEach(async () => {
     messageRepository = new InMemoryMessageRepository([]);
+    readedByRepository = new InMemoryReadedByRepository([]);
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MessageService,
         { provide: GroupService, useValue: mockGroupService },
         { provide: UserService, useValue: mockUserService },
-        { provide: TypeormMessageRepository, useValue: messageRepository }
+        { provide: TypeormMessageRepository, useValue: messageRepository },
+        { provide: TypeormReadedByRepository, useValue: readedByRepository }
       ]
     }).compile();
 
@@ -195,6 +202,112 @@ describe('MessageService', () => {
       mockUserService.getUserGroups.mockResolvedValueOnce(groups);
       await sut.joinGroupsRooms(jwtDto.id, socket);
       expect(socket.join).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  describe('When mark message as readed from user message', () => {
+    test('should throw forbidden error', async () => {
+      const origin = UserBuilder.aUser().build();
+      const contact = UserBuilder.aUser().newUsername().newId().build();
+      const message = await messageRepository.addContactMessage(
+        contact,
+        'new message',
+        origin
+      );
+      const reader = UserBuilder.aUser().build();
+      reader.username = 'other';
+      reader.id = `new-${reader.id}`;
+      mockUserService.getByID.mockResolvedValueOnce(reader);
+      const sutFunction = async () =>
+        await sut.markMessagesAsReaded([message.id], reader);
+      await expect(sutFunction()).rejects.toThrow(ForbiddenException);
+    });
+
+    test('should throw forbidden error, user cant read own message', async () => {
+      const origin = UserBuilder.aUser().build();
+      const contact = UserBuilder.aUser().newUsername().newId().build();
+      const message = await messageRepository.addContactMessage(
+        contact,
+        'new message',
+        origin
+      );
+      mockUserService.getByID.mockResolvedValueOnce(origin);
+      const sutFunction = async () =>
+        await sut.markMessagesAsReaded([message.id], origin);
+      await expect(sutFunction()).rejects.toThrow(ForbiddenException);
+    });
+
+    test('should mark as readed and return readedBy', async () => {
+      const origin = UserBuilder.aUser().build();
+      const contact = UserBuilder.aUser().newUsername().newId().build();
+      const message = await messageRepository.addContactMessage(
+        contact,
+        'new message',
+        origin
+      );
+      mockUserService.getByID.mockResolvedValueOnce(contact);
+      const results = await sut.markMessagesAsReaded([message.id], contact);
+      expect(results).toHaveLength(1);
+      results.forEach((result) => {
+        expect(result).toHaveProperty('user');
+        expect(result).toHaveProperty('readedAt');
+        expect(result.message).toHaveProperty('id');
+      });
+    });
+  });
+
+  describe('When mark message as readed from group message', () => {
+    test('should throw forbidden error, user not from group', async () => {
+      const origin = UserBuilder.aUser().build();
+      const group = GroupBuilder.aGroup().build();
+      const message = await messageRepository.addGroupMessage(
+        group,
+        'new message',
+        origin
+      );
+      const reader = UserBuilder.aUser().build();
+      reader.username = 'other';
+      reader.id = `new-${reader.id}`;
+      mockUserService.getByID.mockResolvedValueOnce(reader);
+      mockGroupService.isUserInGroup.mockResolvedValueOnce(false);
+      const sutFunction = async () =>
+        await sut.markMessagesAsReaded([message.id], reader);
+      await expect(sutFunction()).rejects.toThrow(ForbiddenException);
+    });
+
+    test('should throw forbidden error, user cant read own message', async () => {
+      const origin = UserBuilder.aUser().build();
+      const group = GroupBuilder.aGroup().build();
+      const message = await messageRepository.addGroupMessage(
+        group,
+        'new message',
+        origin
+      );
+      mockUserService.getByID.mockResolvedValueOnce(origin);
+      mockGroupService.isUserInGroup.mockResolvedValueOnce(true);
+      const sutFunction = async () =>
+        await sut.markMessagesAsReaded([message.id], origin);
+      await expect(sutFunction()).rejects.toThrow(ForbiddenException);
+    });
+
+    test('should mark as readed and return readedBy', async () => {
+      const origin = UserBuilder.aUser().build();
+      const contact = UserBuilder.aUser().newUsername().newId().build();
+      const group = GroupBuilder.aGroup().build();
+      const message = await messageRepository.addGroupMessage(
+        group,
+        'new message',
+        origin
+      );
+      mockUserService.getByID.mockResolvedValueOnce(contact);
+      mockGroupService.isUserInGroup.mockResolvedValueOnce(true);
+      const results = await sut.markMessagesAsReaded([message.id], contact);
+      expect(results).toHaveLength(1);
+      results.forEach((result) => {
+        expect(result).toHaveProperty('user');
+        expect(result).toHaveProperty('readedAt');
+        expect(result.message).toHaveProperty('id');
+      });
     });
   });
 });

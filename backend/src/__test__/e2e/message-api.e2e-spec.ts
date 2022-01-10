@@ -1,17 +1,24 @@
 import {
   TypeormGroupRepository,
   TypeormMessageRepository,
+  TypeormReadedByRepository,
   TypeormUserRepository
 } from '@/external/repositories/typeorm';
 import { MessagesGateway } from '@/gateways/messages.gateway';
 import { MessageModule } from '@/modules/message/message.module';
-import { GroupRepository, MessageRepository, UserRepository } from '@/ports';
+import {
+  GroupRepository,
+  MessageRepository,
+  ReadedByRepository,
+  UserRepository
+} from '@/ports';
 import GroupBuilder from '@/__test__/builder/group-builder';
 import UserBuilder from '@/__test__/builder/user-builder';
 import { JwtAuthGuardDouble } from '@/__test__/doubles/auth';
 import {
   InMemoryGroupRepository,
   InMemoryMessageRepository,
+  InMemoryReadedByRepository,
   InMemoryUserRepository
 } from '@/__test__/doubles/repositories';
 import { createMock } from '@golevelup/ts-jest';
@@ -27,6 +34,7 @@ describe('MessageController (e2e)', () => {
   let userRepository: UserRepository;
   let groupRepository: GroupRepository;
   let messageRepository: MessageRepository;
+  let readedByRepository: ReadedByRepository;
   const mockMessageGateway = createMock<MessagesGateway>();
   const user = UserBuilder.aUser().build();
   const contact = UserBuilder.aUser().newId().newUsername().build();
@@ -42,6 +50,7 @@ describe('MessageController (e2e)', () => {
       { ...group, users: [user, contact] }
     ]);
     messageRepository = new InMemoryMessageRepository([]);
+    readedByRepository = new InMemoryReadedByRepository([]);
     await seedMessageRepository(messageRepository);
     const moduleFixture = await Test.createTestingModule({
       imports: [
@@ -65,6 +74,8 @@ describe('MessageController (e2e)', () => {
       .useValue(groupRepository)
       .overrideProvider(TypeormMessageRepository)
       .useValue(messageRepository)
+      .overrideProvider(TypeormReadedByRepository)
+      .useValue(readedByRepository)
       .overrideProvider(MessagesGateway)
       .useValue(mockMessageGateway)
       .compile();

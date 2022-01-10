@@ -109,6 +109,7 @@ export class InMemoryMessageRepository implements MessageRepository {
     messageToAdd.origin = origin;
     messageToAdd.groupDestination = group;
     messageToAdd.createdAt = new Date();
+    messageToAdd.readedBy = [];
     this.idcounter++;
     this._data.unshift(messageToAdd);
     return messageToAdd;
@@ -125,6 +126,7 @@ export class InMemoryMessageRepository implements MessageRepository {
     messageToAdd.origin = origin;
     messageToAdd.userDestination = contact;
     messageToAdd.createdAt = new Date();
+    messageToAdd.readedBy = [];
     this.idcounter++;
     this._data.unshift(messageToAdd);
     return messageToAdd;

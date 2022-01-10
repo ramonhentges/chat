@@ -1,21 +1,28 @@
 import {
   TypeormGroupRepository,
   TypeormMessageRepository,
+  TypeormReadedByRepository,
   TypeormUserRepository
 } from '@/external/repositories/typeorm';
-import { Group, Message } from '@/models';
+import { Group, Message, ReadedBy } from '@/models';
 import { AuthService } from '@/modules/auth/auth.service';
 import { AddRemoveUserToGroupDto } from '@/modules/group/dto';
 import { GroupModule } from '@/modules/group/group.module';
 import { MessageDto } from '@/modules/message/dto/message.dto';
 import { MessageModule } from '@/modules/message/message.module';
-import { GroupRepository, MessageRepository, UserRepository } from '@/ports';
+import {
+  GroupRepository,
+  MessageRepository,
+  ReadedByRepository,
+  UserRepository
+} from '@/ports';
 import GroupBuilder from '@/__test__/builder/group-builder';
 import UserBuilder from '@/__test__/builder/user-builder';
 import { JwtAuthGuardDouble } from '@/__test__/doubles/auth';
 import {
   InMemoryGroupRepository,
   InMemoryMessageRepository,
+  InMemoryReadedByRepository,
   InMemoryUserRepository
 } from '@/__test__/doubles/repositories';
 import { getClientWebsocketForApp } from '../helpers';
@@ -28,13 +35,12 @@ import { Socket } from 'socket.io-client';
 import * as request from 'supertest';
 import { initializeApp } from '../helpers';
 
-
-
 describe('MessageGateway (e2e)', () => {
   let sut: INestApplication;
   let userRepository: UserRepository;
   let groupRepository: GroupRepository;
   let messageRepository: MessageRepository;
+  let readedByRepository: ReadedByRepository;
   let userSocket: Socket;
   let contactSocket: Socket;
   const mockAuthService = createMock<AuthService>();
@@ -51,6 +57,7 @@ describe('MessageGateway (e2e)', () => {
       { ...group, users: [user, contact] }
     ]);
     messageRepository = new InMemoryMessageRepository([]);
+    readedByRepository = new InMemoryReadedByRepository([]);
 
     const moduleFixture = await Test.createTestingModule({
       imports: [
@@ -75,6 +82,8 @@ describe('MessageGateway (e2e)', () => {
       .useValue(groupRepository)
       .overrideProvider(TypeormMessageRepository)
       .useValue(messageRepository)
+      .overrideProvider(TypeormReadedByRepository)
+      .useValue(readedByRepository)
       .overrideProvider(AuthService)
       .useValue(mockAuthService)
       .compile();
@@ -377,6 +386,57 @@ describe('MessageGateway (e2e)', () => {
         .delete(`/groups/remove-user/${group.id}/${contact.username}`)
         .set('Authorization', JSON.stringify(user))
         .expect(HttpStatus.NO_CONTENT);
+    });
+  });
+
+  describe('When mark a message as readed', () => {
+    it('should throw forbidden exception, origin cant read the message', async (done) => {
+      const message = await messageRepository.addContactMessage(
+        contact,
+        'some message',
+        user
+      );
+      userSocket.on('exception', (error) => {
+        expect(error.status).toBe('error');
+        expect(error.message).toBeDefined();
+        done();
+      });
+
+      userSocket.emit('markAsReaded', [message.id]);
+    });
+
+    it('should emit readed by to origin', async (done) => {
+      const message = await messageRepository.addContactMessage(
+        contact,
+        'some message',
+        user
+      );
+      userSocket.on('markAsReaded', (readedBy: ReadedBy) => {
+        expect(readedBy).toHaveProperty('id');
+        expect(readedBy).toHaveProperty('user');
+        expect(readedBy).toHaveProperty('readedAt');
+        expect(readedBy.message).toHaveProperty('id');
+        done();
+      });
+
+      contactSocket.emit('markAsReaded', [message.id]);
+    });
+
+    it('should emit readed by to group', async (done) => {
+      const message = await messageRepository.addGroupMessage(
+        group,
+        'some message',
+        user
+      );
+      userSocket.on('markAsReaded', (readedBy: ReadedBy) => {
+        expect(readedBy).toHaveProperty('id');
+        expect(readedBy).toHaveProperty('user');
+        expect(readedBy).toHaveProperty('readedAt');
+        expect(readedBy.message).toHaveProperty('id');
+        done();
+      });
+
+      contactSocket.emit('markAsReaded', [message.id]);
     });
   });
 

@@ -5,6 +5,7 @@ import { MessageDto } from '@/modules/message/dto/message.dto';
 import { MessageService } from '@/modules/message/message.service';
 import { UserService } from '@/modules/user/user.service';
 import { getValidationPipe } from '@/validation/validation-pipe';
+import { HttpStatus } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -72,7 +73,7 @@ export class MessagesGateway {
     const sendedMessage = await this.messageService
       .postGroupMessage(userToken, message)
       .catch((err) => {
-        if (err.status === 403) {
+        if (err.status === HttpStatus.FORBIDDEN) {
           throw new WsException(err.response.message);
         }
         throw new WsException('Erro interno do sistema');
@@ -118,7 +119,7 @@ export class MessagesGateway {
     const returnMessage = await this.messageService
       .deleteMessage(userToken, messageId)
       .catch((err) => {
-        if (err.status === 403) {
+        if (err.status === HttpStatus.FORBIDDEN) {
           throw new WsException(err.response.message);
         }
         throw new WsException('Erro interno do sistema');
@@ -141,7 +142,7 @@ export class MessagesGateway {
     const deletedMessage = await this.messageService
       .deleteMessage(userToken, messageId)
       .catch((err) => {
-        if (err.status === 403) {
+        if (err.status === HttpStatus.FORBIDDEN) {
           throw new WsException(err.response.message);
         }
         throw new WsException('Erro interno do sistema');
@@ -155,5 +156,44 @@ export class MessagesGateway {
       event: 'deletedUserMessage',
       data: returnMessage
     };
+  }
+  @SubscribeMessage('markAsReaded')
+  async handleMarkMessageAsReaded(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    messagesId: string[]
+  ): Promise<void> {
+    const userToken = await this.authService.validate(
+      `${client.handshake.headers.authorization}`.replace('Bearer ', '')
+    );
+    const markedAsReaded = await this.messageService
+      .markMessagesAsReaded(messagesId, userToken)
+      .catch((err) => {
+        if (err.status === HttpStatus.FORBIDDEN) {
+          throw new WsException(err.response.message);
+        }
+        throw new WsException('Erro interno do sistema');
+      });
+    markedAsReaded.forEach((readedBy) => {
+      if (readedBy.message.userDestination) {
+        client.broadcast
+          .to(`user-${readedBy.message.origin.id}`)
+          .emit('markAsReaded', {
+            id: readedBy.id,
+            user: readedBy.user,
+            readedAt: readedBy.readedAt,
+            message: { id: readedBy.message.id }
+          });
+      } else {
+        client.broadcast
+          .to(`group-${readedBy.message.groupDestination.id}`)
+          .emit('markAsReaded', {
+            id: readedBy.id,
+            user: readedBy.user,
+            readedAt: readedBy.readedAt,
+            message: { id: readedBy.message.id }
+          });
+      }
+    });
   }
 }

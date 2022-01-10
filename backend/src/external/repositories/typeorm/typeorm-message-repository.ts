@@ -8,7 +8,8 @@ import { EntityRepository, Repository } from 'typeorm';
 @EntityRepository(Message)
 export class TypeormMessageRepository
   extends Repository<Message>
-  implements MessageRepository {
+  implements MessageRepository
+{
   async findUserActiveContacts(user: User): Promise<User[]> {
     const userMessages = await this.createQueryBuilder('msg')
       .where([
@@ -41,8 +42,8 @@ export class TypeormMessageRepository
     return users;
   }
   findContactLastMessage(user: User, contact: User): Promise<Message> {
-    return this.createQueryBuilder('msg')
-      .where([
+    return this.findOne({
+      where: [
         {
           origin: user,
           userDestination: contact
@@ -51,76 +52,48 @@ export class TypeormMessageRepository
           origin: contact,
           userDestination: user
         }
-      ])
-      .leftJoin('msg.origin', 'org')
-      .leftJoin('msg.userDestination', 'dst')
-      .select([
-        'msg.id',
-        'msg.message',
-        'msg.deleted',
-        'msg.createdAt',
-        'org.username',
-        'org.fullName',
-        'dst.username',
-        'dst.fullName'
-      ])
-      .orderBy({ 'msg.createdAt': 'DESC' })
-      .getOne();
+      ],
+      relations: ['origin', 'userDestination', 'readedBy', 'readedBy.user'],
+      order: { createdAt: 'DESC' }
+    });
   }
   findGroupMessages(group: Group, query: QueryFilter): Promise<Message[]> {
-    return this.createQueryBuilder('msg')
-      .where({ groupDestination: group })
-      .leftJoin('msg.origin', 'org')
-      .select([
-        'msg.id',
-        'msg.message',
-        'msg.deleted',
-        'msg.createdAt',
-        'org.username',
-        'org.fullName',
-    ])
-      .orderBy({ 'msg.createdAt': 'DESC' })
-      .take(query.take)
-      .skip(query.skip)
-      .getMany();
+    return this.find({
+      where: { groupDestination: group },
+      relations: ['origin', 'groupDestination', 'readedBy', 'readedBy.user'],
+      order: { createdAt: 'DESC' },
+      take: query.take,
+      skip: query.skip
+    });
   }
   findLastGroupMessage(group: Group): Promise<Message> {
-    return this.createQueryBuilder('msg')
-      .where({ groupDestination: group })
-      .leftJoin('msg.origin', 'org')
-      .select([
-        'msg.id',
-        'msg.message',
-        'msg.deleted',
-        'msg.createdAt',
-        'org.username',
-        'org.fullName',
-    ])
-      .orderBy({ 'msg.createdAt': 'DESC' })
-      .getOne();
+    return this.findOne({
+      where: { groupDestination: group },
+      relations: ['origin', 'groupDestination', 'readedBy', 'readedBy.user'],
+      order: { createdAt: 'DESC' }
+    });
   }
   async findContactMessages(
     user: User,
     contact: User,
     query: QueryFilter
   ): Promise<Message[]> {
-    return this.createQueryBuilder('msg')
-      .where([
-        { origin: user, userDestination: contact },
-        { origin: contact, userDestination: user }
-      ])
-      .leftJoin('msg.origin', 'org')
-      .select([
-        'msg.id',
-        'msg.message',
-        'msg.deleted',
-        'msg.createdAt',
-        'org.username',
-    ])
-      .orderBy({ 'msg.createdAt': 'DESC' })
-      .take(query.take)
-      .skip(query.skip)
-      .getMany();
+    return this.find({
+      where: [
+        {
+          origin: user,
+          userDestination: contact
+        },
+        {
+          origin: contact,
+          userDestination: user
+        }
+      ],
+      relations: ['origin', 'userDestination', 'readedBy', 'readedBy.user'],
+      order: { createdAt: 'DESC' },
+      take: query.take,
+      skip: query.skip
+    });
   }
   addGroupMessage(
     group: Group,
@@ -152,7 +125,13 @@ export class TypeormMessageRepository
   findOneByID(messageId: string): Promise<Message> {
     return this.findOne({
       where: { id: messageId },
-      relations: ['origin', 'userDestination', 'groupDestination']
+      relations: [
+        'origin',
+        'userDestination',
+        'groupDestination',
+        'readedBy',
+        'readedBy.user'
+      ]
     });
   }
 }

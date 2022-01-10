@@ -1,10 +1,17 @@
-import { TypeormMessageRepository } from '@/external/repositories/typeorm/typeorm-message-repository';
+import {
+  TypeormReadedByRepository,
+  TypeormMessageRepository
+} from '@/external/repositories/typeorm';
 import { QueryFilter } from '@/global-dto/query';
 import { Message } from '@/models/message.model';
 import { User } from '@/models/user.model';
+import { ReadedByRepository } from '@/ports';
 import { MessageRepository } from '@/ports/message-repository';
 import {
-  ForbiddenException, forwardRef, Inject, Injectable
+  ForbiddenException,
+  forwardRef,
+  Inject,
+  Injectable
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Socket } from 'socket.io';
@@ -18,10 +25,12 @@ export class MessageService {
   constructor(
     @InjectRepository(TypeormMessageRepository)
     private messageRepo: MessageRepository,
+    @InjectRepository(TypeormReadedByRepository)
+    private readedByRepo: ReadedByRepository,
     @Inject(forwardRef(() => GroupService))
     private groupService: GroupService,
     private userService: UserService
-  ) { }
+  ) {}
 
   async userLastMessages(user: JwsTokenDto) {
     const userBd = await this.userService.getByID(user.id);
@@ -114,6 +123,36 @@ export class MessageService {
     userGroups.forEach((group) => {
       socket.join(`group-${group.id}`);
     });
+  }
+
+  async markMessagesAsReaded(messagesId: string[], user: JwsTokenDto) {
+    const reader = await this.userService.getByID(user.id);
+    const getMessages = messagesId.map(
+      async (id) => await this.messageRepo.findOneByID(id)
+    );
+    const messages = await Promise.all(getMessages).then(async (messages) => {
+      for (const message of messages) {
+        if (message.userDestination) {
+          if (message.userDestination.id !== reader.id) {
+            throw new ForbiddenException({
+              message: 'Você não pode marcar esta mensagem como lida'
+            });
+          }
+        } else {
+          const userInGroup = await this.groupService.isUserInGroup(
+            user.id,
+            message.groupDestination.id
+          );
+          if (!userInGroup || isMyMessage(reader, message)) {
+            throw new ForbiddenException({
+              message: 'Você não pode marcar esta mensagem como lida'
+            });
+          }
+        }
+      }
+      return this.readedByRepo.markAsReaded(messages, reader);
+    });
+    return messages;
   }
 }
 

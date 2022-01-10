@@ -8,10 +8,14 @@ import { UserModule } from '../user/user.module';
 import { GroupMessageController } from './group-message.controller';
 import { MessageService } from './message.service';
 import { UserMessageController } from './user-message.controller';
+import { TypeormReadedByRepository } from '@/external/repositories/typeorm';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([TypeormMessageRepository]),
+    TypeOrmModule.forFeature([
+      TypeormMessageRepository,
+      TypeormReadedByRepository
+    ]),
     AuthModule,
     forwardRef(() => GroupModule),
     UserModule

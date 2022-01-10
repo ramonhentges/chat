@@ -4,10 +4,10 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn
 } from 'typeorm';
-import { Group } from './group.model';
-import { User } from './user.model';
+import { User, Group, ReadedBy } from '.';
 
 @Entity({ name: 'messages' })
 export class Message {
@@ -37,6 +37,9 @@ export class Message {
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
+
+  @OneToMany(() => ReadedBy, (readedBy) => readedBy.message)
+  readedBy: ReadedBy[];
 
   canDelete(): boolean {
     const endDate = new Date(this.createdAt);
