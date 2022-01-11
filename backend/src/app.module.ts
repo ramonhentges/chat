@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { UserModule } from './modules/user/user.module';
 import { GroupModule } from './modules/group/group.module';
 import { MessageModule } from './modules/message/message.module';
+import { ReadedBy } from './models';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { MessageModule } from './modules/message/message.module';
       username: process.env.TYPEORM_USERNAME,
       password: process.env.TYPEORM_PASSWORD,
       database: process.env.TYPEORM_DATABASE,
-      entities: [User, Group, Message]
+      entities: [User, Group, Message, ReadedBy]
     }),
     AuthModule,
     UserModule,
