@@ -7,7 +7,8 @@ import { EntityRepository, Repository } from 'typeorm';
 @EntityRepository(User)
 export class TypeormUserRepository
   extends Repository<User>
-  implements UserRepository {
+  implements UserRepository
+{
   async updateById(id: string, user: UpdateUserData): Promise<User> {
     await this.update({ id }, user);
     return this.findOne({ where: { id } });
@@ -36,7 +37,7 @@ export class TypeormUserRepository
   }
   findOneByIdWithGroups(id: string): Promise<User> {
     return this.findOne({
-      relations: ['groups'],
+      relations: ['groups', 'groups.users'],
       where: { id }
     });
   }
