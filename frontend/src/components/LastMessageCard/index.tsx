@@ -1,4 +1,3 @@
-import { Typography } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -7,24 +6,11 @@ import { useAuth } from '../../contexts/Auth';
 import { useConversation } from '../../contexts/Conversation';
 import { IMessage } from '../../interfaces/i-message';
 import { Group } from '../../models/group';
+import { ReadedInfo } from '../ReadedInfo';
 
 interface LastMessageCardProps {
   lastMessage: IMessage;
 }
-
-const getTime = (date: Date): string => {
-  const today = new Date();
-  if (
-    date.getDate() === today.getDate() &&
-    date.getMonth() === today.getMonth() &&
-    date.getFullYear() === today.getFullYear()
-  ) {
-    return `${date.getHours()}:${
-      date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes()
-    }`;
-  }
-  return `${date.toLocaleString()}`;
-};
 
 const LastMessageCard: React.FC<LastMessageCardProps> = ({ lastMessage }) => {
   const { user } = useAuth();
@@ -64,14 +50,11 @@ const LastMessageCard: React.FC<LastMessageCardProps> = ({ lastMessage }) => {
         title={contact.getConversationTitle()}
         subheader={user && lastMessage.getCardMessage(user)}
       />
-      <Typography
+      <ReadedInfo
+        message={lastMessage}
+        type="card"
         sx={{ marginTop: -3, paddingRight: 1 }}
-        align="right"
-        display="block"
-        variant="caption"
-      >
-        {getTime(lastMessage.createdAt)}
-      </Typography>
+      />
     </Card>
   );
 };

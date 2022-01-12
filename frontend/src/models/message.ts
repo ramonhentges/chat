@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import { MINUTES_TO_DELETE_MESSAGE } from '../constants/message';
+import { ReadedBy } from './readed-by.model';
 import { User } from './user';
 
 export class Message {
@@ -14,6 +15,9 @@ export class Message {
   id: string;
   message: string;
   deleted: boolean;
+
+  @Type(() => ReadedBy)
+  readedBy: ReadedBy[];
 
   @Type(() => Date)
   createdAt: Date;

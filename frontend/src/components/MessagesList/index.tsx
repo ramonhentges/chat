@@ -1,5 +1,5 @@
+import { Delete } from '@mui/icons-material';
 import {
-  Chip,
   CircularProgress,
   Grid,
   ListItemIcon,
@@ -7,24 +7,24 @@ import {
   MenuItem,
   Typography
 } from '@mui/material';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { useConversation } from '../../contexts/Conversation';
-import Message from '../Message';
 import Fade from '@mui/material/Fade';
-import { Delete } from '@mui/icons-material';
-import { useConfirm } from '../../contexts/ConfirmDialog';
-import { UserMessage } from '../../models/user-message';
-import { GroupMessage } from '../../models/group-message';
-import { useAlert } from '../../contexts/AlertSnackbar';
+import { useInjection } from 'inversify-react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   MINUTES_TO_DELETE_MESSAGE,
   SCROLL_POSITION_TO_TAKE_MORE_MESSAGES,
   SCROll_TO_BOTTOM_OFFSET
 } from '../../constants/message';
-import { sameDay } from '../../util/date';
-import { useInjection } from 'inversify-react';
+import { useAlert } from '../../contexts/AlertSnackbar';
+import { useConfirm } from '../../contexts/ConfirmDialog';
+import { useConversation } from '../../contexts/Conversation';
+import { GroupMessage } from '../../models/group-message';
+import { UserMessage } from '../../models/user-message';
 import { SocketService } from '../../ports/services/SocketService';
 import { TYPES } from '../../types/InversifyTypes';
+import { sameDay } from '../../util/date';
+import Message from '../Message';
+import { DateChip } from './DateChip';
 
 function canTakeMoreMessages(
   scrollTop: number,
@@ -43,9 +43,7 @@ function canScrollDown(scrollPosition: number, scrollHeight: number) {
 }
 
 export default function MessagesList() {
-  const _socketService = useInjection<SocketService>(
-    TYPES.SocketService
-  );
+  const _socketService = useInjection<SocketService>(TYPES.SocketService);
   const messagesGrid = useRef<HTMLDivElement>(null);
   const { confirm } = useConfirm();
   const {
@@ -163,15 +161,7 @@ export default function MessagesList() {
           {(idx === 0 ||
             (idx > 0 &&
               !sameDay(message.createdAt, messages[idx - 1].createdAt))) && (
-            <Chip
-              sx={{ alignSelf: 'center', mb: 2 }}
-              variant="outlined"
-              label={
-                <Typography variant="body2" style={{ whiteSpace: 'normal' }}>
-                  {message.createdAt.toLocaleDateString()}
-                </Typography>
-              }
-            />
+            <DateChip date={message.createdAt} />
           )}
           <Message message={message} openMenu={handleOpen} />
         </React.Fragment>

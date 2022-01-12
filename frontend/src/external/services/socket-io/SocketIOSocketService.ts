@@ -62,4 +62,8 @@ export class SocketIOSocketService implements SocketService {
   removeListner = (id: string) => {
     this.socket.off(id);
   };
+
+  markMessageAsReaded = (messageId: string[]) => {
+    this.socket.emit('markAsReaded', messageId);
+  };
 }

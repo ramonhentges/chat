@@ -16,4 +16,6 @@ export interface SocketService {
   connect: () => void;
 
   disconnect: () => void;
+
+  markMessageAsReaded: (messageId: string[]) => void;
 }

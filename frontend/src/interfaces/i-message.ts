@@ -1,4 +1,5 @@
 import { Group } from '../models/group';
+import { ReadedBy } from '../models/readed-by.model';
 import { User } from '../models/user';
 
 export interface IMessage {
@@ -11,4 +12,5 @@ export interface IMessage {
   createdAt: Date;
   deleted: boolean;
   origin: User;
+  readedBy: ReadedBy[];
 }

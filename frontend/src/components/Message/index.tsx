@@ -5,7 +5,7 @@ import { useConversation } from '../../contexts/Conversation';
 import { IMessage } from '../../interfaces/i-message';
 import { GroupMessage } from '../../models/group-message';
 import { getUserColor } from '../../stores/user-color.store';
-import { formatTime } from '../../util/date';
+import { ReadedInfo } from '../ReadedInfo';
 
 interface MessageProps {
   message: IMessage;
@@ -49,9 +49,7 @@ export default function Message({ message, openMenu }: MessageProps) {
             <Typography variant="body2" sx={{ whiteSpace: 'normal' }}>
               {message.getMessage()}
             </Typography>
-            <Typography align="right" display="block" variant="caption">
-              {formatTime(message.createdAt)}
-            </Typography>
+            <ReadedInfo message={message} type='conversation' />
           </>
         }
         sx={{ padding: 1, height: '100%' }}
