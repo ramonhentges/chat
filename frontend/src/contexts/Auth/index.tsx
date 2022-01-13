@@ -42,7 +42,6 @@ export const AuthProvider: React.FC = ({ children }) => {
       await getUserInfo();
       _socketService.setAuthorizationToken(response.data.accessToken);
       _socketService.addListner('disconnect', function () {
-        console.log('Disconnected');
         setTimeout(_socketService.connect, 5000);
       });
       _socketService.connect();
@@ -66,7 +65,6 @@ export const AuthProvider: React.FC = ({ children }) => {
       _socketService.connect();
       setUser(_plainClassConverter.plainToClass(User, response.data));
     } else if (response.status === HttpStatus.UNAUTHORIZED) {
-      console.log('aquii');
       signOut();
     }
     setLoading(false);

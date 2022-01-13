@@ -49,7 +49,6 @@ export function ChangeUserInfo(props: any) {
           refreshUserInfo();
           setActualPage(ActualPage.CHAT);
         } else if (status === HttpStatus.UNPROCESSABLE_ENTITY) {
-          console.log(data);
           setErrors(data);
           openAlert({
             severity: 'error',

@@ -52,8 +52,6 @@ function isReaded(
   readedBy: ReadedBy[]
 ): boolean {
   if (destination instanceof Group) {
-    console.log(destination);
-    
     if (readedBy.length >= destination.users.length - 1) {
       return true;
     }
