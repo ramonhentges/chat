@@ -175,24 +175,26 @@ export class MessagesGateway {
         throw new WsException('Erro interno do sistema');
       });
     markedAsReaded.forEach((readedBy) => {
+      const emitData = {
+        event: 'markAsReaded',
+        data: {
+          id: readedBy.id,
+          user: readedBy.user,
+          readedAt: readedBy.readedAt,
+          message: { id: readedBy.message.id }
+        }
+      };
+      this.server
+        .to(`user-${userToken.id}`)
+        .emit(emitData.event, emitData.data);
       if (readedBy.message.userDestination) {
         client.broadcast
           .to(`user-${readedBy.message.origin.id}`)
-          .emit('markAsReaded', {
-            id: readedBy.id,
-            user: readedBy.user,
-            readedAt: readedBy.readedAt,
-            message: { id: readedBy.message.id }
-          });
+          .emit(emitData.event, emitData.data);
       } else {
         client.broadcast
           .to(`group-${readedBy.message.groupDestination.id}`)
-          .emit('markAsReaded', {
-            id: readedBy.id,
-            user: readedBy.user,
-            readedAt: readedBy.readedAt,
-            message: { id: readedBy.message.id }
-          });
+          .emit(emitData.event, emitData.data);
       }
     });
   }
