@@ -1,5 +1,3 @@
 #!/bin/bash
 
-npm install
-
-npm run start
+yarn dev
