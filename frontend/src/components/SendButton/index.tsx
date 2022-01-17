@@ -8,6 +8,7 @@ import {
 import SendIcon from '@mui/icons-material/Send';
 import React, { useState } from 'react';
 import { useConversation } from '../../contexts/Conversation';
+import { SelectEmoji } from '../SelectEmoji';
 
 export default function SendButton() {
   const [message, setMessage] = useState('');
@@ -21,6 +22,10 @@ export default function SendButton() {
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
     let value = event.target.value;
     setMessage(value);
+  }
+
+  function addEmoji(emoji: string) {
+    setMessage((prev) => `${prev} ${emoji}`.trim());
   }
 
   return !!destination && !loading ? (
@@ -38,9 +43,12 @@ export default function SendButton() {
             id="outlined-adornment-amount"
             value={message}
             endAdornment={
-              <IconButton size="small" aria-label="search" type="submit">
-                <SendIcon />
-              </IconButton>
+              <>
+                <SelectEmoji addEmoji={addEmoji} />
+                <IconButton size="small" aria-label="search" type="submit">
+                  <SendIcon />
+                </IconButton>
+              </>
             }
           />
           <InputLabel variant="outlined" htmlFor="outlined-adornment-amount">
