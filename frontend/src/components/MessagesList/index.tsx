@@ -1,4 +1,4 @@
-import { Delete } from '@mui/icons-material';
+import { Delete, Info } from '@mui/icons-material';
 import {
   CircularProgress,
   Grid,
@@ -25,6 +25,7 @@ import { TYPES } from '../../types/InversifyTypes';
 import { sameDay } from '../../util/date';
 import Message from '../Message';
 import { DateChip } from './DateChip';
+import ShowMessageInfoModal from '../ShowMessageInfo';
 
 function canTakeMoreMessages(
   scrollTop: number,
@@ -45,6 +46,7 @@ function canScrollDown(scrollPosition: number, scrollHeight: number) {
 export default function MessagesList() {
   const _socketService = useInjection<SocketService>(TYPES.SocketService);
   const messagesGrid = useRef<HTMLDivElement>(null);
+  const messageInfoRef = useRef<any>();
   const { confirm } = useConfirm();
   const {
     messages,
@@ -148,41 +150,52 @@ export default function MessagesList() {
       <CircularProgress />
     </Grid>
   ) : (
-    <Grid
-      container
-      item
-      alignItems="flex-start"
-      direction="column"
-      sx={{ flexGrow: 2, overflowY: 'auto', flexWrap: 'nowrap', padding: 2 }}
-      ref={messagesGrid}
-    >
-      {messages.map((message, idx) => (
-        <React.Fragment key={message.id}>
-          {(idx === 0 ||
-            (idx > 0 &&
-              !sameDay(message.createdAt, messages[idx - 1].createdAt))) && (
-            <DateChip date={message.createdAt} />
-          )}
-          <Message message={message} openMenu={handleOpen} />
-        </React.Fragment>
-      ))}
-      <Menu
-        id="fade-menu"
-        anchorEl={anchorEl}
-        keepMounted
-        open={open}
-        onClose={handleClose}
-        TransitionComponent={Fade}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+    <>
+      <Grid
+        container
+        item
+        alignItems="flex-start"
+        direction="column"
+        sx={{ flexGrow: 2, overflowY: 'auto', flexWrap: 'nowrap', padding: 2 }}
+        ref={messagesGrid}
       >
-        <MenuItem onClick={deleteMessage}>
-          <ListItemIcon>
-            <Delete fontSize="small" />
-          </ListItemIcon>
-          <Typography variant="inherit">Deletar Mensagem</Typography>
-        </MenuItem>
-      </Menu>
-    </Grid>
+        {messages.map((message, idx) => (
+          <React.Fragment key={message.id}>
+            {(idx === 0 ||
+              (idx > 0 &&
+                !sameDay(message.createdAt, messages[idx - 1].createdAt))) && (
+              <DateChip date={message.createdAt} />
+            )}
+            <Message message={message} openMenu={handleOpen} />
+          </React.Fragment>
+        ))}
+        <Menu
+          id="fade-menu"
+          anchorEl={anchorEl}
+          keepMounted
+          open={open}
+          onClose={handleClose}
+          TransitionComponent={Fade}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <MenuItem
+            onClick={() => messageInfoRef.current!.handleOpen(selectedMessage)}
+          >
+            <ListItemIcon>
+              <Info fontSize="small" />
+            </ListItemIcon>
+            <Typography variant="inherit">Informações</Typography>
+          </MenuItem>
+          <MenuItem onClick={deleteMessage}>
+            <ListItemIcon>
+              <Delete fontSize="small" />
+            </ListItemIcon>
+            <Typography variant="inherit">Deletar Mensagem</Typography>
+          </MenuItem>
+        </Menu>
+      </Grid>
+      <ShowMessageInfoModal ref={messageInfoRef} />
+    </>
   );
 }
