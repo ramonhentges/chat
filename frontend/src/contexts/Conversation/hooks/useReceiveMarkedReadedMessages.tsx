@@ -36,7 +36,14 @@ export const useReceiveMarkedReadedMessages = (
 
 function markMessageAsReaded(message: IMessage, readedBy: ReadedBy) {
   if (message.id === readedBy.message.id) {
-    message.readedBy.push(readedBy);
+    if (!alreadyMarked(message.readedBy, readedBy)) {
+      message.readedBy.push(readedBy);
+    }
   }
   return message;
 }
+
+const alreadyMarked = (
+  readedByArray: ReadedBy[],
+  readedBy: ReadedBy
+): boolean => readedByArray.some((readed) => readed.id === readedBy.id);
