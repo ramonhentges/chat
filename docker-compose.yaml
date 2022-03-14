@@ -11,14 +11,13 @@ services:
       - 3000:3000
     volumes:
       - ./frontend:/home/node/app
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: prod.Dockerfile
-    entrypoint: .docker/prod.entrypoint.sh
-    container_name: chat-backend
-    ports:
-      - 3011:3011
-    volumes:
-      - ./backend:/home/node/app
+#  backend:
+#    build:
+#      context: ./backend
+#      dockerfile: prod.Dockerfile
+#    entrypoint: .docker/prod.entrypoint.sh
+#    container_name: chat-backend
+#    ports:
+#      - 3011:3011
+#    volumes:
+#      - ./backend:/home/node/app
