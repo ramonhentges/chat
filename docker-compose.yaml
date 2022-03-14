@@ -5,7 +5,7 @@ services:
     build:
       context: ./frontend
       dockerfile: prod.Dockerfile
-    entrypoint: .docker/entrypoint.sh
+    entrypoint: .docker/prod.entrypoint.sh
     container_name: chat-frontend
     ports:
       - 3000:3000
