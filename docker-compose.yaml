@@ -1,20 +1,24 @@
-version: "3"
+version: '3'
 
 services:
-    frontend:
-        build: ./frontend
-        entrypoint: .docker/entrypoint.sh
-        container_name: chat-frontend
-        ports:
-            - 3000:3000
-        volumes:
-            - ./frontend:/home/node/app
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: prod.Dockerfile
+    entrypoint: .docker/entrypoint.sh
+    container_name: chat-frontend
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/home/node/app
 
-    backend:
-        build: ./backend
-        entrypoint: .docker/entrypoint.sh
-        container_name: chat-backend
-        ports:
-            - 3011:3011
-        volumes:
-            - ./backend:/home/node/app
+  backend:
+    build:
+      context: ./backend
+      dockerfile: prod.Dockerfile
+    entrypoint: .docker/prod.entrypoint.sh
+    container_name: chat-backend
+    ports:
+      - 3011:3011
+    volumes:
+      - ./backend:/home/node/app
