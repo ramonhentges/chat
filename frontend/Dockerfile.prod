@@ -8,13 +8,13 @@ RUN mkdir -p /home/node/app
 
 WORKDIR /home/node/app
 
-COPY --chown=node package*.json ./
+#COPY --chown=node package*.json ./
 
-RUN yarn install
+#RUN yarn install
 
 COPY --chown=node ./ .
 
-RUN yarn build
+#RUN yarn build
 
 EXPOSE 5000
 
